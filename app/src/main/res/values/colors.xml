@@ -7,4 +7,13 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <!-- Itadakimasu's color theme -->
+    <color name="primaryColor">#ff7043</color>
+    <color name="primaryLightColor">#ffa270</color>
+    <color name="primaryDarkColor">#c63f17</color>
+    <color name="secondaryColor">#e53935</color>
+    <color name="secondaryLightColor">#ff6f60</color>
+    <color name="secondaryDarkColor">#ab000d</color>
+    <color name="primaryTextColor">#000000</color>
+    <color name="secondaryTextColor">#000000</color>
 </resources>

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "254520407214",
+    "project_id": "itadakimasu-70139",
+    "storage_bucket": "itadakimasu-70139.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:254520407214:android:33c3a03a3b871fee31693f",
+        "android_client_info": {
+          "package_name": "app.itadakimasu"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "254520407214-gc14o6vs9lk2e3ebjt17kiio2t61vo06.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQP18ELmifQ_Ztbc5jlNAOJFqUrUDS34I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "254520407214-gc14o6vs9lk2e3ebjt17kiio2t61vo06.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
