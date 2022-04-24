@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Itadakimasu</string>
+    <string name="title_home">Home</string>
+    <string name="title_new_recipe">New Recipe</string>
+    <string name="title_favourites">My Favourites</string>
+    <string name="title_profile">My Profile</string>
+</resources>
