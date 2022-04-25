@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import com.google.firebase.firestore.Exclude;
 
 public class User implements Parcelable {
+    @Exclude
     private String uuid;
     private String username;
     private String photoUri;
@@ -14,6 +15,12 @@ public class User implements Parcelable {
         this.uuid = uuid;
         this.username = username;
         this.photoUri = photoUri;
+    }
+
+    public User(String uuid, String username) {
+        this.uuid = uuid;
+        this.username = username;
+        this.photoUri = "";
     }
 
     public String getUuid() {
@@ -41,8 +48,6 @@ public class User implements Parcelable {
     }
 
 
-    // AUTO-GENERATED PARCELABLE //
-
     @Override
     public int describeContents() {
         return 0;
@@ -67,7 +72,7 @@ public class User implements Parcelable {
         this.photoUri = in.readString();
     }
 
-    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
+    public static final Creator<User> CREATOR = new Creator<User>() {
         @Override
         public User createFromParcel(Parcel source) {
             return new User(source);

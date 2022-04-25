@@ -1,15 +1,22 @@
 package app.itadakimasu.data.repository;
 
 
+import android.app.Application;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+
+import java.util.Objects;
+import java.util.concurrent.Executor;
 
 import app.itadakimasu.data.Result;
 import app.itadakimasu.data.model.User;
@@ -23,26 +30,28 @@ public class AppAuthRepository {
 
     public AppAuthRepository() {
         this.firebaseAuth = FirebaseAuth.getInstance();
+
     }
-
-
-
 
     public void login(String username, String password) {
 
     }
 
-    public MutableLiveData<Result<?>> register(String email, String username, String password) {
+    public MutableLiveData<Result<?>> register(String email, String username,String password) {
         MutableLiveData<Result<?>> result = new MutableLiveData<>();
-        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    FirebaseUser user = firebaseAuth.getCurrentUser();
-                    updateUsername(user, username);
-                    result.setValue(new Result.Success<FirebaseUser>(user));
 
-                } else {
-                    result.setValue(new Result.Error(task.getException()));
+        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+                if (firebaseUser != null) {
+                    updateDisplayName(username);
+                    User user = new User(firebaseUser.getUid(), username);
+                    result.setValue(new Result.Success<User>(user));
                 }
+
+            } else {
+                result.setValue(new Result.Error(task.getException()));
+            }
         });
         return result;
     }
@@ -59,9 +68,11 @@ public class AppAuthRepository {
         return firebaseAuth.getCurrentUser();
     }
 
-    private void updateUsername(FirebaseUser user, String username) {
-        UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest.Builder().setDisplayName(username)
+    public void updateDisplayName(String username) {
+        UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest
+                .Builder()
+                .setDisplayName(username)
                 .build();
-        user.updateProfile(profileUpdate);
+        Objects.requireNonNull(firebaseAuth.getCurrentUser()).updateProfile(profileUpdate);
     }
 }

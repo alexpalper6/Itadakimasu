@@ -54,4 +54,24 @@ class RegisterFormState {
     boolean isDataValid() {
         return isDataValid;
     }
+
+    public void setEmailError(@Nullable Integer emailError) {
+        this.emailError = emailError;
+    }
+
+    public void setUsernameError(@Nullable Integer usernameError) {
+        this.usernameError = usernameError;
+    }
+
+    public void setPasswordError(@Nullable Integer passwordError) {
+        this.passwordError = passwordError;
+    }
+
+    public void setRepeatedPasswordError(@Nullable Integer repeatedPasswordError) {
+        this.repeatedPasswordError = repeatedPasswordError;
+    }
+
+    public void setDataValid(boolean dataValid) {
+        this.isDataValid = dataValid;
+    }
 }

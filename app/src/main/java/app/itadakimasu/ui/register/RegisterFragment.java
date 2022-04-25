@@ -18,8 +18,11 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import app.itadakimasu.data.Result;
 import app.itadakimasu.databinding.FragmentRegisterBinding;
 
 
@@ -32,6 +35,7 @@ public class RegisterFragment extends Fragment {
     private EditText etNewPassword;
     private EditText etRepeatPassword;
     private Button btCreateAccount;
+    private ProgressBar pbRegProgress;
 
     public static RegisterFragment newInstance() {
         return new RegisterFragment();
@@ -49,13 +53,26 @@ public class RegisterFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         registerViewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
 
-        etNewEmail = binding.etNewEmail;
-        etNewUsername = binding.etNewUsername;
-        etNewPassword = binding.etNewPassword;
-        etRepeatPassword = binding.etRepeatPassword;
-        btCreateAccount = binding.btCreateAccount;
+        setBindingReferences();
 
         registerViewModel.getRegisterFormState().observe(getViewLifecycleOwner(), registerFormState -> checkFormState(registerFormState));
+        registerViewModel.getRegisterResult().observe(getViewLifecycleOwner(), registerResult -> {
+            if (registerResult == null) {
+                return;
+            }
+            pbRegProgress.setVisibility(View.GONE);
+            if (registerResult.getUser() != null) {
+                //TODO: Send user to add photo
+            }
+            if (registerResult.getError() != null) {
+                if (getContext() != null && getContext().getApplicationContext() != null) {
+                    Toast.makeText(
+                            getContext().getApplicationContext(),
+                            registerResult.getError(),
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        });
 
         TextWatcher afterTextChangedListener = new TextWatcher() {
             @Override
@@ -75,19 +92,43 @@ public class RegisterFragment extends Fragment {
             }
         };
         setTextListeners(etNewEmail, etNewUsername, etNewPassword, etRepeatPassword, afterTextChangedListener);
+
         etRepeatPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    //TODO: Register from viewModel
+                    register();
                 }
                 return false;
             }
         });
 
+        btCreateAccount.setOnClickListener(v -> register());
+
     }
 
-    private void setTextListeners(EditText etNewEmail, EditText etNewUsername, EditText etNewPassword, EditText etRepeatPassword, TextWatcher afterTextChangedListener) {
+    private void setBindingReferences() {
+        etNewEmail = binding.etNewEmail;
+        etNewUsername = binding.etNewUsername;
+        etNewPassword = binding.etNewPassword;
+        etRepeatPassword = binding.etRepeatPassword;
+        btCreateAccount = binding.btCreateAccount;
+        pbRegProgress = binding.pbRegisterProgress;
+    }
+
+    private void register() {
+        registerViewModel.register(etNewEmail.getText().toString(), etNewUsername.getText().toString(),
+                etNewPassword.getText().toString()).observe(getViewLifecycleOwner(), new Observer<Result>() {
+            @Override
+            public void onChanged(Result result) {
+                registerViewModel.registerResultChanged(result);
+            }
+        });
+        pbRegProgress.setVisibility(View.VISIBLE);
+    }
+
+    private void setTextListeners(EditText etNewEmail, EditText etNewUsername, EditText etNewPassword,
+                                  EditText etRepeatPassword, TextWatcher afterTextChangedListener) {
         etNewEmail.addTextChangedListener(afterTextChangedListener);
         etNewUsername.addTextChangedListener(afterTextChangedListener);
         etNewPassword.addTextChangedListener(afterTextChangedListener);
