@@ -1,17 +1,17 @@
-package app.itadakimasu.data;
+package app.itadakimasu.data.repository;
+
+
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserInfo;
 import com.google.firebase.auth.UserProfileChangeRequest;
 
-import app.itadakimasu.R;
+import app.itadakimasu.data.Result;
 import app.itadakimasu.data.model.User;
 
 /**
@@ -26,17 +26,7 @@ public class AppAuthRepository {
     }
 
 
-    public boolean isLoggedIn() {
-        return false;
-    }
 
-    public void logout() {
-        firebaseAuth.signOut();
-    }
-
-    private void setLoggedInUser() {
-
-    }
 
     public void login(String username, String password) {
 
@@ -47,15 +37,26 @@ public class AppAuthRepository {
         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     FirebaseUser user = firebaseAuth.getCurrentUser();
-                    if (user != null) {
-                        updateUsername(user, username);
-                        result.setValue(new Result.Success<FirebaseUser>(user));
-                    }
+                    updateUsername(user, username);
+                    result.setValue(new Result.Success<FirebaseUser>(user));
+
                 } else {
                     result.setValue(new Result.Error(task.getException()));
                 }
         });
         return result;
+    }
+
+    public void logout() {
+        firebaseAuth.signOut();
+    }
+
+    public boolean isSignedIn() {
+        return firebaseAuth.getCurrentUser() != null;
+    }
+
+    public FirebaseUser getCurrentUser() {
+        return firebaseAuth.getCurrentUser();
     }
 
     private void updateUsername(FirebaseUser user, String username) {

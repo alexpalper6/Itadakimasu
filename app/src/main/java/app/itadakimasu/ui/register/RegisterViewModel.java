@@ -10,7 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import app.itadakimasu.R;
-import app.itadakimasu.data.AppAuthRepository;
+import app.itadakimasu.data.repository.AppAuthRepository;
 
 public class RegisterViewModel extends ViewModel {
     private AppAuthRepository authRepository;

@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import app.itadakimasu.data.AppAuthRepository;
+import app.itadakimasu.data.repository.AppAuthRepository;
 
 public class LoginViewModel extends ViewModel {
 

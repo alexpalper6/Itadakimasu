@@ -6,14 +6,14 @@
     <string name="title_profile">My Profile</string>
     <string name="title_login">Login</string>
     <string name="title_register">Register</string>
-    <!-- Strings related to login -->
+    <!-- Strings related to login and register -->
     <string name="prompt_email">Email</string>
     <string name="prompt_username">Username</string>
     <string name="prompt_password">Password</string>
     <string name="prompt_repeat_password">Repeat password</string>
     <string name="action_register">Register</string>
     <string name="action_sign_in_short">Sign in</string>
-    <string name="welcome">"Welcome!"</string>
+    <string name="welcome">"Welcome, %1$s!"</string>
     <string name="invalid_email">Not a valid email</string>
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be greater than 8 characters and must contain numbers</string>
@@ -22,4 +22,9 @@
     <string name="action_sign_up">Are you new? Sign up!</string>
     <string name="create_account">Create Account</string>
     <string name="app_logo">App logo</string>
+    <string name="no_thanks">No thanks</string>
+    <string name="done">Done!</string>
+    <string name="prompt_add_photo">Finish setting up your profile by adding a photo!</string>
+
+
 </resources>

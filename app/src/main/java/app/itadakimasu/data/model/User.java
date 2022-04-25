@@ -3,6 +3,8 @@ package app.itadakimasu.data.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.firebase.firestore.Exclude;
+
 public class User implements Parcelable {
     private String uuid;
     private String username;

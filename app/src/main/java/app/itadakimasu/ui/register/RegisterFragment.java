@@ -20,12 +20,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import app.itadakimasu.databinding.RegisterFragmentBinding;
+import app.itadakimasu.databinding.FragmentRegisterBinding;
+
 
 public class RegisterFragment extends Fragment {
 
     private RegisterViewModel registerViewModel;
-    private RegisterFragmentBinding binding;
+    private FragmentRegisterBinding binding;
     private EditText etNewEmail;
     private EditText etNewUsername;
     private EditText etNewPassword;
@@ -39,7 +40,7 @@ public class RegisterFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        binding = RegisterFragmentBinding.inflate(inflater, container, false);
+        binding = FragmentRegisterBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
