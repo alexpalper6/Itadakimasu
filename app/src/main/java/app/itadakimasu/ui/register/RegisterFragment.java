@@ -25,21 +25,22 @@ import android.widget.Toast;
 import app.itadakimasu.data.Result;
 import app.itadakimasu.databinding.FragmentRegisterBinding;
 
-
+/**
+ * Fragment that let the user interact with the system in order to register.
+ */
 public class RegisterFragment extends Fragment {
-
+    // ViewModel that contains the UI States that this class will use to show the feedback to the user.
     private RegisterViewModel registerViewModel;
+    // Class that contains the reference of every view of fragment_register layout.
     private FragmentRegisterBinding binding;
+
+    // References of the views, TODO Maybe this will be deleted
     private EditText etNewEmail;
     private EditText etNewUsername;
     private EditText etNewPassword;
     private EditText etRepeatPassword;
     private Button btCreateAccount;
     private ProgressBar pbRegProgress;
-
-    public static RegisterFragment newInstance() {
-        return new RegisterFragment();
-    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -55,7 +56,14 @@ public class RegisterFragment extends Fragment {
 
         setBindingReferences();
 
+        // Observes for data changes in the UI State's data input validation.
+        // Then it will check the UI state for the error messages, which will be assigned to their
+        // respective EditTexts or it will check if the data is valid.
         registerViewModel.getRegisterFormState().observe(getViewLifecycleOwner(), registerFormState -> checkFormState(registerFormState));
+
+        // Observes for the data changes that is established by the registration.
+        // If the result is successful, then the user will be sent to the next fragment.
+        // If it's not, then the error message will prompt.
         registerViewModel.getRegisterResult().observe(getViewLifecycleOwner(), registerResult -> {
             if (registerResult == null) {
                 return;
@@ -74,6 +82,7 @@ public class RegisterFragment extends Fragment {
             }
         });
 
+        // Instantiate a TextWatcher that will update the state of  the RegisterFormState from the ViewModel.
         TextWatcher afterTextChangedListener = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -85,14 +94,23 @@ public class RegisterFragment extends Fragment {
                 // Nothing to do here
             }
 
+            /**
+             * When a text changes on an EditTet, it will call the method registerDataChanged from the
+             * ViewModel, updating the form state and checking if the every input is valid or not.
+             * @param s - the editable text.
+             */
             @Override
             public void afterTextChanged(Editable s) {
                 registerViewModel.registerDataChanged(etNewEmail.getText().toString(), etNewUsername.getText().toString(),
                         etNewPassword.getText().toString(), etRepeatPassword.getText().toString());
             }
         };
-        setTextListeners(etNewEmail, etNewUsername, etNewPassword, etRepeatPassword, afterTextChangedListener);
 
+        // Set the TextWatcher to each EditText.
+        setTextListeners(afterTextChangedListener);
+
+        // The last EditText has an imeOption called actionDone, that option is called when pressed enter.
+        // This method will listen for this option, when it's activated, it'll use the register method.
         etRepeatPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -103,10 +121,14 @@ public class RegisterFragment extends Fragment {
             }
         });
 
+        // Establish a click listener on create button account, when clicked, register method will be called.
         btCreateAccount.setOnClickListener(v -> register());
 
     }
 
+    /**
+     * Set the reference variables with their respective views.
+     */
     private void setBindingReferences() {
         etNewEmail = binding.etNewEmail;
         etNewUsername = binding.etNewUsername;
@@ -116,6 +138,11 @@ public class RegisterFragment extends Fragment {
         pbRegProgress = binding.pbRegisterProgress;
     }
 
+    /**
+     * Perform the registry with ViewModel's method, using the input fields as the data used.
+     * It will observe for the returned result. When it's returned, it will notify that the
+     * registerResult has changed, using registerResultChanged from the ViewModel.
+     */
     private void register() {
         registerViewModel.register(etNewEmail.getText().toString(), etNewUsername.getText().toString(),
                 etNewPassword.getText().toString()).observe(getViewLifecycleOwner(), new Observer<Result>() {
@@ -127,14 +154,23 @@ public class RegisterFragment extends Fragment {
         pbRegProgress.setVisibility(View.VISIBLE);
     }
 
-    private void setTextListeners(EditText etNewEmail, EditText etNewUsername, EditText etNewPassword,
-                                  EditText etRepeatPassword, TextWatcher afterTextChangedListener) {
+    /**
+     * Establish each EditText with the TextWatcher.
+     * @param afterTextChangedListener - the TextWatcher that will notify and update the RegisterFormState
+     *                                 from the ViewModel.
+     */
+    private void setTextListeners(TextWatcher afterTextChangedListener) {
         etNewEmail.addTextChangedListener(afterTextChangedListener);
         etNewUsername.addTextChangedListener(afterTextChangedListener);
         etNewPassword.addTextChangedListener(afterTextChangedListener);
         etRepeatPassword.addTextChangedListener(afterTextChangedListener);
     }
 
+    /**
+     *
+     * @param registerFormState - the UI State that contains the error message or the data validation
+     *                          boolean.
+     */
     private void checkFormState(RegisterFormState registerFormState) {
         if (registerFormState == null) {
             return;
