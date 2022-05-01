@@ -2,6 +2,7 @@ package app.itadakimasu.ui.register.addPhoto;
 
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -23,7 +24,7 @@ public class AddPhotoFragment extends Fragment {
 
     private AddPhotoViewModel addPhotoViewModel;
     private FragmentAddPhotoBinding binding;
-
+    private ActivityResultLauncher<String> requestPermission;
 
     public static AddPhotoFragment newInstance() {
         return new AddPhotoFragment();
