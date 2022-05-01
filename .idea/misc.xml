@@ -7,7 +7,7 @@
         <entry key="app/src/main/res/drawable/ic_itadakimasu_logo.xml" value="0.2205" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.203125" />
         <entry key="app/src/main/res/layout/add_photo_fragment.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/fragment_add_photo.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_add_photo.xml" value="0.5" />
         <entry key="app/src/main/res/layout/fragment_favourites.xml" value="0.203125" />
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.203125" />
         <entry key="app/src/main/res/layout/fragment_login.xml" value="0.33" />

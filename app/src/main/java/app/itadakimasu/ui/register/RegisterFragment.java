@@ -8,6 +8,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -27,8 +28,10 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
+import app.itadakimasu.R;
 import app.itadakimasu.data.Result;
 import app.itadakimasu.databinding.FragmentRegisterBinding;
+import app.itadakimasu.ui.register.addPhoto.AddPhotoFragment;
 
 /**
  * Fragment that let the user interact with the system in order to register.
@@ -78,17 +81,23 @@ public class RegisterFragment extends Fragment {
             if (registerResult.getUsernameError() != null) {
                 etNewUsername.setText("");
                 if (getContext() != null && getContext().getApplicationContext() != null) {
-                    Snackbar.make(getActivity().findViewById(android.R.id.content), registerResult.getUsernameError(), BaseTransientBottomBar.LENGTH_LONG).show();
+                    Snackbar.make(getActivity().findViewById(android.R.id.content),
+                            registerResult.getUsernameError(),
+                            BaseTransientBottomBar.LENGTH_LONG).show();
                 }
             }
 
             if (registerResult.getUser() != null) {
-                //TODO: Send user to add photo
+                Bundle bundleArgs = new Bundle();
+                bundleArgs.putString(AddPhotoFragment.USERNAME_DISPLAY, registerResult.getUser().getUsername());
+                NavHostFragment.findNavController(this).navigate(R.id.action_navigation_register_to_addPhotoFragment, bundleArgs);
             }
 
             if (registerResult.getError() != null) {
                 if (getContext() != null && getContext().getApplicationContext() != null) {
-                    Snackbar.make(getActivity().findViewById(android.R.id.content), registerResult.getError(), BaseTransientBottomBar.LENGTH_LONG).show();
+                    Snackbar.make(getActivity().findViewById(android.R.id.content),
+                            registerResult.getError(),
+                            BaseTransientBottomBar.LENGTH_LONG).show();
                     /*Toast.makeText(
                             getContext().getApplicationContext(),
                             registerResult.getError(),
