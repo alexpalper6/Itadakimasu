@@ -180,7 +180,7 @@ public class RegisterViewModel extends ViewModel {
      * @return true if password is valid; false is is not valid.
      */
     private boolean isPasswordValid(String password) {
-        Pattern pattern = Pattern.compile(".*[a-zA-Z].*[0-9].*");
+        Pattern pattern = Pattern.compile(".*[a-zA-Z0-9].*");
         Matcher matcher = pattern.matcher(password);
 
         return password.length() > 8 && matcher.matches();

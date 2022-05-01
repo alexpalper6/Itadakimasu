@@ -56,7 +56,11 @@ public class UsersRepository {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    usernameResult.setValue(new Result.Success<Boolean>(true));
+                    if (task.getResult().isEmpty()) {
+                        usernameResult.setValue(new Result.Success<Boolean>(false));
+                    } else {
+                        usernameResult.setValue(new Result.Success<Boolean>(true));
+                    }
 
                 } else {
                     boolean isUsernameNotFound = ((FirebaseFirestoreException)task.getException()).getCode() == FirebaseFirestoreException.Code.NOT_FOUND;

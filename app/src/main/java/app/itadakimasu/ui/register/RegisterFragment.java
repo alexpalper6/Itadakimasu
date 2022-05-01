@@ -22,6 +22,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
@@ -76,10 +78,7 @@ public class RegisterFragment extends Fragment {
             if (registerResult.getUsernameError() != null) {
                 etNewUsername.setText("");
                 if (getContext() != null && getContext().getApplicationContext() != null) {
-                    Toast.makeText(
-                            getContext().getApplicationContext(),
-                            registerResult.getUsernameError(),
-                            Toast.LENGTH_LONG).show();
+                    Snackbar.make(getActivity().findViewById(android.R.id.content), registerResult.getUsernameError(), BaseTransientBottomBar.LENGTH_LONG).show();
                 }
             }
 
@@ -89,10 +88,11 @@ public class RegisterFragment extends Fragment {
 
             if (registerResult.getError() != null) {
                 if (getContext() != null && getContext().getApplicationContext() != null) {
-                    Toast.makeText(
+                    Snackbar.make(getActivity().findViewById(android.R.id.content), registerResult.getError(), BaseTransientBottomBar.LENGTH_LONG).show();
+                    /*Toast.makeText(
                             getContext().getApplicationContext(),
                             registerResult.getError(),
-                            Toast.LENGTH_LONG).show();
+                            Toast.LENGTH_LONG).show(); */
                 }
                 btCreateAccount.setEnabled(true);
             }
