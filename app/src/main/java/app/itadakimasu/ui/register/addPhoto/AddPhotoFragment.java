@@ -24,7 +24,7 @@ public class AddPhotoFragment extends Fragment {
 
     private AddPhotoViewModel addPhotoViewModel;
     private FragmentAddPhotoBinding binding;
-    private ActivityResultLauncher<String> requestPermission;
+    private ActivityResultLauncher<String> requestPermissionMedia;
 
     public static AddPhotoFragment newInstance() {
         return new AddPhotoFragment();
