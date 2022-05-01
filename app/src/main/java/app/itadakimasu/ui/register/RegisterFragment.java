@@ -22,6 +22,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.FirebaseException;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+
 import app.itadakimasu.data.Result;
 import app.itadakimasu.databinding.FragmentRegisterBinding;
 
@@ -69,9 +72,21 @@ public class RegisterFragment extends Fragment {
                 return;
             }
             pbRegProgress.setVisibility(View.GONE);
+
+            if (registerResult.getUsernameError() != null) {
+                etNewUsername.setText("");
+                if (getContext() != null && getContext().getApplicationContext() != null) {
+                    Toast.makeText(
+                            getContext().getApplicationContext(),
+                            registerResult.getUsernameError(),
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+
             if (registerResult.getUser() != null) {
                 //TODO: Send user to add photo
             }
+
             if (registerResult.getError() != null) {
                 if (getContext() != null && getContext().getApplicationContext() != null) {
                     Toast.makeText(
@@ -79,6 +94,7 @@ public class RegisterFragment extends Fragment {
                             registerResult.getError(),
                             Toast.LENGTH_LONG).show();
                 }
+                btCreateAccount.setEnabled(true);
             }
         });
 
@@ -115,14 +131,14 @@ public class RegisterFragment extends Fragment {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    register();
+                    createAccount();
                 }
                 return false;
             }
         });
 
         // Establish a click listener on create button account, when clicked, register method will be called.
-        btCreateAccount.setOnClickListener(v -> register());
+        btCreateAccount.setOnClickListener(v -> createAccount());
 
     }
 
@@ -139,6 +155,32 @@ public class RegisterFragment extends Fragment {
     }
 
     /**
+     * The user will try to create the account, the username will be search on the database, if it doesn't exist,
+     * then the registry will be performed.
+     * If the user exists, it update the resultFormState with the username error, telling the user that the username
+     * is already chosen, or another error that could have happened.
+     */
+    private void createAccount() {
+        registerViewModel.isUsernameChosen(etNewUsername.getText().toString()).observe(getViewLifecycleOwner(), new Observer<Result<?>>() {
+            @Override
+            public void onChanged(Result<?> result) {
+                if (result instanceof Result.Success) {
+                    boolean usernameIsFound = ((Result.Success<Boolean>) result).getData();
+                    if (!usernameIsFound) {
+                        register();
+                        return;
+                    }
+                }
+                registerViewModel.setUsernameResultError(result);
+            }
+        });
+        // The account creation button will be disabled, we don't want the user to perform the same
+        // registry multiple times
+        btCreateAccount.setEnabled(false);
+        pbRegProgress.setVisibility(View.VISIBLE);
+    }
+
+    /**
      * Perform the registry with ViewModel's method, using the input fields as the data used.
      * It will observe for the returned result. When it's returned, it will notify that the
      * registerResult has changed, using registerResultChanged from the ViewModel.
@@ -151,7 +193,7 @@ public class RegisterFragment extends Fragment {
                 registerViewModel.registerResultChanged(result);
             }
         });
-        pbRegProgress.setVisibility(View.VISIBLE);
+
     }
 
     /**

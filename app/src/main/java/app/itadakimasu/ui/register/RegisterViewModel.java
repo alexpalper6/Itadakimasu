@@ -6,9 +6,11 @@ import android.util.Patterns;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
+import com.google.firebase.firestore.FirebaseFirestoreException;
+
+import java.util.Observer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,7 +64,7 @@ public class RegisterViewModel extends ViewModel {
     LiveData<RegisterResult> getRegisterResult() { return registerResult; }
 
     /**
-     * This method should be used on observables data.
+     * This method should be used on observable data.
      *
      * The result that this method gets will check if it's an instance of Result.Success, in this case
      * it would add the user's data to the database and update the registerResult.
@@ -76,6 +78,21 @@ public class RegisterViewModel extends ViewModel {
             User user = ((Result.Success<User>) result).getData();
             usersRepository.addUserToDatabase(user);
             registerResult.setValue(new RegisterResult(user));
+        } else {
+            registerResult.setValue(new RegisterResult(((Result.Error) result).getError().getMessage()));
+        }
+    }
+
+    /**
+     * If the username result error is sucessfull it means that the error is due that the username is found
+     * Instead, is it's a Result.Error, another error happened
+     * @param result - the result obtained in order to tell if the user is already chosen or if
+     *               another error happened
+     */
+    public void setUsernameResultError(Result<?> result) {
+        if (result instanceof Result.Success) {
+            registerFormState.setValue(new RegisterFormState(null, R.string.username_chosen, null, null));
+            registerResult.setValue(new RegisterResult(R.string.username_chosen));
         } else {
             registerResult.setValue(new RegisterResult(((Result.Error) result).getError().getMessage()));
         }
@@ -131,6 +148,15 @@ public class RegisterViewModel extends ViewModel {
     }
 
     /**
+     *
+     * @param username - the username that the user inputs
+     * @return a result, a boolean true if username exists, exception if is not found
+     */
+    public LiveData<Result<?>> isUsernameChosen(String username) {
+        return usersRepository.isUsernameChosen(username);
+    }
+
+    /**
      * Checks if the email address written by the user is valid.
      * @param email input introduced by user.
      * @return true if email matches an email pattern; false if it doesn't match.
@@ -169,5 +195,6 @@ public class RegisterViewModel extends ViewModel {
     private boolean isRepeatedPasswordValid(String password, String repeatedPassword) {
         return !repeatedPassword.trim().isEmpty() && repeatedPassword.equals(password);
     }
+
 
 }

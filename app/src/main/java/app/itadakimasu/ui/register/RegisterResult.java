@@ -12,6 +12,8 @@ public class RegisterResult {
     @Nullable
     private User user;
     @Nullable
+    private Integer usernameError;
+    @Nullable
     private String error;
 
     /**
@@ -20,6 +22,14 @@ public class RegisterResult {
      */
     public RegisterResult(@Nullable User user) {
         this.user = user;
+    }
+
+    /**
+     * Consturctor used to store the username error String Resource
+     * @param usernameError
+     */
+    public RegisterResult(@Nullable Integer usernameError) {
+        this.usernameError = usernameError;
     }
 
     /**
@@ -46,5 +56,10 @@ public class RegisterResult {
     @Nullable
     public String getError() {
         return error;
+    }
+
+    @Nullable
+    public Integer getUsernameError() {
+        return usernameError;
     }
 }

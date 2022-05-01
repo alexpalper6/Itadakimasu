@@ -16,6 +16,7 @@
     <string name="welcome">"Welcome, %1$s!"</string>
     <string name="invalid_email">Not a valid email</string>
     <string name="invalid_username">Not a valid username</string>
+    <string name="username_chosen">The username is already chosen!</string>
     <string name="invalid_password">Password must be greater than 8 characters and must contain numbers</string>
     <string name="invalid_repeated_apssword">The password does not match</string>
     <string name="login_failed">"Login failed"</string>
