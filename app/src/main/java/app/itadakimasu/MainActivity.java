@@ -8,6 +8,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
@@ -18,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import app.itadakimasu.databinding.ActivityMainBinding;
+import app.itadakimasu.ui.SelectMediaDialogFragment;
 
 public class MainActivity extends AppCompatActivity {
 

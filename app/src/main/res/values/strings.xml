@@ -26,6 +26,13 @@
     <string name="no_thanks">No thanks</string>
     <string name="done">Done!</string>
     <string name="prompt_add_photo">Finish setting up your profile by adding a photo!</string>
+    <string name="select_media_method">Set the photo by</string>
+    <string name="cancel">Cancel</string>
+
+    <string-array name="media_selectors">
+        <item>Camera</item>
+        <item>Gallery</item>
+    </string-array>
 
 
 </resources>
