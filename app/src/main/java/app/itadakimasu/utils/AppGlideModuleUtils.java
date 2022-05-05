@@ -13,6 +13,10 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.InputStream;
 
+/**
+ * Class that lets retrieve the reference of an image from the Storage and show it on the
+ * ImageView with Glide.
+ */
 @GlideModule
 public class AppGlideModuleUtils extends AppGlideModule {
     @Override
