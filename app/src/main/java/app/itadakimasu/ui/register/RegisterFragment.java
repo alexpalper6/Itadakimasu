@@ -81,7 +81,7 @@ public class RegisterFragment extends Fragment {
             if (registerResult.getUsernameError() != null) {
                 etNewUsername.setText("");
                 if (getContext() != null && getContext().getApplicationContext() != null) {
-                    Snackbar.make(getActivity().findViewById(android.R.id.content),
+                    Snackbar.make(requireActivity().findViewById(android.R.id.content),
                             registerResult.getUsernameError(),
                             BaseTransientBottomBar.LENGTH_LONG).show();
                 }
@@ -90,18 +90,14 @@ public class RegisterFragment extends Fragment {
             if (registerResult.getUser() != null) {
                 Bundle bundleArgs = new Bundle();
                 bundleArgs.putString(AddPhotoFragment.USERNAME_DISPLAY, registerResult.getUser().getUsername());
-                NavHostFragment.findNavController(this).navigate(R.id.action_navigation_register_to_addPhotoFragment, bundleArgs);
+                NavHostFragment.findNavController(requireParentFragment()).navigate(R.id.action_navigation_register_to_addPhotoFragment, bundleArgs);
             }
 
             if (registerResult.getError() != null) {
                 if (getContext() != null && getContext().getApplicationContext() != null) {
-                    Snackbar.make(getActivity().findViewById(android.R.id.content),
+                    Snackbar.make(requireActivity().findViewById(android.R.id.content),
                             registerResult.getError(),
                             BaseTransientBottomBar.LENGTH_LONG).show();
-                    /*Toast.makeText(
-                            getContext().getApplicationContext(),
-                            registerResult.getError(),
-                            Toast.LENGTH_LONG).show(); */
                 }
                 btCreateAccount.setEnabled(true);
             }
@@ -207,6 +203,7 @@ public class RegisterFragment extends Fragment {
 
     /**
      * Establish each EditText with the TextWatcher.
+     *
      * @param afterTextChangedListener - the TextWatcher that will notify and update the RegisterFormState
      *                                 from the ViewModel.
      */
@@ -218,7 +215,6 @@ public class RegisterFragment extends Fragment {
     }
 
     /**
-     *
      * @param registerFormState - the UI State that contains the error message or the data validation
      *                          boolean.
      */

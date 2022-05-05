@@ -5,6 +5,7 @@ import android.app.Application;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -34,11 +35,19 @@ public class AppAuthRepository {
 
     }
 
-    public void login(String username, String password) {
-
+    public LiveData<Result.Error> login(String userEmail, String password) {
+        MutableLiveData<Result.Error> mutableLiveData = new MutableLiveData<>();
+        firebaseAuth.signInWithEmailAndPassword(userEmail, password).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                mutableLiveData.setValue(new Result.Error(e));
+            }
+        });
+        return mutableLiveData;
     }
 
-    public MutableLiveData<Result<?>> register(String email, String username,String password) {
+
+    public MutableLiveData<Result<?>> register(String email, String username, String password) {
         MutableLiveData<Result<?>> result = new MutableLiveData<>();
 
         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {

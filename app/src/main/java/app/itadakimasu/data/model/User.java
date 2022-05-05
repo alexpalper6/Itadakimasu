@@ -3,24 +3,21 @@ package app.itadakimasu.data.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.google.firebase.firestore.Exclude;
-
 public class User implements Parcelable {
-    @Exclude
     private String uuid;
     private String username;
-    private String photoUri;
+    private String photoUrl;
 
     public User(String uuid, String username, String photoUri) {
         this.uuid = uuid;
         this.username = username;
-        this.photoUri = photoUri;
+        this.photoUrl = photoUri;
     }
 
     public User(String uuid, String username) {
         this.uuid = uuid;
         this.username = username;
-        this.photoUri = "";
+        this.photoUrl = "";
     }
 
     public String getUuid() {
@@ -39,12 +36,12 @@ public class User implements Parcelable {
         this.username = username;
     }
 
-    public String getPhotoUri() {
-        return photoUri;
+    public String getPhotoUrl() {
+        return photoUrl;
     }
 
-    public void setPhotoUri(String photoUri) {
-        this.photoUri = photoUri;
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 
 
@@ -57,19 +54,19 @@ public class User implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.uuid);
         dest.writeString(this.username);
-        dest.writeString(this.photoUri);
+        dest.writeString(this.photoUrl);
     }
 
     public void readFromParcel(Parcel source) {
         this.uuid = source.readString();
         this.username = source.readString();
-        this.photoUri = source.readString();
+        this.photoUrl = source.readString();
     }
 
     protected User(Parcel in) {
         this.uuid = in.readString();
         this.username = in.readString();
-        this.photoUri = in.readString();
+        this.photoUrl = in.readString();
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {

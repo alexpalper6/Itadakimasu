@@ -1,9 +1,12 @@
 package app.itadakimasu;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,7 +14,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
+import androidx.navigation.NavOptions;
+import androidx.navigation.NavOptionsBuilder;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
@@ -21,7 +27,7 @@ import java.util.List;
 import app.itadakimasu.databinding.ActivityMainBinding;
 import app.itadakimasu.ui.SelectMediaDialogFragment;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FirebaseAuth.AuthStateListener {
 
     private ActivityMainBinding binding;
 
@@ -57,6 +63,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         NavigationUI.setupWithNavController(binding.navView, navController);
+
+
+
     }
 
     private void hideNavView() {
@@ -67,4 +76,29 @@ public class MainActivity extends AppCompatActivity {
         binding.navView.setVisibility(View.VISIBLE);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseAuth.getInstance().addAuthStateListener(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        FirebaseAuth.getInstance().removeAuthStateListener(this);
+    }
+
+    @Override
+    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+        // TODO: Redirect to login and clear navigation stack
+        if (firebaseAuth.getCurrentUser() == null) {
+            NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+            navController.popBackStack();
+
+
+
+
+
+        }
+    }
 }

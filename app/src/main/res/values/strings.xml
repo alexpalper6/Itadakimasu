@@ -27,8 +27,15 @@
     <string name="done">Done!</string>
     <string name="prompt_add_photo">Finish setting up your profile by adding a photo!</string>
     <string name="select_media_method">Set the photo by</string>
+    <string name="gallery_perm_denied_info">You must give permissions in order to set an image</string>
     <string name="cancel">Cancel</string>
-
+    <string name="ok">OK</string>
+    <string name="image_error">Image couldn\'t be established</string>
+    <string name="image_upload_error">Image could not be uploaded</string>
+    <string name="retry">Retry</string>
+    <string name="image_user_error">Image could not be added on the profile</string>
+    <string name="add_photo_info">Add a photo by clicking on the image</string>
+    <string name="sign_out">Sign out</string>
     <string-array name="media_selectors">
         <item>Camera</item>
         <item>Gallery</item>

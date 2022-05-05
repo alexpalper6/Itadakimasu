@@ -7,9 +7,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 
+import com.google.firebase.auth.FirebaseAuth;
+
+import app.itadakimasu.R;
 import app.itadakimasu.databinding.FragmentProfileBinding;
 
 public class ProfileFragment extends Fragment {
@@ -27,6 +32,14 @@ public class ProfileFragment extends Fragment {
         //final TextView textView = binding.textNotifications;
        // notificationsViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        binding.btSignOut.setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();
+        });
     }
 
     @Override
