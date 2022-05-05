@@ -4,6 +4,9 @@ import com.canhub.cropper.CropImageContractOptions;
 import com.canhub.cropper.CropImageOptions;
 import com.canhub.cropper.CropImageView;
 
+/**
+ * Util class that uses Android-Image-Cropper to set crop image options.
+ */
 public class ImageCropUtils {
 
     public static CropImageContractOptions getProfilePictureGalleryOptions() {
