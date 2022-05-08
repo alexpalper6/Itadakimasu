@@ -1,19 +1,44 @@
 package app.itadakimasu.ui.profile;
 
+import android.net.Uri;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import app.itadakimasu.data.Result;
+import app.itadakimasu.data.repository.StorageRepository;
+import app.itadakimasu.data.repository.UsersRepository;
+import app.itadakimasu.ui.register.addPhoto.PhotoResultState;
+
 public class ProfileViewModel extends ViewModel {
 
-    private final MutableLiveData<String> mText;
 
+    private StorageRepository storageRepository;
+    private MutableLiveData<Uri> photoUri;
+    private MutableLiveData<String> photoPath;
     public ProfileViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("This is my profile fragment");
+        this.storageRepository = new StorageRepository();
+        this.photoUri = new MutableLiveData<>();
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    public LiveData<Uri> getPhotoUri() {
+        return photoUri;
     }
+    public void setPhotoUri(Uri uri) {
+        photoUri.setValue(uri);
+    }
+
+    public LiveData<String> getPhotoPath() {
+        return photoPath;
+    }
+    public void setPhotoPath(String photoUrl) {
+        photoPath.setValue(photoUrl);
+    }
+
+    public LiveData<Result<?>> uploadPhotoStorage(byte[] imageData) {
+
+        return storageRepository.updateUserImage(imageData);
+    }
+
 }

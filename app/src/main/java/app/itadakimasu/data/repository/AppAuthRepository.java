@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.concurrent.Executor;
 
 import app.itadakimasu.data.Result;
+import app.itadakimasu.data.model.FirebaseContract;
 import app.itadakimasu.data.model.User;
 
 /**
@@ -35,6 +36,13 @@ public class AppAuthRepository {
 
     }
 
+    /**
+     * Authenticates the user with given email and password, returns a result so the UI Layer can
+     * interact with it.
+     * @param userEmail - the email.
+     * @param password - the password of the user.
+     * @return a result error if the login is not successful, so the system can notify the user.
+     */
     public LiveData<Result.Error> login(String userEmail, String password) {
         MutableLiveData<Result.Error> mutableLiveData = new MutableLiveData<>();
         firebaseAuth.signInWithEmailAndPassword(userEmail, password).addOnFailureListener(new OnFailureListener() {
@@ -46,7 +54,14 @@ public class AppAuthRepository {
         return mutableLiveData;
     }
 
-
+    /**
+     * Creates an account with given email, username and password.
+     * @param email - the user's email.
+     * @param username - the user's name.
+     * @param password - the user's password.
+     * @return a result, a successful one if the registry is performed, this result will contain the
+     * user's data; and an error with the message, in case the account couldn't be created.
+     */
     public MutableLiveData<Result<?>> register(String email, String username, String password) {
         MutableLiveData<Result<?>> result = new MutableLiveData<>();
 
@@ -54,8 +69,8 @@ public class AppAuthRepository {
             if (task.isSuccessful()) {
                 FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
                 if (firebaseUser != null) {
-                    updateDisplayName(username);
                     User user = new User(firebaseUser.getUid(), username);
+                    user.setPhotoUrl(FirebaseContract.StorageReference.USER_PICTURES + username);
                     result.setValue(new Result.Success<User>(user));
                 }
 
@@ -66,23 +81,19 @@ public class AppAuthRepository {
         return result;
     }
 
+    /**
+     * Logs out the user.
+     */
     public void logout() {
         firebaseAuth.signOut();
     }
 
-    public boolean isSignedIn() {
-        return firebaseAuth.getCurrentUser() != null;
-    }
-
+    /**
+     * Obtains the current user.
+     * @return a FirebaseUser instance with the user's authentication data.
+     */
     public FirebaseUser getCurrentUser() {
         return firebaseAuth.getCurrentUser();
     }
 
-    public void updateDisplayName(String username) {
-        UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest
-                .Builder()
-                .setDisplayName(username)
-                .build();
-        Objects.requireNonNull(firebaseAuth.getCurrentUser()).updateProfile(profileUpdate);
-    }
 }

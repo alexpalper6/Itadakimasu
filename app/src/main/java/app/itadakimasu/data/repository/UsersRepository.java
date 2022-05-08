@@ -42,44 +42,25 @@ public class UsersRepository {
     }
 
     /**
-     * TODO: Comment more
-     * Add a user with their info on the database.
-     * @param user
+     * Add a user with their data to the database.
+     * When the upload is performed it could success or not, show it will return a Result in order
+     * to get that result on the ViewModel and show it to the user through the UI elements.
+     * @param user - the users data.
      */
-    public void addUserToDatabase(User user) {
+    public LiveData<Result<?>> addUserToDatabase(User user) {
+        MutableLiveData<Result<?>> result = new MutableLiveData<>();
         dbFirestore.collection(FirebaseContract.UserEntry.COLLECTION_NAME)
                 .document(user.getUuid())
                 .set(user).addOnCompleteListener(listener -> {
                     if (listener.isSuccessful()) {
-                        Log.w("User added", "User added succesfully");
+                        result.setValue(new Result.Success<User>(user));
+                    } else {
+                        result.setValue(new Result.Error(listener.getException()));
                     }
-        });
-    }
-
-    public void updateUsername() {
-
-    }
-
-    /**
-     * Updates the photo url that references the user image's on the storage.
-     * @param photoUrl - the url reference
-     * @return a result error with the error message if it fails; if not, the result will be empty.
-     */
-    public LiveData<Result<Result.Error>> updateUserPhotoUrl(String photoUrl) {
-        MutableLiveData<Result<Result.Error>> result = new MutableLiveData<>();
-        FirebaseUser user = firebaseAuth.getCurrentUser();
-        DocumentReference userRef = dbFirestore
-                .collection(FirebaseContract.UserEntry.COLLECTION_NAME)
-                .document(user.getUid());
-
-        userRef.update(FirebaseContract.UserEntry.PHOTO, photoUrl).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                result.setValue(new Result.Error(e));
-            }
         });
         return result;
     }
+
 
     /**
      * Checks if a username already exists in the database.
@@ -116,7 +97,5 @@ public class UsersRepository {
         });
         return usernameResult;
     }
-
-
 
 }

@@ -8,24 +8,23 @@ import androidx.lifecycle.ViewModel;
 
 import app.itadakimasu.data.Result;
 import app.itadakimasu.data.repository.StorageRepository;
-import app.itadakimasu.data.repository.UsersRepository;
 
 /**
  * ViewModel of AddPhotoFragment, stores the data that is necessary to use and result states.
  */
 public class AddPhotoViewModel extends ViewModel {
-    private UsersRepository usersRepository;
-    private StorageRepository storageRepository;
-    private MutableLiveData<String> usernameDisplayState;
-    private MutableLiveData<Uri> photoUri;
-    private MutableLiveData<PhotoResultState> photoResultState;
+    private final StorageRepository storageRepository;
+    private final MutableLiveData<String> usernameDisplayState;
+    private final MutableLiveData<PhotoResultState> photoResultState;  
+    private final MutableLiveData<Uri> photoUriState;
+    private final MutableLiveData<String> photoPathState;
 
     public AddPhotoViewModel() {
-        this.usersRepository = new UsersRepository();
         this.storageRepository = new StorageRepository();
         this.usernameDisplayState = new MutableLiveData<>();
-        this.photoUri = new MutableLiveData<>();
+        this.photoUriState = new MutableLiveData<>();
         this.photoResultState = new MutableLiveData<>();
+        this.photoPathState = new MutableLiveData<>();
     }
 
     /**
@@ -38,8 +37,15 @@ public class AddPhotoViewModel extends ViewModel {
     /**
      * @return the uri of the image that is given by the user.
      */
-    public LiveData<Uri> getPhotoUri() {
-        return photoUri;
+    public LiveData<Uri> getPhotoUriState() {
+        return photoUriState;
+    }
+
+    /**
+     * @return the path of the cropped image, used to upload the image to the storage compressed
+     */
+    public LiveData<String> getPhotoPathState() {
+        return photoPathState;
     }
 
     /**
@@ -52,21 +58,14 @@ public class AddPhotoViewModel extends ViewModel {
     /**
      * Uses the storage repository to upload the image, this method is used with an observer in order
      * to be able to handle the result.
-     * @param uriImage - the file path where the user has the image.
+     * @param imageData - the resized image in bytes.
      * @return a result that could be successful if the image is uploaded or not.
      */
-    public LiveData<Result<?>> uploadPhotoStorage(Uri uriImage) {
-        return storageRepository.updateUserImage(uriImage);
+    public LiveData<Result<?>> uploadPhotoStorage(byte[] imageData) {
+
+        return storageRepository.updateUserImage(imageData);
     }
 
-    /**
-     * Set the photoUrl of the User's document on the database.
-     * @param photoUrl - the photo's reference on the storage.
-     * @return a result with an error that won't be null if the update fails.
-     */
-    public LiveData<Result<Result.Error>> updateUserPhotoUrl(String photoUrl) {
-        return usersRepository.updateUserPhotoUrl(photoUrl);
-    }
 
     /**
      * Sets the username that will be displayed
@@ -80,8 +79,16 @@ public class AddPhotoViewModel extends ViewModel {
      * Establish the file's uri of the image that the user selects.
      * @param uri - the reference of the file that the user gives by camera or their gallery.
      */
-    public void setPhotoUri(Uri uri) {
-        photoUri.setValue(uri);
+    public void setPhotoUriState(Uri uri) {
+        photoUriState.setValue(uri);
+    }
+
+    /**
+     * Establish the file's uri complete path that permits compress the image.
+     * @param photoPath - the file's path
+     */
+    public void setPhotoPathState(String photoPath) {
+        photoPathState.setValue(photoPath);
     }
 
     /**
@@ -89,16 +96,6 @@ public class AddPhotoViewModel extends ViewModel {
      * @param photoStorageError - the error message.
      */
     public void setUploadPhotoErrorResult(int photoStorageError) {
-        photoResultState.setValue(new PhotoResultState(null, photoStorageError, null));
+        photoResultState.setValue(new PhotoResultState(photoStorageError));
     }
-
-    /**
-     * Sets the error when the transaction uploading on the user's document the photo url fails.
-     * @param photoUrlUserError - the message.
-     * @param photoUrl - the photo's url that references the image on the storage.
-     */
-    public void setUserUrlTransactionError(int photoUrlUserError, String photoUrl) {
-        photoResultState.setValue(new PhotoResultState(photoUrl, null, photoUrlUserError));
-    }
-
 }

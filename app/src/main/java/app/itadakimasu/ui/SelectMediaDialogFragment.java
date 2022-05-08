@@ -23,6 +23,8 @@ public class SelectMediaDialogFragment extends DialogFragment {
     // Dialog keys for request and bundle
     public static String DIALOG_REQUEST = "app.itadakimasu.ui.SelectMediaDialogFragment.DialogRequest";
     public static String DIALOG_RESULT = "app.itadakimasu.ui.SelectMediaDialogFragment.DialogResult";
+    public static final int TAKING_PHOTO_CAMERA = 0;
+    public static final int IMAGE_GALLERY = 1;
 
 
     @NonNull

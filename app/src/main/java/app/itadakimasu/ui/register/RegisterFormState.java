@@ -5,8 +5,8 @@ import androidx.annotation.Nullable;
 import app.itadakimasu.data.model.User;
 
 /**
- * UI State that will hold the error messages that the fragment will use in order to give feedback
- * to the user when the data on the input fields are invalid.
+ * UI State that will hold state of the form, the input fields. The fragment will use it in order to give feedback
+ * to the user when the data on the input fields are invalid or not.
  */
 class RegisterFormState {
     // String resources that stores email error message

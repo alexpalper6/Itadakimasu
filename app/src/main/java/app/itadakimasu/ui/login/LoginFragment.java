@@ -118,7 +118,7 @@ public class LoginFragment extends Fragment implements FirebaseAuth.AuthStateLis
     @Override
     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
         if (firebaseAuth.getCurrentUser() != null) {
-            NavHostFragment.findNavController(this).navigate(R.id.action_navigation_login_to_navigation_home);
+            NavHostFragment.findNavController(this).navigate(R.id.action_auth_navigation_to_navigation_home);
 
         }
     }

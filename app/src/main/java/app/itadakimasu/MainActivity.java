@@ -27,6 +27,10 @@ import java.util.List;
 import app.itadakimasu.databinding.ActivityMainBinding;
 import app.itadakimasu.ui.SelectMediaDialogFragment;
 
+/**
+ * Activity of the application, charges the nav controller, the BottomNavigation visibility on fragments
+ * and the implementation of an AuthStateListener.
+ */
 public class MainActivity extends AppCompatActivity implements FirebaseAuth.AuthStateListener {
 
     private ActivityMainBinding binding;
@@ -38,7 +42,6 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        //BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
@@ -50,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
                 R.id.navigation_photo_addition);
 
         // Adds a listener, when the navigation is triggered it'll check the destination's fragment.
-        // If the fragment is one from the list, the BottomNavigation will be hiden; if not, it will be visible.
+        // If the fragment is one from the list, the BottomNavigation will be hidden; if not, it will be visible.
         navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
             @Override
             public void onDestinationChanged(@NonNull NavController navController, @NonNull NavDestination navDestination, @Nullable Bundle bundle) {
@@ -62,43 +65,53 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
             }
         });
 
+        // Set ups the navigation controller with the bottom navigation view,
+        // so the user can navigate between fragments using this view.
         NavigationUI.setupWithNavController(binding.navView, navController);
-
-
-
     }
 
+    /**
+     * Sets the bottom navigation view visibility as gone. (Hides it).
+     */
     private void hideNavView() {
         binding.navView.setVisibility(View.GONE);
     }
 
+    /**
+     * Sets the bottom navigation view visibility as visible.
+     */
     private void showNavView() {
         binding.navView.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * When the configuration lifecycle reach to start, an instance of authStateListener is created and setted.
+     */
     @Override
     protected void onStart() {
         super.onStart();
         FirebaseAuth.getInstance().addAuthStateListener(this);
     }
 
+    /**
+     * When the configuration lifecycle reach onStop, the authStateListener is removed.
+     */
     @Override
     protected void onStop() {
         super.onStop();
         FirebaseAuth.getInstance().removeAuthStateListener(this);
     }
 
+    /**
+     * Implements auth state listener, when the user authentication expires (ex: Sign out), they are sent to the login.
+     * The Navigation's back stack is cleared so the user won't be able to return to the app unless they authenticate.
+     * @param firebaseAuth - the Firebase authentication class that will let the program to get the authentication data.
+     */
     @Override
     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-        // TODO: Redirect to login and clear navigation stack
         if (firebaseAuth.getCurrentUser() == null) {
             NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-            navController.popBackStack();
-
-
-
-
-
+            navController.navigate(R.id.auth_navigation, null, new NavOptions.Builder().setPopUpTo(R.id.navigation_home, true).build());
         }
     }
 }

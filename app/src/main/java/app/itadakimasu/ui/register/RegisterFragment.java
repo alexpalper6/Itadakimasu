@@ -12,24 +12,18 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.FirebaseException;
-import com.google.firebase.firestore.FirebaseFirestoreException;
+
 
 import app.itadakimasu.R;
 import app.itadakimasu.data.Result;
+import app.itadakimasu.data.model.User;
 import app.itadakimasu.databinding.FragmentRegisterBinding;
 import app.itadakimasu.ui.register.addPhoto.AddPhotoFragment;
 
@@ -41,14 +35,6 @@ public class RegisterFragment extends Fragment {
     private RegisterViewModel registerViewModel;
     // Class that contains the reference of every view of fragment_register layout.
     private FragmentRegisterBinding binding;
-
-    // References of the views, TODO Maybe this will be deleted
-    private EditText etNewEmail;
-    private EditText etNewUsername;
-    private EditText etNewPassword;
-    private EditText etRepeatPassword;
-    private Button btCreateAccount;
-    private ProgressBar pbRegProgress;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -62,44 +48,41 @@ public class RegisterFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         registerViewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
 
-        setBindingReferences();
-
         // Observes for data changes in the UI State's data input validation.
         // Then it will check the UI state for the error messages, which will be assigned to their
         // respective EditTexts or it will check if the data is valid.
-        registerViewModel.getRegisterFormState().observe(getViewLifecycleOwner(), registerFormState -> checkFormState(registerFormState));
+        registerViewModel.getRegisterFormState().observe(getViewLifecycleOwner(), this::checkFormState);
 
-        // Observes for the data changes that is established by the registration.
-        // If the result is successful, then the user will be sent to the next fragment.
-        // If it's not, then the error message will prompt.
+        // Observes for the data error changes that is established by the registration.
         registerViewModel.getRegisterResult().observe(getViewLifecycleOwner(), registerResult -> {
             if (registerResult == null) {
                 return;
             }
-            pbRegProgress.setVisibility(View.GONE);
+            binding.pbRegisterProgress.setVisibility(View.GONE);
 
             if (registerResult.getUsernameError() != null) {
-                etNewUsername.setText("");
+                binding.etNewUsername.setText("");
                 if (getContext() != null && getContext().getApplicationContext() != null) {
                     Snackbar.make(requireActivity().findViewById(android.R.id.content),
                             registerResult.getUsernameError(),
                             BaseTransientBottomBar.LENGTH_LONG).show();
                 }
             }
-
-            if (registerResult.getUser() != null) {
-                Bundle bundleArgs = new Bundle();
-                bundleArgs.putString(AddPhotoFragment.USERNAME_DISPLAY, registerResult.getUser().getUsername());
-                NavHostFragment.findNavController(requireParentFragment()).navigate(R.id.action_navigation_register_to_addPhotoFragment, bundleArgs);
+            // If the transaction fails, the registry error result will have the user's data
+            // so a SnackBar will appear asking the user for retry.
+            if (registerResult.getUser() != null && registerResult.getError() != null) {
+                Snackbar.make(requireActivity().findViewById(android.R.id.content), registerResult.getError(), BaseTransientBottomBar.LENGTH_LONG)
+                        .setAction(R.string.retry, v -> completeRegisterTransaction(registerResult.getUser()))
+                        .show();
             }
 
-            if (registerResult.getError() != null) {
+            if (registerResult.getError() != null && registerResult.getUser() == null) {
                 if (getContext() != null && getContext().getApplicationContext() != null) {
                     Snackbar.make(requireActivity().findViewById(android.R.id.content),
                             registerResult.getError(),
                             BaseTransientBottomBar.LENGTH_LONG).show();
                 }
-                btCreateAccount.setEnabled(true);
+                binding.btCreateAccount.setEnabled(true);
             }
         });
 
@@ -122,8 +105,8 @@ public class RegisterFragment extends Fragment {
              */
             @Override
             public void afterTextChanged(Editable s) {
-                registerViewModel.registerDataChanged(etNewEmail.getText().toString(), etNewUsername.getText().toString(),
-                        etNewPassword.getText().toString(), etRepeatPassword.getText().toString());
+                registerViewModel.registerDataChanged(binding.etNewEmail.getText().toString(), binding.etNewUsername.getText().toString(),
+                        binding.etNewPassword.getText().toString(), binding.etRepeatPassword.getText().toString());
             }
         };
 
@@ -132,32 +115,18 @@ public class RegisterFragment extends Fragment {
 
         // The last EditText has an imeOption called actionDone, that option is called when pressed enter.
         // This method will listen for this option, when it's activated, it'll use the register method.
-        etRepeatPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    createAccount();
-                }
-                return false;
+        binding.etRepeatPassword.setOnEditorActionListener((textView, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                createAccount();
             }
+            return false;
         });
 
         // Establish a click listener on create button account, when clicked, register method will be called.
-        btCreateAccount.setOnClickListener(v -> createAccount());
+        binding.btCreateAccount.setOnClickListener(v -> createAccount());
 
     }
 
-    /**
-     * Set the reference variables with their respective views.
-     */
-    private void setBindingReferences() {
-        etNewEmail = binding.etNewEmail;
-        etNewUsername = binding.etNewUsername;
-        etNewPassword = binding.etNewPassword;
-        etRepeatPassword = binding.etRepeatPassword;
-        btCreateAccount = binding.btCreateAccount;
-        pbRegProgress = binding.pbRegisterProgress;
-    }
 
     /**
      * The user will try to create the account, the username will be search on the database, if it doesn't exist,
@@ -166,39 +135,59 @@ public class RegisterFragment extends Fragment {
      * is already chosen, or another error that could have happened.
      */
     private void createAccount() {
-        registerViewModel.isUsernameChosen(etNewUsername.getText().toString()).observe(getViewLifecycleOwner(), new Observer<Result<?>>() {
-            @Override
-            public void onChanged(Result<?> result) {
-                if (result instanceof Result.Success) {
-                    boolean usernameIsFound = ((Result.Success<Boolean>) result).getData();
-                    if (!usernameIsFound) {
-                        register();
-                        return;
-                    }
+        registerViewModel.isUsernameChosen(binding.etNewUsername.getText().toString()).observe(getViewLifecycleOwner(), result -> {
+            if (result instanceof Result.Success) {
+
+                boolean usernameIsFound = ((Result.Success<Boolean>) result).getData();
+                if (!usernameIsFound) {
+                    register();
+                    return;
                 }
-                registerViewModel.setUsernameResultError(result);
             }
+            registerViewModel.setUsernameResultError(result);
         });
         // The account creation button will be disabled, we don't want the user to perform the same
         // registry multiple times
-        btCreateAccount.setEnabled(false);
-        pbRegProgress.setVisibility(View.VISIBLE);
+        binding.btCreateAccount.setEnabled(false);
+        binding.pbRegisterProgress.setVisibility(View.VISIBLE);
     }
 
     /**
      * Perform the registry with ViewModel's method, using the input fields as the data used.
-     * It will observe for the returned result. When it's returned, it will notify that the
-     * registerResult has changed, using registerResultChanged from the ViewModel.
+     * It will observe for the returned result. When it's returned, if the result is successful,
+     * it will continue the registry transaction (the user will be uploaded to the database).
+     * If not, it will show an error by updating the registry error result.
      */
     private void register() {
-        registerViewModel.register(etNewEmail.getText().toString(), etNewUsername.getText().toString(),
-                etNewPassword.getText().toString()).observe(getViewLifecycleOwner(), new Observer<Result>() {
-            @Override
-            public void onChanged(Result result) {
-                registerViewModel.registerResultChanged(result);
+        registerViewModel.register(binding.etNewEmail.getText().toString(), binding.etNewUsername.getText().toString(),
+                binding.etNewPassword.getText().toString()).observe(getViewLifecycleOwner(), result -> {
+                    if (result instanceof Result.Success) {
+                        User user = ((Result.Success<User>) result).getData();
+                        completeRegisterTransaction(user);
+                    } else if (result instanceof Result.Error) {
+                        registerViewModel.setRegisterError(((Result.Error) result).getError().getMessage());
+                    }
+                });
+    }
+
+    /**
+     * Adds the user to the database, completing the registry transaction.
+     * If the result is successful, the user will be redirected to the next part of the registry, where
+     * they can upload a profile picture or not.
+     * If it is not successful, the register error result will be updated.
+     * @param user - the user's data.
+     */
+    private void completeRegisterTransaction(User user) {
+        registerViewModel.addUserToDatabase(user).observe(getViewLifecycleOwner(), result -> {
+            if (result instanceof Result.Success) {
+                binding.pbRegisterProgress.setVisibility(View.GONE);
+                Bundle bundleArgs = new Bundle();
+                bundleArgs.putString(AddPhotoFragment.USERNAME_DISPLAY, user.getUsername());
+                NavHostFragment.findNavController(requireParentFragment()).navigate(R.id.action_navigation_register_to_addPhotoFragment, bundleArgs);
+            } else if (result instanceof  Result.Error){
+                registerViewModel.setUserUploadError(((Result.Error) result).getError().getMessage(), user);
             }
         });
-
     }
 
     /**
@@ -208,10 +197,10 @@ public class RegisterFragment extends Fragment {
      *                                 from the ViewModel.
      */
     private void setTextListeners(TextWatcher afterTextChangedListener) {
-        etNewEmail.addTextChangedListener(afterTextChangedListener);
-        etNewUsername.addTextChangedListener(afterTextChangedListener);
-        etNewPassword.addTextChangedListener(afterTextChangedListener);
-        etRepeatPassword.addTextChangedListener(afterTextChangedListener);
+        binding.etNewEmail.addTextChangedListener(afterTextChangedListener);
+        binding.etNewUsername.addTextChangedListener(afterTextChangedListener);
+        binding.etNewPassword.addTextChangedListener(afterTextChangedListener);
+        binding.etRepeatPassword.addTextChangedListener(afterTextChangedListener);
     }
 
     /**
@@ -223,19 +212,19 @@ public class RegisterFragment extends Fragment {
             return;
         }
 
-        btCreateAccount.setEnabled(registerFormState.isDataValid());
+        binding.btCreateAccount.setEnabled(registerFormState.isDataValid());
 
         if (registerFormState.getEmailError() != null) {
-            etNewEmail.setError(getString(registerFormState.getEmailError()));
+            binding.etNewEmail.setError(getString(registerFormState.getEmailError()));
         }
         if (registerFormState.getUsernameError() != null) {
-            etNewUsername.setError(getString(registerFormState.getUsernameError()));
+            binding.etNewUsername.setError(getString(registerFormState.getUsernameError()));
         }
         if (registerFormState.getPasswordError() != null) {
-            etNewPassword.setError(getString(registerFormState.getPasswordError()));
+            binding.etNewPassword.setError(getString(registerFormState.getPasswordError()));
         }
         if (registerFormState.getRepeatedPasswordError() != null) {
-            etRepeatPassword.setError(getString(registerFormState.getRepeatedPasswordError()));
+            binding.etRepeatPassword.setError(getString(registerFormState.getRepeatedPasswordError()));
         }
     }
 

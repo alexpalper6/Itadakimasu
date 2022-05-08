@@ -1,16 +1,11 @@
 package app.itadakimasu.ui.register;
 
-import android.app.Application;
 import android.util.Patterns;
 
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.google.firebase.firestore.FirebaseFirestoreException;
-
-import java.util.Observer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,13 +21,14 @@ import app.itadakimasu.data.repository.UsersRepository;
  */
 public class RegisterViewModel extends ViewModel {
     // Repository that handles the business logic for authentication.
-    private AppAuthRepository authRepository;
+    private final AppAuthRepository authRepository;
     // Repository that handles the business logic for Users data in the database.
-    private UsersRepository usersRepository;
+    private final UsersRepository usersRepository;
     // Observable and mutable data, UI State that represents the validity of input fields.
-    private MutableLiveData<RegisterFormState> registerFormState;
+    private final MutableLiveData<RegisterFormState> registerFormState;
     // Observable and mutable data, contains the result of the registry.
-    private MutableLiveData<RegisterResult> registerResult;
+    private final MutableLiveData<RegisterErrorResult> registerResult;
+
 
     public RegisterViewModel() {
         this.authRepository = new AppAuthRepository();
@@ -61,42 +57,7 @@ public class RegisterViewModel extends ViewModel {
      * @return a RegisterResult object, that will contain data handled by the fragment, in orther to show
      * an error or to continue with the user creation process.
      */
-    LiveData<RegisterResult> getRegisterResult() { return registerResult; }
-
-    /**
-     * This method should be used on observable data.
-     *
-     * The result that this method gets will check if it's an instance of Result.Success, in this case
-     * it would add the user's data to the database and update the registerResult.
-     *
-     * If the result is not a successful one, registerResult will be settled with an error message.
-     *
-     * @param result - the Result object that could contain a successful returned User, or an Error.
-     */
-    public void registerResultChanged(Result<?> result) {
-        if (result instanceof Result.Success) {
-            User user = ((Result.Success<User>) result).getData();
-            usersRepository.addUserToDatabase(user);
-            registerResult.setValue(new RegisterResult(user));
-        } else {
-            registerResult.setValue(new RegisterResult(((Result.Error) result).getError().getMessage()));
-        }
-    }
-
-    /**
-     * If the username result error is sucessfull it means that the error is due that the username is found
-     * Instead, is it's a Result.Error, another error happened
-     * @param result - the result obtained in order to tell if the user is already chosen or if
-     *               another error happened
-     */
-    public void setUsernameResultError(Result<?> result) {
-        if (result instanceof Result.Success) {
-            registerFormState.setValue(new RegisterFormState(null, R.string.username_chosen, null, null));
-            registerResult.setValue(new RegisterResult(R.string.username_chosen));
-        } else {
-            registerResult.setValue(new RegisterResult(((Result.Error) result).getError().getMessage()));
-        }
-    }
+    LiveData<RegisterErrorResult> getRegisterResult() { return registerResult; }
 
     /**
      * Registers the user with the input data from the RegisterFragment's fields.
@@ -110,6 +71,51 @@ public class RegisterViewModel extends ViewModel {
     public LiveData<Result<?>> register(String email, String username, String password) {
         return authRepository.register(email, username, password);
     }
+
+    /**
+     * Adds the user's data to the database.
+     * @param user - the user's data.
+     * @return a result, successful if the user could be uploaded; and an error if not.
+     */
+    LiveData<Result<?>> addUserToDatabase(User user) {
+        return usersRepository.addUserToDatabase(user);
+    }
+
+    /**
+     * If the username result error is sucessfull it means that the error is due that the username is found
+     * Instead, is it's a Result.Error, another error happened
+     * @param result - the result obtained in order to tell if the user is already chosen or if
+     *               another error happened
+     */
+    public void setUsernameResultError(Result<?> result) {
+        if (result instanceof Result.Success) {
+            registerFormState.setValue(new RegisterFormState(null, R.string.username_chosen, null, null));
+            registerResult.setValue(new RegisterErrorResult(R.string.username_chosen, null, null));
+        } else {
+            registerResult.setValue(new RegisterErrorResult(null, ((Result.Error) result).getError().getMessage(), null));
+        }
+    }
+
+    /**
+     * Sets the error message when the user creation is not successful.
+     * @param errorMessage - the error message.
+     */
+    public void setRegisterError(String errorMessage) {
+        registerResult.setValue(new RegisterErrorResult(null, errorMessage, null));
+
+    }
+
+    /**
+     * When the transaction is not successful, the register result will be settled with the error
+     * message and the user's data, so the system will notify the user what happened and will allow
+     * them to retry.
+     * @param message - the error messsage.
+     * @param user - the user's data.
+     */
+    public void setUserUploadError(String message, User user) {
+        registerResult.setValue(new RegisterErrorResult(null, message, user));
+    }
+
 
     /**
      * Every time the user writes input on the register's edit texts fields, this method will catch
@@ -195,6 +201,5 @@ public class RegisterViewModel extends ViewModel {
     private boolean isRepeatedPasswordValid(String password, String repeatedPassword) {
         return !repeatedPassword.trim().isEmpty() && repeatedPassword.equals(password);
     }
-
 
 }

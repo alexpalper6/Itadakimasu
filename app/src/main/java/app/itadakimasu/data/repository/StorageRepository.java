@@ -30,31 +30,25 @@ public class StorageRepository {
         this.authInstance = FirebaseAuth.getInstance();
     }
 
+
     /**
-     * Given the image file's uri, obtains the current user and uploads on the Storage
+     * Given the resized image data, obtains the current user and uploads on the Storage
      * a file on the child "users/", this file with have the as name the user's username (example: alexpalper.jpeg).
      *
      * It will return a result, successful with the image's path if it's uploaded; error if it fails.
-     * @param imageUri - the file's uri from the user
+     * @param imageData - the resized image in bytes.
      * @return a result with the image's path on the storage or an error if it fails.
      */
-    public LiveData<Result<?>> updateUserImage(Uri imageUri) {
+    public LiveData<Result<?>> updateUserImage(byte[] imageData) {
         String userId = Objects.requireNonNull(authInstance.getCurrentUser()).getUid();
         MutableLiveData<Result<?>> result = new MutableLiveData<>();
 
         StorageReference userImage = dbStorage.getReference().child(FirebaseContract.StorageReference.USER_PICTURES + userId);
 
-        userImage.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                result.setValue(new Result.Success<String>(userImage.getPath()));
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                result.setValue(new Result.Error(e));
-            }
-        });
+
+        userImage.putBytes(imageData)
+                .addOnSuccessListener(success -> result.setValue(new Result.Success<String>(userImage.getPath())))
+                .addOnFailureListener(failure -> result.setValue(new Result.Error(failure)));
         return result;
     }
 }
