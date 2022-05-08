@@ -20,11 +20,11 @@ import app.itadakimasu.data.model.User;
  */
 public class RegisterErrorResult {
     @Nullable
-    private Integer usernameError;
+    private final Integer usernameError;
     @Nullable
-    private String error;
+    private final String error;
     @Nullable
-    private User user;
+    private final User user;
 
     public RegisterErrorResult(@Nullable Integer usernameError, @Nullable String error, @Nullable User user) {
         this.usernameError = usernameError;

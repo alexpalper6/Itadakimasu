@@ -1,6 +1,6 @@
 package app.itadakimasu.ui.register;
 
-import androidx.lifecycle.Observer;
+
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;

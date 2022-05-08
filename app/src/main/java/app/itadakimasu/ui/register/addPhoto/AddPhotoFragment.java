@@ -13,7 +13,6 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentResultListener;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -68,7 +67,7 @@ public class AddPhotoFragment extends Fragment {
                 }
             });
 
-    
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
@@ -109,19 +108,18 @@ public class AddPhotoFragment extends Fragment {
         });
 
         // Receives the result of the Dialog using FragmentResultListener.
-        getParentFragmentManager().setFragmentResultListener(SelectMediaDialogFragment.DIALOG_REQUEST, this, new FragmentResultListener() {
-            @Override
-            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-                // Depending on the result, it will open the camera or the gallery
-                int which = result.getInt(SelectMediaDialogFragment.DIALOG_RESULT);
+        getParentFragmentManager().setFragmentResultListener(SelectMediaDialogFragment.DIALOG_REQUEST,
+                this,
+                (requestKey, result) -> {
+                    // Depending on the result, it will open the camera or the gallery
+                    int which = result.getInt(SelectMediaDialogFragment.DIALOG_RESULT);
 
-                if (which == SelectMediaDialogFragment.TAKING_PHOTO_CAMERA) {
-                    imageMediaLauncher.launch(ImageCropUtils.getProfilePictureCameraOptions());
-                } else if (which == SelectMediaDialogFragment.IMAGE_GALLERY) {
-                    checkGalleryPermissions();
-                }
-            }
-        });
+                    if (which == SelectMediaDialogFragment.TAKING_PHOTO_CAMERA) {
+                        imageMediaLauncher.launch(ImageCropUtils.getProfilePictureCameraOptions());
+                    } else if (which == SelectMediaDialogFragment.IMAGE_GALLERY) {
+                        checkGalleryPermissions();
+                    }
+                });
 
         // If the user declines, they will be redirected to the home fragment
         binding.btDecline.setOnClickListener(v -> {
@@ -165,7 +163,7 @@ public class AddPhotoFragment extends Fragment {
      * If the result is successful it will redirect the user to the home section.
      * If it fails, it will set an upload photo error on the result state.
      */
-   private void uploadPhotoStorage() {
+    private void uploadPhotoStorage() {
         String imagePath = addPhotoViewModel.getPhotoPathState().getValue();
         byte[] imageData = ImageCompressorUtils.compressImage(imagePath);
 

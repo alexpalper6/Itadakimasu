@@ -1,17 +1,13 @@
 package app.itadakimasu.data.repository;
 
-import android.net.Uri;
-
-import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
+
 
 import java.util.Objects;
 
@@ -22,8 +18,8 @@ import app.itadakimasu.data.model.FirebaseContract;
  * Repository used to add files on the Storage.
  */
 public class StorageRepository {
-    private FirebaseStorage dbStorage;
-    private FirebaseAuth authInstance;
+    private final FirebaseStorage dbStorage;
+    private final FirebaseAuth authInstance;
 
     public StorageRepository() {
         this.dbStorage = FirebaseStorage.getInstance();

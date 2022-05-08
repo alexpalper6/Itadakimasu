@@ -69,7 +69,7 @@ public class User implements Parcelable {
         this.photoUrl = in.readString();
     }
 
-    public static final Creator<User> CREATOR = new Creator<User>() {
+    public static final Creator<User> CREATOR = new Creator<>() {
         @Override
         public User createFromParcel(Parcel source) {
             return new User(source);

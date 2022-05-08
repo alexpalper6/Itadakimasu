@@ -12,9 +12,9 @@ import app.itadakimasu.data.repository.AppAuthRepository;
 
 public class LoginViewModel extends ViewModel {
 
-    private AppAuthRepository loginRepository;
-    private MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
-    private MutableLiveData<LoginErrorResult> loginErrorResult = new MutableLiveData<>();
+    private final AppAuthRepository loginRepository;
+    private final MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
+    private final MutableLiveData<LoginErrorResult> loginErrorResult = new MutableLiveData<>();
 
     public LoginViewModel() {
         this.loginRepository = new AppAuthRepository();

@@ -8,14 +8,13 @@ import androidx.lifecycle.ViewModel;
 
 import app.itadakimasu.data.Result;
 import app.itadakimasu.data.repository.StorageRepository;
-import app.itadakimasu.data.repository.UsersRepository;
-import app.itadakimasu.ui.register.addPhoto.PhotoResultState;
+
 
 public class ProfileViewModel extends ViewModel {
 
 
-    private StorageRepository storageRepository;
-    private MutableLiveData<Uri> photoUri;
+    private final StorageRepository storageRepository;
+    private final MutableLiveData<Uri> photoUri;
     private MutableLiveData<String> photoPath;
     public ProfileViewModel() {
         this.storageRepository = new StorageRepository();

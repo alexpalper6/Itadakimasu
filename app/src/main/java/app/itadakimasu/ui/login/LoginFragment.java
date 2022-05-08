@@ -1,6 +1,5 @@
 package app.itadakimasu.ui.login;
 
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,7 +17,6 @@ import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 
-import app.itadakimasu.data.Result;
 import app.itadakimasu.databinding.FragmentLoginBinding;
 
 import app.itadakimasu.R;
@@ -45,25 +43,19 @@ public class LoginFragment extends Fragment implements FirebaseAuth.AuthStateLis
         super.onViewCreated(view, savedInstanceState);
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
-        loginViewModel.getLoginFormState().observe(getViewLifecycleOwner(), new Observer<LoginFormState>() {
-            @Override
-            public void onChanged(LoginFormState loginFormState) {
-                if (loginFormState.getUserEmailError() != null) {
-                    binding.etEmail.setError(getString(loginFormState.getUserEmailError()));
-                }
-
-                binding.btLogin.setEnabled(loginFormState.isDataValid());
+        loginViewModel.getLoginFormState().observe(getViewLifecycleOwner(), loginFormState -> {
+            if (loginFormState.getUserEmailError() != null) {
+                binding.etEmail.setError(getString(loginFormState.getUserEmailError()));
             }
+
+            binding.btLogin.setEnabled(loginFormState.isDataValid());
         });
 
-        loginViewModel.getLoginErrorResult().observe(getViewLifecycleOwner(), new Observer<LoginErrorResult>() {
-            @Override
-            public void onChanged(LoginErrorResult loginResultState) {
-                binding.loading.setVisibility(View.GONE);
-                Snackbar.make(requireActivity().findViewById(android.R.id.content)
-                        , loginResultState.getError()
-                        , BaseTransientBottomBar.LENGTH_LONG).show();
-            }
+        loginViewModel.getLoginErrorResult().observe(getViewLifecycleOwner(), loginResultState -> {
+            binding.loading.setVisibility(View.GONE);
+            Snackbar.make(requireActivity().findViewById(android.R.id.content)
+                    , loginResultState.getError()
+                    , BaseTransientBottomBar.LENGTH_LONG).show();
         });
 
         binding.btRegister.setOnClickListener(v ->
@@ -96,12 +88,9 @@ public class LoginFragment extends Fragment implements FirebaseAuth.AuthStateLis
 
     private void login(String userEmail, String password) {
         binding.loading.setVisibility(View.VISIBLE);
-        loginViewModel.login(userEmail, password).observe(getViewLifecycleOwner(), new Observer<Result.Error>() {
-            @Override
-            public void onChanged(Result.Error error) {
-                if (error.getError() != null) {
-                    loginViewModel.setLoginErrorResult(error.getError().getMessage());
-                }
+        loginViewModel.login(userEmail, password).observe(getViewLifecycleOwner(), error -> {
+            if (error.getError() != null) {
+                loginViewModel.setLoginErrorResult(error.getError().getMessage());
             }
         });
     }
