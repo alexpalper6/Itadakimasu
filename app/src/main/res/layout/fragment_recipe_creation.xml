@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    tools:context=".ui.recipeCreation.RecipeCreationFragment">
+
+
+    <ImageView
+        android:id="@+id/iv_add_recipe_image"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="@string/add_recipe_Image"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_baseline_add_photo_alternate_24"
+        app:layout_constraintBottom_toTopOf="@+id/guideline3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider2" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.32" />
+
+    <ImageView
+        android:id="@+id/iv_add_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:contentDescription="@string/write_title"
+        android:src="@drawable/ic_baseline_title_24"
+        app:layout_constraintBottom_toBottomOf="@+id/til_add_recipe_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/til_add_recipe_title" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_add_recipe_title"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="start"
+        app:endIconMode="clear_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/iv_add_title"
+        app:layout_constraintTop_toTopOf="@+id/guideline3">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_add_recipe_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:hint="@string/write_title"
+            android:inputType="textShortMessage|text"
+            android:textColorHint="#757575"
+            tools:ignore="TextContrastCheck,DuplicateSpeakableTextCheck" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <ImageView
+        android:id="@+id/iv_add_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/write_description"
+        android:src="@drawable/ic_baseline_description_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/til_add_recipe_description" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_add_recipe_description"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="start"
+        app:endIconMode="clear_text"
+        app:layout_constraintBottom_toTopOf="@+id/guideline4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/iv_add_description"
+        app:layout_constraintTop_toBottomOf="@+id/til_add_recipe_title">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_add_recipe_description"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="start"
+            android:hint="@string/write_description"
+            android:inputType="textMultiLine"
+            android:lines="10"
+            android:singleLine="false"
+            android:textColorHint="#757575"
+            tools:ignore="TextContrastCheck,DuplicateSpeakableTextCheck" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/bt_add_ingredients"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/add_ingredients"
+        app:layout_constraintBottom_toTopOf="@+id/bt_add_steps"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline4" />
+
+    <Button
+        android:id="@+id/bt_add_steps"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="@string/add_steps"
+        app:layout_constraintBottom_toTopOf="@+id/fab_create_recipe"
+        app:layout_constraintEnd_toEndOf="@+id/bt_add_ingredients"
+        app:layout_constraintStart_toStartOf="@+id/bt_add_ingredients"
+        app:layout_constraintTop_toBottomOf="@+id/bt_add_ingredients" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.7" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_create_recipe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:clickable="true"
+        android:contentDescription="@string/create_recipe"
+        android:src="@drawable/ic_baseline_done_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="DuplicateSpeakableTextCheck" />
+
+    <ImageButton
+        android:id="@+id/ib_go_back"
+        style="@android:style/Widget.Material.ImageButton"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:contentDescription="@string/go_back"
+        android:minWidth="48dp"
+        android:minHeight="48dp"
+        android:src="?attr/actionModeCloseDrawable"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:text="@string/title_recipe_creation"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/ib_go_back"
+        app:layout_constraintStart_toEndOf="@+id/ib_go_back"
+        app:layout_constraintTop_toTopOf="@+id/ib_go_back" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/divider2"
+        android:layout_width="409dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ib_go_back" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

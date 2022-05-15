@@ -18,13 +18,28 @@ import app.itadakimasu.data.model.FirebaseContract;
  * Repository used to add files on the Storage.
  */
 public class StorageRepository {
+    public static volatile StorageRepository INSTANCE;
     private final FirebaseStorage dbStorage;
     private final FirebaseAuth authInstance;
 
-    public StorageRepository() {
+    public static StorageRepository getInstance() {
+        if (INSTANCE == null) {
+            synchronized (StorageRepository.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new StorageRepository();
+                }
+            }
+        }
+        return INSTANCE;
+    }
+
+    private StorageRepository() {
         this.dbStorage = FirebaseStorage.getInstance();
         this.authInstance = FirebaseAuth.getInstance();
     }
+
+
+
 
 
     /**

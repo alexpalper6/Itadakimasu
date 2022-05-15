@@ -4,15 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.register.RegisterFragment">
+    android:paddingLeft="@dimen/fragment_horizontal_margin"
+    android:paddingTop="@dimen/fragment_vertical_margin"
+    android:paddingRight="@dimen/fragment_horizontal_margin"
+    android:paddingBottom="@dimen/fragment_vertical_margin"
+    tools:context=".ui.auth.register.RegisterFragment">
 
     <TextView
-        android:id="@+id/et_create_account"
+        android:id="@+id/tv_create_account"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="24dp"
-        android:layout_marginEnd="8dp"
         android:text="@string/create_account"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
@@ -22,69 +24,111 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/et_new_password"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_new_email"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:autofillHints="@string/prompt_password"
-        android:ems="10"
-        android:hint="@string/prompt_password"
-        android:inputType="textPassword"
-        android:minHeight="48dp"
-        android:selectAllOnFocus="true"
-        android:textColorHint="#757575"
-        app:layout_constraintEnd_toEndOf="@+id/et_new_email"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/et_new_email"
-        app:layout_constraintTop_toBottomOf="@+id/et_new_username" />
-
-    <EditText
-        android:id="@+id/et_repeat_password"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:autofillHints="@string/prompt_repeat_password"
-        android:ems="10"
-        android:hint="@string/prompt_repeat_password"
-        android:imeOptions="actionDone"
-        android:inputType="textPassword"
-        android:minHeight="48dp"
-        android:selectAllOnFocus="true"
-        android:textColorHint="#757575"
-        app:layout_constraintEnd_toEndOf="@+id/et_new_password"
-        app:layout_constraintStart_toStartOf="@+id/et_new_password"
-        app:layout_constraintTop_toBottomOf="@+id/et_new_password" />
-
-    <EditText
-        android:id="@+id/et_new_email"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="24dp"
-        android:autofillHints="@string/prompt_email"
-        android:hint="@string/prompt_email"
-        android:inputType="textEmailAddress"
-        android:minHeight="48dp"
-        android:selectAllOnFocus="true"
-        android:textColorHint="#757575"
+        app:endIconMode="clear_text"
+        app:helperText="@string/required"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_create_account" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_create_account"
+        app:startIconDrawable="@drawable/ic_baseline_email_24">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_new_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/prompt_email"
+            android:inputType="textWebEmailAddress|textEmailAddress"
+            android:textColorHint="#757575"
+            tools:ignore="TextContrastCheck" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_new_username"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:endIconMode="clear_text"
+        app:helperText="@string/required"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/til_new_email"
+        app:startIconDrawable="@drawable/ic_person_24">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_new_username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/prompt_username"
+            android:inputType="text"
+            android:textColorHint="#757575"
+            tools:ignore="TextContrastCheck" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_new_password"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:counterEnabled="true"
+        app:counterMaxLength="30"
+        app:endIconMode="password_toggle"
+        app:helperText="@string/required"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/til_new_username"
+        app:startIconDrawable="@drawable/ic_baseline_lock_24">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_new_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/prompt_password"
+            android:inputType="textWebPassword"
+            android:textColorHint="#757575"
+            tools:ignore="TextContrastCheck" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_repeat_password"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:counterMaxLength="30"
+        app:endIconMode="password_toggle"
+        app:helperText="@string/required"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/til_new_password"
+        app:startIconDrawable="@drawable/ic_baseline_lock_clock_24">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_repeat_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/prompt_repeat_password"
+            android:inputType="textWebPassword"
+            android:textColorHint="#757575"
+            tools:ignore="TextContrastCheck" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/bt_create_account"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginTop="32dp"
         android:enabled="false"
         android:text="@string/action_register"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_repeat_password" />
+        app:layout_constraintTop_toBottomOf="@+id/til_repeat_password" />
 
     <ProgressBar
         android:id="@+id/pb_register_progress"
@@ -96,22 +140,4 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <EditText
-        android:id="@+id/et_new_username"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="24dp"
-        android:autofillHints="@string/prompt_username"
-        android:ems="10"
-        android:hint="@string/prompt_username"
-        android:inputType="textPersonName"
-        android:minHeight="48dp"
-        android:selectAllOnFocus="true"
-        android:textColorHint="#757575"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_new_email" />
 </androidx.constraintlayout.widget.ConstraintLayout>

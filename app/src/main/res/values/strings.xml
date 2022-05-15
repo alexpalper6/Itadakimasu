@@ -1,4 +1,5 @@
 <resources>
+    <!-- App title strings -->
     <string name="app_name">Itadakimasu</string>
     <string name="title_home">Home</string>
     <string name="title_new_recipe">New Recipe</string>
@@ -6,40 +7,78 @@
     <string name="title_profile">My Profile</string>
     <string name="title_login">Login</string>
     <string name="title_register">Register</string>
+    <string name="title_recipe_creation">Recipe Creation</string>
     <!-- Strings related to login and register -->
+    <string name="app_logo">App logo</string>
+
     <string name="prompt_email">Email</string>
     <string name="prompt_username">Username</string>
     <string name="prompt_password">Password</string>
     <string name="prompt_repeat_password">Repeat password</string>
+    <string name="required">*Required</string>
+
     <string name="action_register">Register</string>
     <string name="action_sign_in_short">Sign in</string>
-    <string name="welcome">"Welcome, %1$s!"</string>
+    <string name="sign_out">Sign out</string>
+    <string name="action_sign_up">Are you new? Sign up!</string>
+    <string name="create_account">Create Account</string>
+
     <string name="invalid_email">Not a valid email</string>
     <string name="invalid_username">Not a valid username</string>
     <string name="username_chosen">The username is already chosen!</string>
-    <string name="invalid_password">Password must be greater than 8 characters and must contain numbers</string>
+    <string name="invalid_password">Password must be greater than 8 characters, lesser or equal than 30 and must contain numbers</string>
     <string name="invalid_repeated_apssword">The password does not match</string>
     <string name="login_failed">"Login failed"</string>
-    <string name="action_sign_up">Are you new? Sign up!</string>
-    <string name="create_account">Create Account</string>
-    <string name="app_logo">App logo</string>
-    <string name="no_thanks">No thanks</string>
-    <string name="done">Done!</string>
+
+    <string name="welcome">"Welcome, %1$s!"</string>
     <string name="prompt_add_photo">Finish setting up your profile by adding a photo!</string>
-    <string name="select_media_method">Set the photo by</string>
-    <string name="gallery_perm_denied_info">You must give permissions in order to set an image</string>
-    <string name="cancel">Cancel</string>
-    <string name="ok">OK</string>
+    <string name="add_photo_info">Add a photo by clicking on the image</string>
+
+
     <string name="image_error">Image couldn\'t be established</string>
     <string name="image_upload_error">Image could not be uploaded</string>
-    <string name="retry">Retry</string>
     <string name="image_user_error">Image could not be added on the profile</string>
-    <string name="add_photo_info">Add a photo by clicking on the image</string>
-    <string name="sign_out">Sign out</string>
+
+    <string name="gallery_perm_denied_info">You must give permissions in order to set an image</string>
+
+    <!-- Strings for dialog and actions -->
     <string-array name="media_selectors">
         <item>Camera</item>
         <item>Gallery</item>
     </string-array>
+    <string name="select_media_method">Set the photo by</string>
+    <string name="done">Done!</string>
+    <string name="no_thanks">No thanks</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="retry">Retry</string>
+    <string name="more">More</string>
+    <string name="edit">Edit</string>
+    <string name="remove">Remove</string>
+    <string name="go_back">Go back</string>
+
+
+    <!-- Strings for recipe creation -->
+    <string name="write_title">Write your recipe\'s title here</string>
+    <string name="write_description">Write your recipe\'s description here</string>
+    <string name="add_recipe_Image">Add your recipe\'s image here</string>
+    <string name="add_ingredients">Add Ingredients</string>
+    <string name="add_steps">Add Steps</string>
+    <string name="create_recipe">Create Recipe</string>
+    <!-- Strings for ingredients addition -->
+    <string name="add_ingredient_information">Add ingredient information</string>
+    <!-- Strings for steps addition -->
+    <!-- String for item layouts -->
+    <string name="ingredient">Ingredient</string>
+    <string name="step">Step</string>
+    <string name="step_position">0</string>
+    <string name="add_description">Add description</string>
+    <string name="ingredient_exists">An ingredient already exists with this description</string>
+    <string name="ingredient_description_edit">Ingredient\'s description edition</string>
+    <string name="step_description_edit">Step\'s description edition</string>
+    <string name="add_step_information">Add step information</string>
+    <string name="step_exists">A step already exists with this description</string>
+    <string name="add_ingredient_content_description">Add an ingredient to the list</string>
 
 
 </resources>

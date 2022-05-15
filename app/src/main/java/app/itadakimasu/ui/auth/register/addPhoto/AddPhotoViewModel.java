@@ -1,4 +1,4 @@
-package app.itadakimasu.ui.register.addPhoto;
+package app.itadakimasu.ui.auth.register.addPhoto;
 
 import android.net.Uri;
 
@@ -20,7 +20,7 @@ public class AddPhotoViewModel extends ViewModel {
     private final MutableLiveData<String> photoPathState;
 
     public AddPhotoViewModel() {
-        this.storageRepository = new StorageRepository();
+        this.storageRepository = StorageRepository.getInstance();
         this.usernameDisplayState = new MutableLiveData<>();
         this.photoUriState = new MutableLiveData<>();
         this.photoResultState = new MutableLiveData<>();

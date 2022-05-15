@@ -20,13 +20,27 @@ import app.itadakimasu.data.model.User;
  * Repository used to add data on users collection in the firetore database.
  */
 public class UsersRepository {
+    public static volatile UsersRepository INSTANCE;
     private FirebaseFirestore dbFirestore;
     private FirebaseAuth firebaseAuth;
 
-    public UsersRepository() {
+    public static UsersRepository getInstance() {
+        if (INSTANCE == null) {
+            synchronized (UsersRepository.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new UsersRepository();
+                }
+            }
+        }
+        return INSTANCE;
+    }
+
+    private UsersRepository() {
         this.dbFirestore = FirebaseFirestore.getInstance();
         this.firebaseAuth = FirebaseAuth.getInstance();
     }
+
+
 
     /**
      * Add a user with their data to the database.

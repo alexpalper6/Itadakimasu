@@ -1,4 +1,4 @@
-package app.itadakimasu.ui.register.addPhoto;
+package app.itadakimasu.ui.auth.register.addPhoto;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -30,7 +30,7 @@ import com.google.android.material.snackbar.Snackbar;
 import app.itadakimasu.R;
 import app.itadakimasu.data.Result;
 import app.itadakimasu.databinding.FragmentAddPhotoBinding;
-import app.itadakimasu.ui.SelectMediaDialogFragment;
+import app.itadakimasu.utils.dialogs.SelectMediaDialogFragment;
 import app.itadakimasu.utils.ImageCompressorUtils;
 import app.itadakimasu.utils.ImageCropUtils;
 
@@ -135,7 +135,7 @@ public class AddPhotoFragment extends Fragment {
                 binding.pbAddPhoto.setVisibility(View.VISIBLE);
             } else {
                 Snackbar.make(
-                        requireActivity().findViewById(android.R.id.content)
+                        binding.getRoot()
                         , R.string.add_photo_info
                         , BaseTransientBottomBar.LENGTH_LONG).show();
             }
@@ -151,7 +151,7 @@ public class AddPhotoFragment extends Fragment {
      */
     private void showStorageErrorSnackbar(Integer photoStorageError) {
         Snackbar.make(
-                requireActivity().findViewById(android.R.id.content)
+                binding.getRoot()
                 , photoStorageError
                 , BaseTransientBottomBar.LENGTH_LONG
         ).setAction(R.string.retry, v -> uploadPhotoStorage()).show();

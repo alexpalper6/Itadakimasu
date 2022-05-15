@@ -1,4 +1,4 @@
-package app.itadakimasu.ui.register;
+package app.itadakimasu.ui.auth.register;
 
 import android.util.Patterns;
 
@@ -31,8 +31,8 @@ public class RegisterViewModel extends ViewModel {
 
 
     public RegisterViewModel() {
-        this.authRepository = new AppAuthRepository();
-        this.usersRepository = new UsersRepository();
+        this.authRepository = AppAuthRepository.getInstance();
+        this.usersRepository = UsersRepository.getInstance();
         this.registerFormState = new MutableLiveData<>();
         this.registerResult = new MutableLiveData<>();
     }
@@ -189,7 +189,7 @@ public class RegisterViewModel extends ViewModel {
         Pattern pattern = Pattern.compile("^(?=.*[0-9])(?=.*[a-zA-Z]).*$");
         Matcher matcher = pattern.matcher(password);
 
-        return password.length() > 8 && matcher.matches();
+        return password.length() > 8 && matcher.matches() && password.length() <= 30;
     }
 
     /**

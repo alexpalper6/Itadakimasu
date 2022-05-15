@@ -8,16 +8,14 @@
     android:paddingTop="@dimen/fragment_vertical_margin"
     android:paddingRight="@dimen/fragment_horizontal_margin"
     android:paddingBottom="@dimen/fragment_vertical_margin"
-    tools:context=".ui.register.addPhoto.AddPhotoFragment">
+    tools:context=".ui.auth.register.addPhoto.AddPhotoFragment">
 
 
     <TextView
         android:id="@+id/tv_welcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="24dp"
         android:text="@string/welcome"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
@@ -30,9 +28,7 @@
         android:id="@+id/iv_new_photo"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"
-        android:layout_marginEnd="24dp"
         android:layout_marginBottom="24dp"
         android:contentDescription="@string/prompt_add_photo"
         android:scaleType="fitCenter"
@@ -48,9 +44,7 @@
         android:id="@+id/tv_photo_prompt"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="24dp"
         android:text="@string/prompt_add_photo"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
@@ -63,7 +57,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
         android:text="@string/done"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -72,14 +65,13 @@
 
     <Button
         android:id="@+id/bt_decline"
+        style="?attr/materialButtonOutlinedStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/nonImportantButtonColor"
         android:text="@string/no_thanks"
-        android:textColor="@color/primaryDarkColor"
+        android:textColor="?attr/colorPrimaryVariant"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/bt_done"
         app:layout_constraintHorizontal_bias="0.5"

@@ -1,4 +1,4 @@
-package app.itadakimasu.ui.register;
+package app.itadakimasu.ui.auth.register;
 
 
 import androidx.lifecycle.ViewModelProvider;
@@ -25,7 +25,7 @@ import app.itadakimasu.R;
 import app.itadakimasu.data.Result;
 import app.itadakimasu.data.model.User;
 import app.itadakimasu.databinding.FragmentRegisterBinding;
-import app.itadakimasu.ui.register.addPhoto.AddPhotoFragment;
+import app.itadakimasu.ui.auth.register.addPhoto.AddPhotoFragment;
 
 /**
  * Fragment that let the user interact with the system in order to register.
@@ -63,7 +63,7 @@ public class RegisterFragment extends Fragment {
             if (registerResult.getUsernameError() != null) {
                 binding.etNewUsername.setText("");
                 if (getContext() != null && getContext().getApplicationContext() != null) {
-                    Snackbar.make(requireActivity().findViewById(android.R.id.content),
+                    Snackbar.make(binding.getRoot(),
                             registerResult.getUsernameError(),
                             BaseTransientBottomBar.LENGTH_LONG).show();
                 }
@@ -71,14 +71,14 @@ public class RegisterFragment extends Fragment {
             // If the transaction fails, the registry error result will have the user's data
             // so a SnackBar will appear asking the user for retry.
             if (registerResult.getUser() != null && registerResult.getError() != null) {
-                Snackbar.make(requireActivity().findViewById(android.R.id.content), registerResult.getError(), BaseTransientBottomBar.LENGTH_LONG)
+                Snackbar.make(binding.getRoot(), registerResult.getError(), BaseTransientBottomBar.LENGTH_LONG)
                         .setAction(R.string.retry, v -> completeRegisterTransaction(registerResult.getUser()))
                         .show();
             }
 
             if (registerResult.getError() != null && registerResult.getUser() == null) {
                 if (getContext() != null && getContext().getApplicationContext() != null) {
-                    Snackbar.make(requireActivity().findViewById(android.R.id.content),
+                    Snackbar.make(binding.getRoot(),
                             registerResult.getError(),
                             BaseTransientBottomBar.LENGTH_LONG).show();
                 }
@@ -215,16 +215,27 @@ public class RegisterFragment extends Fragment {
         binding.btCreateAccount.setEnabled(registerFormState.isDataValid());
 
         if (registerFormState.getEmailError() != null) {
-            binding.etNewEmail.setError(getString(registerFormState.getEmailError()));
+            binding.tilNewEmail.setError(getString(registerFormState.getEmailError()));
+        } else {
+            binding.tilNewEmail.setError(null);
         }
+
         if (registerFormState.getUsernameError() != null) {
-            binding.etNewUsername.setError(getString(registerFormState.getUsernameError()));
+            binding.tilNewUsername.setError(getString(registerFormState.getUsernameError()));
+        } else {
+            binding.tilNewUsername.setError(null);
         }
+
         if (registerFormState.getPasswordError() != null) {
-            binding.etNewPassword.setError(getString(registerFormState.getPasswordError()));
+            binding.tilNewPassword.setError(getString(registerFormState.getPasswordError()));
+        } else {
+            binding.tilNewPassword.setError(null);
         }
+
         if (registerFormState.getRepeatedPasswordError() != null) {
-            binding.etRepeatPassword.setError(getString(registerFormState.getRepeatedPasswordError()));
+            binding.tilRepeatPassword.setError(getString(registerFormState.getRepeatedPasswordError()));
+        } else {
+            binding.tilRepeatPassword.setError(null);
         }
     }
 

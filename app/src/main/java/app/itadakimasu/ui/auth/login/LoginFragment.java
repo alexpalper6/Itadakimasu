@@ -1,4 +1,4 @@
-package app.itadakimasu.ui.login;
+package app.itadakimasu.ui.auth.login;
 
 import androidx.lifecycle.ViewModelProvider;
 import androidx.annotation.NonNull;
@@ -45,7 +45,10 @@ public class LoginFragment extends Fragment implements FirebaseAuth.AuthStateLis
 
         loginViewModel.getLoginFormState().observe(getViewLifecycleOwner(), loginFormState -> {
             if (loginFormState.getUserEmailError() != null) {
-                binding.etEmail.setError(getString(loginFormState.getUserEmailError()));
+                //binding.etEmail.setError(getString(loginFormState.getUserEmailError()));
+                binding.tilEmail.setError(getString(loginFormState.getUserEmailError()));
+            } else {
+                binding.tilEmail.setError(null);
             }
 
             binding.btLogin.setEnabled(loginFormState.isDataValid());
@@ -53,7 +56,7 @@ public class LoginFragment extends Fragment implements FirebaseAuth.AuthStateLis
 
         loginViewModel.getLoginErrorResult().observe(getViewLifecycleOwner(), loginResultState -> {
             binding.loading.setVisibility(View.GONE);
-            Snackbar.make(requireActivity().findViewById(android.R.id.content)
+            Snackbar.make(binding.getRoot()
                     , loginResultState.getError()
                     , BaseTransientBottomBar.LENGTH_LONG).show();
         });

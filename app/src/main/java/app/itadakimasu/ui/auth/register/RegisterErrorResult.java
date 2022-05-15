@@ -1,4 +1,4 @@
-package app.itadakimasu.ui.register;
+package app.itadakimasu.ui.auth.register;
 
 import androidx.annotation.Nullable;
 

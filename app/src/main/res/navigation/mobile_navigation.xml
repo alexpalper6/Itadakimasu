@@ -25,6 +25,10 @@
         <action
             android:id="@+id/action_navigation_profile_to_navigation_login"
             app:destination="@id/auth_navigation"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
             app:popUpTo="@id/navigation_profile"
             app:popUpToInclusive="true" />
     </fragment>
@@ -32,7 +36,7 @@
         app:startDestination="@id/navigation_login">
         <fragment
             android:id="@+id/navigation_login"
-            android:name="app.itadakimasu.ui.login.LoginFragment"
+            android:name="app.itadakimasu.ui.auth.login.LoginFragment"
             android:label="@string/title_login"
             tools:layout="@layout/fragment_login">
             <action
@@ -42,7 +46,7 @@
         </fragment>
         <fragment
             android:id="@+id/navigation_register"
-            android:name="app.itadakimasu.ui.register.RegisterFragment"
+            android:name="app.itadakimasu.ui.auth.register.RegisterFragment"
             android:label="@string/title_register"
             tools:layout="@layout/fragment_register">
             <action
@@ -51,7 +55,7 @@
         </fragment>
         <fragment
             android:id="@+id/navigation_photo_addition"
-            android:name="app.itadakimasu.ui.register.addPhoto.AddPhotoFragment"
+            android:name="app.itadakimasu.ui.auth.register.addPhoto.AddPhotoFragment"
             android:label="fragment_add_photo"
             tools:layout="@layout/fragment_add_photo">
             <argument
@@ -61,7 +65,54 @@
         <action
             android:id="@+id/action_auth_navigation_to_navigation_home"
             app:destination="@id/navigation_home"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
             app:popUpTo="@id/auth_navigation"
+            app:popUpToInclusive="true" />
+    </navigation>
+    <navigation
+        android:id="@+id/creation_navigation"
+        app:startDestination="@id/navigation_recipe_creation">
+        <fragment
+            android:id="@+id/navigation_ingredient_creation"
+            android:name="app.itadakimasu.ui.recipeCreation.ingredientCreation.IngredientCreationFragment"
+            android:label="fragment_ingredient_creation"
+            tools:layout="@layout/fragment_ingredient_creation" />
+        <fragment
+            android:id="@+id/navigation_recipe_creation"
+            android:name="app.itadakimasu.ui.recipeCreation.RecipeCreationFragment"
+            android:label="@string/title_recipe_creation"
+            tools:layout="@layout/fragment_recipe_creation">
+            <action
+                android:id="@+id/action_navigation_recipe_creation_to_navigation_ingredient_creation"
+                app:destination="@id/navigation_ingredient_creation"
+                app:enterAnim="@anim/nav_default_enter_anim"
+                app:exitAnim="@anim/nav_default_exit_anim"
+                app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+                app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+            <action
+                android:id="@+id/action_navigation_recipe_creation_to_navigation_step_Creation"
+                app:destination="@id/navigation_step_Creation"
+                app:enterAnim="@anim/nav_default_enter_anim"
+                app:exitAnim="@anim/nav_default_exit_anim"
+                app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+                app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        </fragment>
+        <fragment
+            android:id="@+id/navigation_step_Creation"
+            android:name="app.itadakimasu.ui.recipeCreation.stepCreation.StepCreationFragment"
+            android:label="fragment_step_creation"
+            tools:layout="@layout/fragment_step_creation" />
+        <action
+            android:id="@+id/action_recipe_creation_navigation_to_home"
+            app:destination="@id/navigation_home"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:popUpTo="@id/creation_navigation"
             app:popUpToInclusive="true" />
     </navigation>
 </navigation>

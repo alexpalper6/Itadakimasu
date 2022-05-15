@@ -28,13 +28,26 @@ import app.itadakimasu.data.model.User;
  * Class that requests authentication and user information from the remote data source.
  */
 public class AppAuthRepository {
+    public static volatile AppAuthRepository INSTANCE;
     // Entry point of Firebase Authentication, this is used to get the instance.
     private final FirebaseAuth firebaseAuth;
 
-    public AppAuthRepository() {
-        this.firebaseAuth = FirebaseAuth.getInstance();
-
+    public static AppAuthRepository getInstance() {
+        if (INSTANCE == null) {
+            synchronized (AppAuthRepository.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new AppAuthRepository();
+                }
+            }
+        }
+        return INSTANCE;
     }
+
+    private AppAuthRepository() {
+        this.firebaseAuth = FirebaseAuth.getInstance();
+    }
+
+
 
     /**
      * Authenticates the user with given email and password, returns a result so the UI Layer can

@@ -9,56 +9,18 @@
     android:paddingTop="@dimen/fragment_vertical_margin"
     android:paddingRight="@dimen/fragment_horizontal_margin"
     android:paddingBottom="@dimen/fragment_vertical_margin"
-    tools:context=".ui.login.LoginFragment">
-
-    <EditText
-        android:id="@+id/et_email"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="24dp"
-        android:autofillHints="@string/prompt_email"
-        android:hint="@string/prompt_email"
-        android:inputType="textEmailAddress"
-        android:minHeight="48dp"
-        android:selectAllOnFocus="true"
-        android:textColorHint="#757575"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline" />
-
-    <EditText
-        android:id="@+id/et_password"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="24dp"
-        android:autofillHints="@string/prompt_password"
-        android:hint="@string/prompt_password"
-        android:imeActionLabel="@string/action_sign_in_short"
-        android:imeOptions="actionDone"
-        android:inputType="textPassword"
-        android:minHeight="48dp"
-        android:selectAllOnFocus="true"
-        android:textColorHint="#757575"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_email" />
+    tools:context=".ui.auth.login.LoginFragment">
 
     <ProgressBar
         android:id="@+id/loading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
         android:layout_marginBottom="24dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/et_password"
-        app:layout_constraintStart_toStartOf="@+id/et_password" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
@@ -71,9 +33,7 @@
         android:id="@+id/iv_login_logo"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="24dp"
         android:layout_marginBottom="16dp"
         android:contentDescription="@string/app_logo"
         android:src="@drawable/ic_itadakimasu_dynamic_logo"
@@ -86,24 +46,69 @@
         android:id="@+id/bt_login"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginTop="48dp"
         android:enabled="false"
         android:text="@string/action_sign_in_short"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_password" />
+        app:layout_constraintTop_toBottomOf="@+id/til_password" />
 
     <Button
         android:id="@+id/bt_register"
+        style="?attr/materialButtonOutlinedStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:backgroundTint="@color/nonImportantButtonColor"
         android:text="@string/action_sign_up"
-        android:textColor="@color/primaryDarkColor"
+        android:textColor="?attr/colorPrimaryVariant"
         app:layout_constraintEnd_toEndOf="@+id/bt_login"
         app:layout_constraintStart_toStartOf="@+id/bt_login"
         app:layout_constraintTop_toBottomOf="@+id/bt_login" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_email"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:endIconMode="clear_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline"
+        app:startIconDrawable="@drawable/ic_baseline_email_24">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/prompt_email"
+            android:inputType="textWebEmailAddress|textEmailSubject"
+            android:textColorHint="#757575"
+            tools:ignore="TextContrastCheck" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_password"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:counterEnabled="true"
+        app:counterMaxLength="30"
+        app:endIconMode="password_toggle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/til_email"
+        app:startIconDrawable="@drawable/ic_baseline_lock_24">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/prompt_password"
+            android:inputType="textPassword"
+            android:textColorHint="#757575"
+            tools:ignore="TextContrastCheck" />
+    </com.google.android.material.textfield.TextInputLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

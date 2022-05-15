@@ -1,8 +1,6 @@
-package app.itadakimasu.ui.register;
+package app.itadakimasu.ui.auth.register;
 
 import androidx.annotation.Nullable;
-
-import app.itadakimasu.data.model.User;
 
 /**
  * UI State that will hold state of the form, the input fields. The fragment will use it in order to give feedback

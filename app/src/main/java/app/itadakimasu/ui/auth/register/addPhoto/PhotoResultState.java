@@ -1,4 +1,4 @@
-package app.itadakimasu.ui.register.addPhoto;
+package app.itadakimasu.ui.auth.register.addPhoto;
 
 import androidx.annotation.Nullable;
 

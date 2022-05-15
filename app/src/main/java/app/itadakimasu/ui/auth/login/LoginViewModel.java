@@ -1,4 +1,4 @@
-package app.itadakimasu.ui.login;
+package app.itadakimasu.ui.auth.login;
 
 import android.util.Patterns;
 
@@ -17,7 +17,7 @@ public class LoginViewModel extends ViewModel {
     private final MutableLiveData<LoginErrorResult> loginErrorResult = new MutableLiveData<>();
 
     public LoginViewModel() {
-        this.loginRepository = new AppAuthRepository();
+        this.loginRepository = AppAuthRepository.getInstance();
     }
 
     LiveData<LoginFormState> getLoginFormState() {

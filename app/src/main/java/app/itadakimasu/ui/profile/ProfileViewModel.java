@@ -15,10 +15,11 @@ public class ProfileViewModel extends ViewModel {
 
     private final StorageRepository storageRepository;
     private final MutableLiveData<Uri> photoUri;
-    private MutableLiveData<String> photoPath;
+    private final MutableLiveData<String> photoPath;
     public ProfileViewModel() {
-        this.storageRepository = new StorageRepository();
+        this.storageRepository = StorageRepository.getInstance();
         this.photoUri = new MutableLiveData<>();
+        this.photoPath = new MutableLiveData<>();
     }
 
     public LiveData<Uri> getPhotoUri() {

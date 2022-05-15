@@ -1,31 +1,23 @@
 package app.itadakimasu;
 
-import android.app.FragmentManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDestination;
 import androidx.navigation.NavOptions;
-import androidx.navigation.NavOptionsBuilder;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import app.itadakimasu.databinding.ActivityMainBinding;
-import app.itadakimasu.ui.SelectMediaDialogFragment;
 
 /**
  * Activity of the application, charges the nav controller, the BottomNavigation visibility on fragments
@@ -42,28 +34,31 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        BottomNavigationView bottomNavigationView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_activity_main);
+        NavController navController = Objects.requireNonNull(navHostFragment).getNavController();
 
         // Create a list with fragments that doesn't have the BottomNavigation.
         List<Integer> fragmentsWithNoNavigator = Arrays.asList(
                 R.id.navigation_login,
                 R.id.navigation_register,
-                R.id.navigation_photo_addition);
+                R.id.navigation_photo_addition,
+                R.id.navigation_recipe_creation,
+                R.id.navigation_ingredient_creation,
+                R.id.navigation_step_Creation);
 
         // Adds a listener, when the navigation is triggered it'll check the destination's fragment.
         // If the fragment is one from the list, the BottomNavigation will be hidden; if not, it will be visible.
-        navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
-            @Override
-            public void onDestinationChanged(@NonNull NavController navController, @NonNull NavDestination navDestination, @Nullable Bundle bundle) {
-                if (fragmentsWithNoNavigator.contains(navDestination.getId())) {
-                    hideNavView();
-                } else {
-                    showNavView();
-                }
+        navController.addOnDestinationChangedListener((navController1, navDestination, bundle) -> {
+            if (fragmentsWithNoNavigator.contains(navDestination.getId())) {
+                hideNavView();
+            } else {
+                showNavView();
             }
         });
+
 
         // Set ups the navigation controller with the bottom navigation view,
         // so the user can navigate between fragments using this view.
@@ -110,7 +105,8 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
     @Override
     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
         if (firebaseAuth.getCurrentUser() == null) {
-            NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+            NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_activity_main);
+            NavController navController = Objects.requireNonNull(navHostFragment).getNavController();
             navController.navigate(R.id.auth_navigation, null, new NavOptions.Builder().setPopUpTo(R.id.navigation_home, true).build());
         }
     }
