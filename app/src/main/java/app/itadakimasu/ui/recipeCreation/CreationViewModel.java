@@ -1,35 +1,53 @@
 package app.itadakimasu.ui.recipeCreation;
 
+import android.net.Uri;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+import app.itadakimasu.data.Result;
 import app.itadakimasu.data.model.Ingredient;
 import app.itadakimasu.data.model.Recipe;
 import app.itadakimasu.data.model.Step;
+import app.itadakimasu.data.repository.RecipesRepository;
+import app.itadakimasu.data.repository.StorageRepository;
 
 /**
  * Shared ViewModel used on recipe, ingredients and steps fragments for creating a recipe.
  */
 public class CreationViewModel extends ViewModel {
-    private MutableLiveData<Recipe> recipe;
+    private final RecipesRepository recipesRepository;
+    private final StorageRepository storageRepository;
 
-    private MutableLiveData<List<Ingredient>> ingredientList;
-    private MutableLiveData<List<Step>> stepList;
 
+    private final MutableLiveData<List<Ingredient>> ingredientList;
+    private final MutableLiveData<List<Step>> stepList;
+    private final MutableLiveData<Uri> photoUri;
+    private String photoPath;
     private int itemPositionToEdit;
+
     public CreationViewModel() {
-        this.recipe = new MutableLiveData<>();
-        this.ingredientList = new MutableLiveData<>(new ArrayList<>());
+        this.recipesRepository = RecipesRepository.getInstance();
+        this.storageRepository = StorageRepository.getInstance();
+        this.ingredientList = new MutableLiveData<>();
         this.stepList = new MutableLiveData<>(new ArrayList<>());
+        this.photoUri = new MutableLiveData<>();
     }
 
+    public LiveData<Result<?>> uploadRecipe(String author, String photoAuthorUrl,String recipeTitle, String recipeDescription) {
+        Recipe recipe = new Recipe(author, photoAuthorUrl, recipeTitle, recipeDescription);
 
-    public LiveData<Recipe> getRecipe() {
-        return recipe;
+        return recipesRepository.uploadRecipe(recipe, getIngredientListToUpload(), getStepListToUpload());
+
+    }
+
+    public LiveData<Result<?>> uploadPhotoStorage(String recipePhotoUrl, byte[] imageData) {
+        return storageRepository.updateRecipeImage(recipePhotoUrl, imageData);
     }
 
     public LiveData<List<Step>> getStepList() {
@@ -40,13 +58,10 @@ public class CreationViewModel extends ViewModel {
         return ingredientList;
     }
 
-    public int getItemPositionToEdit() {
-        return itemPositionToEdit;
+    public LiveData<Uri> getPhotoUri() {
+        return photoUri;
     }
 
-    public void setItemPositionToEdit(int itemPositionToEdit) {
-        this.itemPositionToEdit = itemPositionToEdit;
-    }
 
     // Methods for ingredient list
 
@@ -81,6 +96,7 @@ public class CreationViewModel extends ViewModel {
             return false;
         }
         List<Ingredient> list = ingredientList.getValue();
+        assert list != null;
         list.set(itemPositionToEdit, new Ingredient(description));
 
         ingredientList.setValue(list);
@@ -92,7 +108,7 @@ public class CreationViewModel extends ViewModel {
      * @param ingredientPosition - The position of the ingredient to remove.
      */
     public void removeIngredientAt(int ingredientPosition) {
-        ingredientList.getValue().remove(ingredientPosition);
+        Objects.requireNonNull(ingredientList.getValue()).remove(ingredientPosition);
         ingredientList.setValue(ingredientList.getValue());
     }
 
@@ -102,7 +118,7 @@ public class CreationViewModel extends ViewModel {
      * @return true if an ingredient has the description; false if not.
      */
     public boolean ingredientExists(String ingredientDescription) {
-        return ingredientList.getValue().contains(new Ingredient(ingredientDescription));
+        return Objects.requireNonNull(ingredientList.getValue()).contains(new Ingredient(ingredientDescription));
     }
 
     /**
@@ -111,7 +127,7 @@ public class CreationViewModel extends ViewModel {
      * @return true if the new description is different; false if is the same.
      */
     public boolean ingredientHasDifferentDescToEdit(String description) {
-        return !ingredientList.getValue().get(itemPositionToEdit).getIngredientDescription().equals(description);
+        return !Objects.requireNonNull(ingredientList.getValue()).get(itemPositionToEdit).getIngredientDescription().equals(description);
     }
 
 
@@ -148,6 +164,7 @@ public class CreationViewModel extends ViewModel {
             return false;
         }
         List<Step> list = stepList.getValue();
+        assert list != null;
         list.set(itemPositionToEdit, new Step(description));
 
         stepList.setValue(list);
@@ -169,7 +186,7 @@ public class CreationViewModel extends ViewModel {
      * @return true if a step have been found with the same description; false if not.
      */
     public boolean stepExists(String stepDescription) {
-        return stepList.getValue().contains(new Step(stepDescription));
+        return Objects.requireNonNull(stepList.getValue()).contains(new Step(stepDescription));
     }
 
     /**
@@ -178,7 +195,83 @@ public class CreationViewModel extends ViewModel {
      * @return true if the new description is different; false if is the same.
      */
     public boolean stepHasDifferentDescToEdit(String description) {
-        return !stepList.getValue().get(itemPositionToEdit).getStepDescription().equals(description);
+        return !Objects.requireNonNull(stepList.getValue()).get(itemPositionToEdit).getStepDescription().equals(description);
     }
+
+    // ------- //
+
+    /**
+     * @return the path of the cropped image that the user uploads.
+     */
+    public String getPhotoPath() {
+        return photoPath;
+    }
+
+    /**
+     * Sets the image path that has been cropped.
+     * @param photoPath - the cropped image path.
+     */
+    public void setPhotoPath(String photoPath) {
+        this.photoPath = photoPath;
+    }
+
+    /**
+     * Sets the uri of the cropped image.
+     * @param uri - the cropped image.
+     */
+    public void setPhotoUri(Uri uri) {
+        photoUri.setValue(uri);
+    }
+
+    /**
+     * @param itemPositionToEdit - the position of the item selected that will be used for editing or
+     *                           removing an item from a list.
+     */
+    public void setItemPositionToEdit(int itemPositionToEdit) {
+        this.itemPositionToEdit = itemPositionToEdit;
+    }
+
+    /**
+     * Checks if all fields are filled.
+     * @param recipeTitle - the recipe's title EditText from the RecipeCreationFragment.
+     * @param recipeDescription - the recipe's description EditText from the RecipeCreationFragment.
+     * @return true if every field is filled; false if not.
+     */
+    public boolean areFieldsFilled(String recipeTitle, String recipeDescription) {
+        boolean titleIsFilled = recipeTitle.length() != 0;
+        boolean descriptionIsFilled = recipeDescription.length() != 0;
+        boolean photoFieldFilled = (photoPath != null && photoPath.length() != 0) && photoUri.getValue() != null;
+        boolean listFieldsFilled = !Objects.requireNonNull(ingredientList.getValue()).isEmpty()
+                && !Objects.requireNonNull(stepList.getValue()).isEmpty();
+
+        return titleIsFilled && descriptionIsFilled && photoFieldFilled && listFieldsFilled;
+    }
+
+    /**
+     * @return a list of the ingredients that are going to be uploaded, with their position updated.
+     */
+    private List<Ingredient> getIngredientListToUpload() {
+        List<Ingredient> list = ingredientList.getValue();
+        assert list != null;
+        for (int i = 0; i < list.size(); i++) {
+            list.get(0).setIngredientPosition(i);
+        }
+
+        return list;
+    }
+
+    /**
+     *
+     * @return a list of the steps that are going to be uploaded, with their position updated.
+     */
+    private List<Step> getStepListToUpload() {
+        List<Step> list = stepList.getValue();
+        assert list != null;
+        for (int i = 0; i < list.size(); i++) {
+            list.get(i).setStepPosition(i);
+        }
+        return list;
+    }
+
 
 }

@@ -19,6 +19,9 @@ public class Step implements Parcelable {
         this.stepDescription = stepDescription;
     }
 
+    public Step() {
+    }
+
     public int getStepPosition() {
         return stepPosition;
     }

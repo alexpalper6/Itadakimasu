@@ -1,6 +1,8 @@
 package app.itadakimasu.ui.auth.register.addPhoto;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
+import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,11 +37,10 @@ import app.itadakimasu.utils.dialogs.SelectMediaDialogFragment;
 import app.itadakimasu.utils.ImageCompressorUtils;
 import app.itadakimasu.utils.ImageCropUtils;
 
-
+/**
+ * Fragment that prompts when the user registers, asking them to set their profile's image.
+ */
 public class AddPhotoFragment extends Fragment {
-    // Keys for bundles
-    public static final String USERNAME_DISPLAY = "app.itadakimasu.register.addPhoto.usernameDisplay";
-
     private AddPhotoViewModel addPhotoViewModel;
     private FragmentAddPhotoBinding binding;
 
@@ -80,7 +82,9 @@ public class AddPhotoFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         addPhotoViewModel = new ViewModelProvider(this).get(AddPhotoViewModel.class);
-        addPhotoViewModel.setDisplayedUsername(getArguments().getString(USERNAME_DISPLAY));
+        SharedPreferences sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
+        String retrievedUsername = sharedPreferences.getString(getString(R.string.saved_photo_url_key), "");
+        addPhotoViewModel.setDisplayedUsername(retrievedUsername);
 
         // Observes change in the username, so when the fragment gets the username, it will show it on screen.
         addPhotoViewModel.getDisplayedUsername().observe(getViewLifecycleOwner(),
@@ -165,7 +169,7 @@ public class AddPhotoFragment extends Fragment {
      */
     private void uploadPhotoStorage() {
         String imagePath = addPhotoViewModel.getPhotoPathState().getValue();
-        byte[] imageData = ImageCompressorUtils.compressImage(imagePath);
+        byte[] imageData = ImageCompressorUtils.compressImage(imagePath, ImageCompressorUtils.PROFILE_MAX_HEIGHT, ImageCompressorUtils.PROFILE_MAX_WIDTH);
 
         addPhotoViewModel.uploadPhotoStorage(imageData).observe(getViewLifecycleOwner(), result -> {
             if (result instanceof Result.Success) {

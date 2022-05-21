@@ -34,6 +34,10 @@ public class Ingredient implements Parcelable {
         this.ingredientDescription = ingredientDescription;
     }
 
+    public Ingredient() {
+
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

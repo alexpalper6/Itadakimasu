@@ -62,4 +62,16 @@ public class StorageRepository {
                 .addOnFailureListener(failure -> result.setValue(new Result.Error(failure)));
         return result;
     }
+
+    public LiveData<Result<?>> updateRecipeImage(String photoUrlReference, byte[] imageData) {
+        MutableLiveData<Result<?>> result = new MutableLiveData<>();
+
+        StorageReference recipeImage = dbStorage.getReference().child(photoUrlReference);
+
+        recipeImage.putBytes(imageData)
+                .addOnSuccessListener(success -> result.setValue(new Result.Success<String>(recipeImage.getPath())))
+                .addOnFailureListener(failure -> result.setValue(new Result.Error(failure)));
+        return result;
+
+    }
 }

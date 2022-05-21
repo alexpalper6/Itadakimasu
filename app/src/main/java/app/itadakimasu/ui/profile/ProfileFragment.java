@@ -1,6 +1,8 @@
 package app.itadakimasu.ui.profile;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -83,6 +85,12 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+
+
+        SharedPreferences sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
+        binding.etNewEmail.setText(sharedPreferences.getString(getString(R.string.saved_username_key), ""));
+
+
         binding.btSignOut.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
         });
@@ -132,7 +140,7 @@ public class ProfileFragment extends Fragment {
 
     private void uploadPhotoStorageCompressed() {
         String photoPath = profileViewModel.getPhotoPath().getValue();
-        byte[] imageData = ImageCompressorUtils.compressImage(photoPath);
+        byte[] imageData = ImageCompressorUtils.compressImage(photoPath, ImageCompressorUtils.PROFILE_MAX_HEIGHT, ImageCompressorUtils.PROFILE_MAX_WIDTH);
 
         profileViewModel.uploadPhotoStorage(imageData).observe(getViewLifecycleOwner(), result -> {
             Snackbar.make(requireActivity().findViewById(android.R.id.content), "OK", BaseTransientBottomBar.LENGTH_LONG).show();

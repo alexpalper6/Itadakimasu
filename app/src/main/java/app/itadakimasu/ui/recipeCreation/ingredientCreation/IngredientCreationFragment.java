@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -44,7 +45,9 @@ public class IngredientCreationFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // Instantiating ViewModel, Adapter and setting the RecyclerView's layout and adapter.
-        creationViewModel = new ViewModelProvider(requireActivity()).get(CreationViewModel.class);
+        // Shares ViewModel with the navigation graph.
+        NavBackStackEntry backStackEntry = NavHostFragment.findNavController(this).getBackStackEntry(R.id.creation_navigation);
+        creationViewModel = new ViewModelProvider(backStackEntry).get(CreationViewModel.class);
         adapter = new IngredientCreationAdapter();
         binding.rvIngredients.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvIngredients.setAdapter(adapter);
@@ -72,7 +75,7 @@ public class IngredientCreationFragment extends Fragment {
             bundle.putString(EditDescriptionDialogFragment.TEXT_TO_EDIT, creationViewModel.getIngredientList().getValue().get(ingredientPosition).getIngredientDescription());
             dialog.setArguments(bundle);
 
-            dialog.show(getParentFragmentManager(), AddDescriptionDialogFragment.TAG);
+            dialog.show(getParentFragmentManager(), EditDescriptionDialogFragment.TAG);
         });
 
         // The remove option will remove the element that the user interacted with, using its position.
@@ -106,6 +109,7 @@ public class IngredientCreationFragment extends Fragment {
             }
         }));
 
+        // Hides the button for adding ingredients when the user scrolls.
         binding.rvIngredients.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {

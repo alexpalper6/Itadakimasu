@@ -6,8 +6,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -99,4 +101,16 @@ public class UsersRepository {
         return usernameResult;
     }
 
+
+    public LiveData<User> retrieveCurrentUserData() {
+        MutableLiveData<User> result = new MutableLiveData<>();
+
+        dbFirestore.collection(FirebaseContract.UserEntry.COLLECTION_NAME)
+                .document(firebaseAuth.getCurrentUser().getUid())
+                .get().addOnSuccessListener(documentSnapshot -> {
+                    result.setValue(documentSnapshot.toObject(User.class));
+                });
+
+        return result;
+    }
 }

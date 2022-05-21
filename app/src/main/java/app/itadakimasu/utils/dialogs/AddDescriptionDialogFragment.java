@@ -13,6 +13,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import app.itadakimasu.R;
 import app.itadakimasu.databinding.DialogAddDescriptionBinding;
 
+/**
+ * Dialog used to write text to a list.
+ */
 public class AddDescriptionDialogFragment extends DialogFragment {
     public static final String TAG = "AddDescriptionDialogFragment";
 
@@ -29,7 +32,7 @@ public class AddDescriptionDialogFragment extends DialogFragment {
         // Getting the layout inflater to set the layout on the dialog
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         DialogAddDescriptionBinding binding = DialogAddDescriptionBinding.inflate(inflater);
-
+        // Sets a default title in case that the bundle could not get the title argument.
         int title = R.string.add_description;
         if (bundle != null) {
             title = bundle.getInt(DIALOG_TITLE);
@@ -40,10 +43,12 @@ public class AddDescriptionDialogFragment extends DialogFragment {
                 .setView(binding.getRoot())
                 .setPositiveButton(R.string.ok, (dialog, which) -> {
                     String description = binding.etIngredientInfo.getText().toString().trim();
-
-                    if ("".equals(description)) {
+                    // If the text is empty, cancels the dialog instead of sending the data.
+                    if (description.length() == 0) {
                         AddDescriptionDialogFragment.this.getDialog().dismiss();
                     } else {
+                        // Sends the text written on the dialog to the fragment that requested the dialog
+                        // adding a result to the parentFragmentManager.
                         Bundle result = new Bundle();
                         result.putString(DIALOG_RESULT, binding.etIngredientInfo.getText().toString());
                         getParentFragmentManager().setFragmentResult(DIALOG_REQUEST, result);

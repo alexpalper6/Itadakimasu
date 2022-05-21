@@ -1,21 +1,15 @@
 package app.itadakimasu.utils;
 
 
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.net.Uri;
-import android.os.Environment;
 
 import androidx.exifinterface.media.ExifInterface;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
@@ -24,15 +18,17 @@ import java.io.IOException;
  * https://stackoverflow.com/questions/28424942/decrease-image-size-without-losing-its-quality-in-android
  */
 public class ImageCompressorUtils {
-    public static float MAX_HEIGHT = 400.0f;
-    public static float MAX_WIDTH = 400.0f;
+    public static float PROFILE_MAX_HEIGHT = 400.0f;
+    public static float PROFILE_MAX_WIDTH= 400.0f;
+    public static float LANDSCAPE_MAX_HEIGHT= 566.0f;
+    public static float LANDSCAPE_MAX_WIDTH= 1080.0f;
 
     /**
      * Compress an image
      * @param imageUri - the path of the image
      * @return the bytes of the image that will be uploaded to the server.
      */
-    public static byte[] compressImage(String imageUri) {
+    public static byte[] compressImage(String imageUri, float maxHeight, float maxWidth) {
 
         BitmapFactory.Options options = new BitmapFactory.Options();
 
@@ -46,24 +42,24 @@ public class ImageCompressorUtils {
 
         // We get the image ratio and the max ratio permitted dividing the width with the height.
         float imgRatio = actualWidth / actualHeight;
-        float maxRatio = MAX_WIDTH / MAX_HEIGHT;
+        float maxRatio = maxWidth / maxHeight;
 
         // Width and height values are set maintaining the aspect ratio of the image
 
-        if (actualHeight > MAX_HEIGHT || actualWidth > MAX_WIDTH) {
+        if (actualHeight > maxHeight || actualWidth > maxWidth) {
             if (imgRatio < maxRatio) {
-                imgRatio = MAX_HEIGHT / actualHeight;
+                imgRatio = maxHeight / actualHeight;
                 actualWidth = (int) (imgRatio * actualWidth);
-                actualHeight = (int) MAX_HEIGHT;
+                actualHeight = (int) maxHeight;
 
             } else if (imgRatio > maxRatio) {
-                imgRatio = MAX_WIDTH / actualWidth;
+                imgRatio = maxWidth / actualWidth;
                 actualHeight = (int) (imgRatio * actualHeight);
-                actualWidth = (int) MAX_WIDTH;
+                actualWidth = (int) maxWidth;
 
             } else {
-                actualHeight = (int) MAX_HEIGHT;
-                actualWidth = (int) MAX_WIDTH;
+                actualHeight = (int) maxHeight;
+                actualWidth = (int) maxWidth;
             }
         }
 

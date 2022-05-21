@@ -3,6 +3,8 @@ package app.itadakimasu.ui.auth.register;
 
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -175,15 +177,24 @@ public class RegisterFragment extends Fragment {
      * If the result is successful, the user will be redirected to the next part of the registry, where
      * they can upload a profile picture or not.
      * If it is not successful, the register error result will be updated.
+     * The app will save the username and photo with SharedPreferences so in the future the app will be
+     * able to retrieve the username data from there instead reading every time from the database.
      * @param user - the user's data.
      */
     private void completeRegisterTransaction(User user) {
         registerViewModel.addUserToDatabase(user).observe(getViewLifecycleOwner(), result -> {
             if (result instanceof Result.Success) {
                 binding.pbRegisterProgress.setVisibility(View.GONE);
-                Bundle bundleArgs = new Bundle();
-                bundleArgs.putString(AddPhotoFragment.USERNAME_DISPLAY, user.getUsername());
-                NavHostFragment.findNavController(requireParentFragment()).navigate(R.id.action_navigation_register_to_addPhotoFragment, bundleArgs);
+
+                SharedPreferences sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                editor.putString(getString(R.string.saved_username_key), user.getUsername());
+                editor.putString(getString(R.string.saved_photo_url_key), user.getPhotoUrl());
+
+                editor.apply();
+
+                NavHostFragment.findNavController(requireParentFragment()).navigate(R.id.action_navigation_register_to_addPhotoFragment);
             } else if (result instanceof  Result.Error){
                 registerViewModel.setUserUploadError(((Result.Error) result).getError().getMessage(), user);
             }

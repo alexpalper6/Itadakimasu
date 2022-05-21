@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.Exclude;
+import com.google.firebase.firestore.FieldValue;
 
 import java.util.Objects;
 
@@ -15,11 +16,11 @@ public class Recipe implements Parcelable {
     private String title;
     private String description;
     private String photoUrl;
-    private Timestamp creationDate;
+    private FieldValue creationDate;
     @Exclude
     private boolean isFavourite;
 
-    public Recipe(String author, String photoAuthorUrl, String title, String description, String photoUrl, Timestamp creationDate) {
+    public Recipe(String author, String photoAuthorUrl, String title, String description, String photoUrl, FieldValue creationDate) {
         this.author = author;
         this.photoAuthorUrl = photoAuthorUrl;
         this.title = title;
@@ -29,7 +30,7 @@ public class Recipe implements Parcelable {
         this.isFavourite = false;
     }
 
-    public Recipe(String author, String photoAuthorUrl, String title, String description, String photoUrl, Timestamp creationDate, boolean isFavourite) {
+    public Recipe(String author, String photoAuthorUrl, String title, String description, String photoUrl, FieldValue creationDate, boolean isFavourite) {
         this.author = author;
         this.photoAuthorUrl = photoAuthorUrl;
         this.title = title;
@@ -37,6 +38,16 @@ public class Recipe implements Parcelable {
         this.photoUrl = photoUrl;
         this.creationDate = creationDate;
         this.isFavourite = isFavourite;
+    }
+
+    public Recipe(String author, String photoAuthorUrl, String title, String description) {
+        this.author = author;
+        this.photoAuthorUrl = photoAuthorUrl;
+        this.title = title;
+        this.description = description;
+    }
+
+    public Recipe() {
     }
 
     public String getAuthor() {
@@ -59,7 +70,7 @@ public class Recipe implements Parcelable {
         return photoUrl;
     }
 
-    public Timestamp getCreationDate() {
+    public FieldValue getCreationDate() {
         return creationDate;
     }
 
@@ -88,7 +99,7 @@ public class Recipe implements Parcelable {
         this.photoUrl = photoUrl;
     }
 
-    public void setCreationDate(Timestamp creationDate) {
+    public void setCreationDate(FieldValue creationDate) {
         this.creationDate = creationDate;
     }
 
@@ -115,6 +126,7 @@ public class Recipe implements Parcelable {
         return Objects.hash(author, photoAuthorUrl, title, description, photoUrl);
     }
 
+
     @Override
     public int describeContents() {
         return 0;
@@ -127,7 +139,7 @@ public class Recipe implements Parcelable {
         dest.writeString(this.title);
         dest.writeString(this.description);
         dest.writeString(this.photoUrl);
-        dest.writeParcelable(this.creationDate, flags);
+        dest.writeParcelable((Parcelable) this.creationDate, flags);
         dest.writeByte(this.isFavourite ? (byte) 1 : (byte) 0);
     }
 
@@ -137,7 +149,7 @@ public class Recipe implements Parcelable {
         this.title = source.readString();
         this.description = source.readString();
         this.photoUrl = source.readString();
-        this.creationDate = source.readParcelable(Timestamp.class.getClassLoader());
+        this.creationDate = source.readParcelable(FieldValue.class.getClassLoader());
         this.isFavourite = source.readByte() != 0;
     }
 
@@ -147,11 +159,11 @@ public class Recipe implements Parcelable {
         this.title = in.readString();
         this.description = in.readString();
         this.photoUrl = in.readString();
-        this.creationDate = in.readParcelable(Timestamp.class.getClassLoader());
+        this.creationDate = in.readParcelable(FieldValue.class.getClassLoader());
         this.isFavourite = in.readByte() != 0;
     }
 
-    public static final Parcelable.Creator<Recipe> CREATOR = new Parcelable.Creator<Recipe>() {
+    public static final Creator<Recipe> CREATOR = new Creator<Recipe>() {
         @Override
         public Recipe createFromParcel(Parcel source) {
             return new Recipe(source);

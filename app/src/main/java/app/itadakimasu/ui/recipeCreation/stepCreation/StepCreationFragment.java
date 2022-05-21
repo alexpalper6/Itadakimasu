@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -44,7 +45,9 @@ public class StepCreationFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // Instantiation and configuration of ViewModel, Adapter and RecyclerViewModel.
-        creationViewModel = new ViewModelProvider(requireActivity()).get(CreationViewModel.class);
+        // Shares ViewModel with the navigation graph.
+        NavBackStackEntry backStackEntry = NavHostFragment.findNavController(this).getBackStackEntry(R.id.creation_navigation);
+        creationViewModel = new ViewModelProvider(backStackEntry).get(CreationViewModel.class);
         adapter = new StepCreationAdapter();
         binding.ibGoBack.setOnClickListener(v -> NavHostFragment.findNavController(this).popBackStack());
         binding.rvSteps.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -73,7 +76,7 @@ public class StepCreationFragment extends Fragment {
             bundle.putString(EditDescriptionDialogFragment.TEXT_TO_EDIT, creationViewModel.getStepList().getValue().get(ingredientPosition).getStepDescription());
             dialog.setArguments(bundle);
 
-            dialog.show(getParentFragmentManager(), AddDescriptionDialogFragment.TAG);
+            dialog.show(getParentFragmentManager(), EditDescriptionDialogFragment.TAG);
         });
 
         // Removes the step selected when the user selects the 'Remove' option
@@ -108,6 +111,8 @@ public class StepCreationFragment extends Fragment {
             }
         }));
 
+
+        // Hides the button for adding steps when the user scrolls.
         binding.rvSteps.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {

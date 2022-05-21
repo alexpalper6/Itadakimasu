@@ -8,16 +8,20 @@ public class User implements Parcelable {
     private String username;
     private String photoUrl;
 
-    public User(String uuid, String username, String photoUri) {
+    public User(String uuid, String username, String photoUrl) {
         this.uuid = uuid;
         this.username = username;
-        this.photoUrl = photoUri;
+        this.photoUrl = photoUrl;
     }
 
     public User(String uuid, String username) {
         this.uuid = uuid;
         this.username = username;
         this.photoUrl = "";
+    }
+
+    // Necessary for Firebase
+    public User() {
     }
 
     public String getUuid() {
