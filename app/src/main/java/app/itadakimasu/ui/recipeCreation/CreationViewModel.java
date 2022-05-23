@@ -34,9 +34,10 @@ public class CreationViewModel extends ViewModel {
     public CreationViewModel() {
         this.recipesRepository = RecipesRepository.getInstance();
         this.storageRepository = StorageRepository.getInstance();
-        this.ingredientList = new MutableLiveData<>();
+        this.ingredientList = new MutableLiveData<>(new ArrayList<>());
         this.stepList = new MutableLiveData<>(new ArrayList<>());
         this.photoUri = new MutableLiveData<>();
+
     }
 
     public LiveData<Result<?>> uploadRecipe(String author, String photoAuthorUrl,String recipeTitle, String recipeDescription) {
@@ -96,7 +97,6 @@ public class CreationViewModel extends ViewModel {
             return false;
         }
         List<Ingredient> list = ingredientList.getValue();
-        assert list != null;
         list.set(itemPositionToEdit, new Ingredient(description));
 
         ingredientList.setValue(list);
@@ -108,7 +108,8 @@ public class CreationViewModel extends ViewModel {
      * @param ingredientPosition - The position of the ingredient to remove.
      */
     public void removeIngredientAt(int ingredientPosition) {
-        Objects.requireNonNull(ingredientList.getValue()).remove(ingredientPosition);
+        assert ingredientList.getValue() != null;
+        ingredientList.getValue().remove(ingredientPosition);
         ingredientList.setValue(ingredientList.getValue());
     }
 
@@ -118,7 +119,8 @@ public class CreationViewModel extends ViewModel {
      * @return true if an ingredient has the description; false if not.
      */
     public boolean ingredientExists(String ingredientDescription) {
-        return Objects.requireNonNull(ingredientList.getValue()).contains(new Ingredient(ingredientDescription));
+        assert ingredientList.getValue() != null;
+        return ingredientList.getValue().contains(new Ingredient(ingredientDescription));
     }
 
     /**
@@ -127,7 +129,8 @@ public class CreationViewModel extends ViewModel {
      * @return true if the new description is different; false if is the same.
      */
     public boolean ingredientHasDifferentDescToEdit(String description) {
-        return !Objects.requireNonNull(ingredientList.getValue()).get(itemPositionToEdit).getIngredientDescription().equals(description);
+        assert ingredientList.getValue() != null;
+        return !ingredientList.getValue().get(itemPositionToEdit).getIngredientDescription().equals(description);
     }
 
 
@@ -144,6 +147,7 @@ public class CreationViewModel extends ViewModel {
         if (stepExists(stepDescription)) {
             return false;
         }
+        assert stepList.getValue() != null;
         Step step = new Step(stepDescription);
         List<Step> list = stepList.getValue();
         list.add(step);
@@ -176,6 +180,7 @@ public class CreationViewModel extends ViewModel {
      * @param stepPosition - The position of the step to remove.
      */
     public void removeStepAt(int stepPosition) {
+        assert stepList.getValue() != null;
         stepList.getValue().remove(stepPosition);
         stepList.setValue(stepList.getValue());
     }
@@ -186,7 +191,8 @@ public class CreationViewModel extends ViewModel {
      * @return true if a step have been found with the same description; false if not.
      */
     public boolean stepExists(String stepDescription) {
-        return Objects.requireNonNull(stepList.getValue()).contains(new Step(stepDescription));
+        assert stepList.getValue() != null;
+        return stepList.getValue().contains(new Step(stepDescription));
     }
 
     /**
@@ -195,7 +201,8 @@ public class CreationViewModel extends ViewModel {
      * @return true if the new description is different; false if is the same.
      */
     public boolean stepHasDifferentDescToEdit(String description) {
-        return !Objects.requireNonNull(stepList.getValue()).get(itemPositionToEdit).getStepDescription().equals(description);
+        assert stepList.getValue() != null;
+        return !stepList.getValue().get(itemPositionToEdit).getStepDescription().equals(description);
     }
 
     // ------- //
@@ -238,11 +245,14 @@ public class CreationViewModel extends ViewModel {
      * @return true if every field is filled; false if not.
      */
     public boolean areFieldsFilled(String recipeTitle, String recipeDescription) {
+        assert ingredientList.getValue() != null;
+        assert stepList.getValue() != null;
+
         boolean titleIsFilled = recipeTitle.length() != 0;
         boolean descriptionIsFilled = recipeDescription.length() != 0;
         boolean photoFieldFilled = (photoPath != null && photoPath.length() != 0) && photoUri.getValue() != null;
-        boolean listFieldsFilled = !Objects.requireNonNull(ingredientList.getValue()).isEmpty()
-                && !Objects.requireNonNull(stepList.getValue()).isEmpty();
+        boolean listFieldsFilled = !ingredientList.getValue().isEmpty()
+                && !stepList.getValue().isEmpty();
 
         return titleIsFilled && descriptionIsFilled && photoFieldFilled && listFieldsFilled;
     }

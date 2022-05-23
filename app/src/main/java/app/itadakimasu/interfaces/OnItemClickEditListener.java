@@ -1,4 +1,4 @@
-package app.itadakimasu.ui.recipeCreation;
+package app.itadakimasu.interfaces;
 
 /**
  * Interface used to implement the editing feature on items in the fragments.

@@ -20,6 +20,7 @@ import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 
+import app.itadakimasu.data.repository.SharedPrefRepository;
 import app.itadakimasu.databinding.FragmentLoginBinding;
 
 import app.itadakimasu.R;
@@ -129,7 +130,7 @@ public class LoginFragment extends Fragment implements FirebaseAuth.AuthStateLis
     /**
      * Listen for authentication changes, if the login is successful, this listener will be triggered,
      * sending the user to the app.
-     * @param firebaseAuth
+     * @param firebaseAuth - the authentication api from firebase that will tell if the user is authenticated or not.
      */
     @Override
     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -141,8 +142,8 @@ public class LoginFragment extends Fragment implements FirebaseAuth.AuthStateLis
                     // Obtains the user's data and saves it on an app file with Shared preferences.
                     SharedPreferences sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString(getString(R.string.saved_username_key), user.getUsername());
-                    editor.putString(getString(R.string.saved_photo_url_key), user.getPhotoUrl());
+                    editor.putString(SharedPrefRepository.SAVED_USERNAME_KEY, user.getUsername());
+                    editor.putString(SharedPrefRepository.SAVED_PHOTO_URL_KEY, user.getPhotoUrl());
 
                     editor.apply();
 

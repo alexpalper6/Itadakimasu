@@ -32,6 +32,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import app.itadakimasu.R;
 import app.itadakimasu.data.Result;
+import app.itadakimasu.data.repository.SharedPrefRepository;
 import app.itadakimasu.databinding.FragmentAddPhotoBinding;
 import app.itadakimasu.utils.dialogs.SelectMediaDialogFragment;
 import app.itadakimasu.utils.ImageCompressorUtils;
@@ -83,7 +84,7 @@ public class AddPhotoFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         addPhotoViewModel = new ViewModelProvider(this).get(AddPhotoViewModel.class);
         SharedPreferences sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
-        String retrievedUsername = sharedPreferences.getString(getString(R.string.saved_photo_url_key), "");
+        String retrievedUsername = sharedPreferences.getString(SharedPrefRepository.SAVED_USERNAME_KEY, "");
         addPhotoViewModel.setDisplayedUsername(retrievedUsername);
 
         // Observes change in the username, so when the fragment gets the username, it will show it on screen.

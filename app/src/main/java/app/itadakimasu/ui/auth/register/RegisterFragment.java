@@ -26,6 +26,7 @@ import com.google.android.material.snackbar.Snackbar;
 import app.itadakimasu.R;
 import app.itadakimasu.data.Result;
 import app.itadakimasu.data.model.User;
+import app.itadakimasu.data.repository.SharedPrefRepository;
 import app.itadakimasu.databinding.FragmentRegisterBinding;
 import app.itadakimasu.ui.auth.register.addPhoto.AddPhotoFragment;
 
@@ -189,8 +190,8 @@ public class RegisterFragment extends Fragment {
                 SharedPreferences sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
 
-                editor.putString(getString(R.string.saved_username_key), user.getUsername());
-                editor.putString(getString(R.string.saved_photo_url_key), user.getPhotoUrl());
+                editor.putString(SharedPrefRepository.SAVED_USERNAME_KEY, user.getUsername());
+                editor.putString(SharedPrefRepository.SAVED_PHOTO_URL_KEY, user.getPhotoUrl());
 
                 editor.apply();
 

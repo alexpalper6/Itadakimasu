@@ -1,44 +1,55 @@
 package app.itadakimasu.ui.profile;
 
-import android.net.Uri;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import app.itadakimasu.data.Result;
-import app.itadakimasu.data.repository.StorageRepository;
+import java.util.ArrayList;
+import java.util.List;
+
+import app.itadakimasu.data.model.Recipe;
+import app.itadakimasu.data.repository.AppAuthRepository;
+import app.itadakimasu.data.repository.RecipesRepository;
 
 
 public class ProfileViewModel extends ViewModel {
+    private final RecipesRepository recipesRepository;
+    private final AppAuthRepository appAuthRepository;
+    private MutableLiveData<List<Recipe>> recipesList;
+    private String username;
+    private String photoUrl;
 
-
-    private final StorageRepository storageRepository;
-    private final MutableLiveData<Uri> photoUri;
-    private final MutableLiveData<String> photoPath;
     public ProfileViewModel() {
-        this.storageRepository = StorageRepository.getInstance();
-        this.photoUri = new MutableLiveData<>();
-        this.photoPath = new MutableLiveData<>();
+        this.recipesRepository = RecipesRepository.getInstance();
+        this.appAuthRepository = AppAuthRepository.getInstance();
+        this.recipesList = new MutableLiveData<>(new ArrayList<>());
     }
 
-    public LiveData<Uri> getPhotoUri() {
-        return photoUri;
-    }
-    public void setPhotoUri(Uri uri) {
-        photoUri.setValue(uri);
+    public LiveData<List<Recipe>> getRecipeList() {
+        return recipesList;
     }
 
-    public LiveData<String> getPhotoPath() {
-        return photoPath;
-    }
-    public void setPhotoPath(String photoUrl) {
-        photoPath.setValue(photoUrl);
+    public void setFirstRecipes() {
+        recipesList = recipesRepository.getRecipesByUser(username);
     }
 
-    public LiveData<Result<?>> uploadPhotoStorage(byte[] imageData) {
-
-        return storageRepository.updateUserImage(imageData);
+    public String getUsername() {
+        return username;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
+    }
+
+    public void signOut() {
+        appAuthRepository.signOut();
+    }
 }

@@ -3,46 +3,50 @@ package app.itadakimasu.data.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.ServerTimestamp;
 
+import java.util.Date;
 import java.util.Objects;
 
 public class Recipe implements Parcelable {
     private String author;
     private String photoAuthorUrl;
 
+    private String id;
     private String title;
     private String description;
     private String photoUrl;
-    private FieldValue creationDate;
+    @ServerTimestamp
+    private Date creationDate;
     @Exclude
     private boolean isFavourite;
 
-    public Recipe(String author, String photoAuthorUrl, String title, String description, String photoUrl, FieldValue creationDate) {
+    public Recipe(String author, String photoAuthorUrl, String id, String title, String description, String photoUrl) {
         this.author = author;
         this.photoAuthorUrl = photoAuthorUrl;
+        this.id = id;
         this.title = title;
         this.description = description;
         this.photoUrl = photoUrl;
-        this.creationDate = creationDate;
         this.isFavourite = false;
     }
 
-    public Recipe(String author, String photoAuthorUrl, String title, String description, String photoUrl, FieldValue creationDate, boolean isFavourite) {
+    public Recipe(String author, String photoAuthorUrl, String id, String title, String description, String photoUrl, boolean isFavourite) {
         this.author = author;
         this.photoAuthorUrl = photoAuthorUrl;
+        this.id = id;
         this.title = title;
         this.description = description;
         this.photoUrl = photoUrl;
-        this.creationDate = creationDate;
         this.isFavourite = isFavourite;
     }
 
     public Recipe(String author, String photoAuthorUrl, String title, String description) {
         this.author = author;
         this.photoAuthorUrl = photoAuthorUrl;
+        this.id = id;
         this.title = title;
         this.description = description;
     }
@@ -50,12 +54,18 @@ public class Recipe implements Parcelable {
     public Recipe() {
     }
 
+
+
     public String getAuthor() {
         return author;
     }
 
     public String getPhotoAuthorUrl() {
         return photoAuthorUrl;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getTitle() {
@@ -70,7 +80,8 @@ public class Recipe implements Parcelable {
         return photoUrl;
     }
 
-    public FieldValue getCreationDate() {
+
+    public Date getCreationDate() {
         return creationDate;
     }
 
@@ -87,6 +98,10 @@ public class Recipe implements Parcelable {
         this.photoAuthorUrl = photoAuthorUrl;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -99,7 +114,8 @@ public class Recipe implements Parcelable {
         this.photoUrl = photoUrl;
     }
 
-    public void setCreationDate(FieldValue creationDate) {
+
+    public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
     }
 
@@ -114,17 +130,15 @@ public class Recipe implements Parcelable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Recipe recipe = (Recipe) o;
-        return Objects.equals(author, recipe.author)
-                && Objects.equals(photoAuthorUrl, recipe.photoAuthorUrl)
-                && Objects.equals(title, recipe.title)
-                && Objects.equals(description, recipe.description)
-                && Objects.equals(photoUrl, recipe.photoUrl);
+        return Objects.equals(id, recipe.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(author, photoAuthorUrl, title, description, photoUrl);
+        return Objects.hash(id);
     }
+
+    // Parcelable //
 
 
     @Override
@@ -136,16 +150,18 @@ public class Recipe implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.author);
         dest.writeString(this.photoAuthorUrl);
+        dest.writeString(this.id);
         dest.writeString(this.title);
         dest.writeString(this.description);
         dest.writeString(this.photoUrl);
-        dest.writeParcelable((Parcelable) this.creationDate, flags);
+        dest.writeParcelable((Parcelable)this.creationDate, flags);
         dest.writeByte(this.isFavourite ? (byte) 1 : (byte) 0);
     }
 
     public void readFromParcel(Parcel source) {
         this.author = source.readString();
         this.photoAuthorUrl = source.readString();
+        this.id = source.readString();
         this.title = source.readString();
         this.description = source.readString();
         this.photoUrl = source.readString();
@@ -156,6 +172,7 @@ public class Recipe implements Parcelable {
     protected Recipe(Parcel in) {
         this.author = in.readString();
         this.photoAuthorUrl = in.readString();
+        this.id = in.readString();
         this.title = in.readString();
         this.description = in.readString();
         this.photoUrl = in.readString();

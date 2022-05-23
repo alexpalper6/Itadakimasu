@@ -22,7 +22,7 @@
         app:layout_constraintBottom_toTopOf="@+id/guideline3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/divider2" />
+        app:layout_constraintTop_toBottomOf="@+id/divider" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline3"
@@ -180,7 +180,7 @@
         app:layout_constraintTop_toTopOf="@+id/ib_go_back" />
 
     <com.google.android.material.divider.MaterialDivider
-        android:id="@+id/divider2"
+        android:id="@+id/divider"
         android:layout_width="409dp"
         android:layout_height="1dp"
         android:layout_marginTop="16dp"

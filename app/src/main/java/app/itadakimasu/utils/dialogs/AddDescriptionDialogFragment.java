@@ -20,7 +20,7 @@ public class AddDescriptionDialogFragment extends DialogFragment {
     public static final String TAG = "AddDescriptionDialogFragment";
 
     public static final String DIALOG_TITLE = "app.itadakimasu.utils.dialogs.AddDescriptionDialogFragment.DialogTitle";
-    public static final String DIALOG_REQUEST = "app.itadakimasu.utils.dialogs.AddDescriptionDialogFragment.DialogTitle";
+    public static final String DIALOG_REQUEST = "app.itadakimasu.utils.dialogs.AddDescriptionDialogFragment.DialogRequest";
     public static final String DIALOG_RESULT = "app.itadakimasu.utils.dialogs.AddDescriptionDialogFragment.DialogResult";
 
     @NonNull

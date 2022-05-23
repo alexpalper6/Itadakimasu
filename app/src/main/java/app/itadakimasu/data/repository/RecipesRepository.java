@@ -4,13 +4,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.ServerTimestamp;
 import com.google.firebase.firestore.WriteBatch;
-import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +24,7 @@ import app.itadakimasu.data.model.Step;
 public class RecipesRepository {
 
     public static volatile RecipesRepository INSTANCE;
+    public static int LIMIT_QUERY = 10;
     private FirebaseFirestore dbFirestore;
 
 
@@ -59,8 +60,8 @@ public class RecipesRepository {
         WriteBatch batch = dbFirestore.batch();
 
         DocumentReference recipeReference = dbFirestore.collection(FirebaseContract.RecipeEntry.COLLECTION_NAME).document();
+        recipe.setId(recipeReference.getId());
         recipe.setPhotoUrl(FirebaseContract.StorageReference.RECIPES_PICTURES + recipeReference.getId());
-        recipe.setCreationDate(FieldValue.serverTimestamp());
 
         batch.set(recipeReference, recipe);
 
@@ -83,4 +84,16 @@ public class RecipesRepository {
         return result;
     }
 
+
+    public MutableLiveData<List<Recipe>> getRecipesByUser(String username) {
+        MutableLiveData<List<Recipe>> list = new MutableLiveData<>(new ArrayList<>());
+        dbFirestore.collection(FirebaseContract.RecipeEntry.COLLECTION_NAME)
+                .whereEqualTo(FirebaseContract.RecipeEntry.AUTHOR, username)
+                .orderBy(FirebaseContract.RecipeEntry.CREATION_DATE, Query.Direction.DESCENDING)
+                .limit(LIMIT_QUERY)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> list.setValue(queryDocumentSnapshots.toObjects(Recipe.class)));
+
+        return list;
+    }
 }

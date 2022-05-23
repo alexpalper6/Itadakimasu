@@ -13,14 +13,11 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.storage.FirebaseStorage;
-
 import app.itadakimasu.R;
-import app.itadakimasu.data.model.FirebaseContract;
 import app.itadakimasu.data.model.Ingredient;
 import app.itadakimasu.databinding.ItemIngredientBinding;
-import app.itadakimasu.ui.recipeCreation.OnItemClickEditListener;
-import app.itadakimasu.ui.recipeCreation.OnItemClickRemoveListener;
+import app.itadakimasu.interfaces.OnItemClickEditListener;
+import app.itadakimasu.interfaces.OnItemClickRemoveListener;
 
 /**
  * Adapter class for ingredient creation's fragment.

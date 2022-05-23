@@ -106,4 +106,10 @@
     <string name="user_data_retrieve_error">User data could not be retrieved</string>
     <string name="recipe_upload_error">The recipe could not be uploaded</string>
 
+    <string name="created_by">Created by: %1$s</string>
+    <string name="recipe_details">Recipe Details</string>
+    <string name="ingredients">Ingredients</string>
+    <string name="steps">Steps</string>
+    <string name="user_profile_image">User profile image</string>
+
 </resources>

@@ -11,6 +11,7 @@ public class FirebaseContract {
         public static final String COLLECTION_NAME = "recipes";
         public static final String AUTHOR = "author";
         public static final String AUTHOR_PHOTO = "photoAuthorUrl";
+        public static final String ID = "id";
         public static final String TITLE = "title";
         public static final String DESCRIPTION = "description";
         public static final String PHOTO = "photoUrl";

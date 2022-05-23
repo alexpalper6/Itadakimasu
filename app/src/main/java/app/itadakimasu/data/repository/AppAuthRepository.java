@@ -83,7 +83,7 @@ public class AppAuthRepository {
                 FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
                 if (firebaseUser != null) {
                     User user = new User(firebaseUser.getUid(), username);
-                    user.setPhotoUrl(FirebaseContract.StorageReference.USER_PICTURES + username);
+                    user.setPhotoUrl(FirebaseContract.StorageReference.USER_PICTURES + firebaseUser.getUid());
                     result.setValue(new Result.Success<User>(user));
                 }
 
@@ -97,7 +97,7 @@ public class AppAuthRepository {
     /**
      * Logs out the user.
      */
-    public void logout() {
+    public void signOut() {
         firebaseAuth.signOut();
     }
 

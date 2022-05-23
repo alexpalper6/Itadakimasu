@@ -35,6 +35,7 @@ import java.util.Objects;
 
 import app.itadakimasu.R;
 import app.itadakimasu.data.Result;
+import app.itadakimasu.data.repository.SharedPrefRepository;
 import app.itadakimasu.databinding.FragmentRecipeCreationBinding;
 import app.itadakimasu.utils.ImageCompressorUtils;
 import app.itadakimasu.utils.ImageCropUtils;
@@ -120,8 +121,8 @@ public class RecipeCreationFragment extends Fragment {
         // If 1 of the fields are empty an alert dialog will prompt to the user asking to fill every
         // field.
         binding.fabCreateRecipe.setOnClickListener(v -> {
-            String recipeTitle = Objects.requireNonNull(binding.etAddRecipeTitle.getText()).toString().trim();
-            String recipeDescription = Objects.requireNonNull(binding.etAddRecipeDescription.getText()).toString().trim();
+            String recipeTitle = binding.etAddRecipeTitle.getText().toString().trim();
+            String recipeDescription = binding.etAddRecipeDescription.getText().toString().trim();
 
             if (creationViewModel.areFieldsFilled(recipeTitle, recipeDescription)) {
                 binding.pbProgress.setVisibility(View.VISIBLE);
@@ -158,8 +159,8 @@ public class RecipeCreationFragment extends Fragment {
      */
     private void uploadRecipe() {
         SharedPreferences userData = requireActivity().getPreferences(Context.MODE_PRIVATE);
-        String username = userData.getString(getString(R.string.saved_username_key), "");
-        String userPhotoUrl = userData.getString(getString(R.string.saved_photo_url_key), "");
+        String username = userData.getString(SharedPrefRepository.SAVED_USERNAME_KEY, "");
+        String userPhotoUrl = userData.getString(SharedPrefRepository.SAVED_PHOTO_URL_KEY, "");
 
         // If the username or the user's photo url is empty then a Snackbar will prompt to the user telling
         // the user that theirs data couldn't be uploaded.

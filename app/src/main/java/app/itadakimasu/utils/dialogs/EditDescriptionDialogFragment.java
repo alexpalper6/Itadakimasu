@@ -17,11 +17,11 @@ import app.itadakimasu.databinding.DialogAddDescriptionBinding;
  * Dialog used to modify a text that is passed to the dialog as an argument.
  */
 public class EditDescriptionDialogFragment extends DialogFragment {
-    public static final String TAG = "EditDescriptionDialog";
+    public static final String TAG = "EditDescriptionDialogFragment";
 
+    public static final String TEXT_TO_EDIT = "app.itadakimasu.utils.dialogs.EditDescriptionDialogFragment.TextToEdit";
     public static final String DIALOG_TITLE = "app.itadakimasu.utils.dialogs.EditDescriptionDialogFragment.DialogTitle";
-    public static final String TEXT_TO_EDIT = "app.itadakimasu.utils.dialogs.AddDescriptionDialogFragment.DialogTitle";
-    public static final String DIALOG_REQUEST = "app.itadakimasu.utils.dialogs.EditDescriptionDialogFragment.DialogTitle";
+    public static final String DIALOG_REQUEST = "app.itadakimasu.utils.dialogs.EditDescriptionDialogFragment.DialogRequest";
     public static final String DIALOG_RESULT = "app.itadakimasu.utils.dialogs.EditDescriptionDialogFragment.DialogResult";
 
     @NonNull
@@ -53,7 +53,7 @@ public class EditDescriptionDialogFragment extends DialogFragment {
                         // Sends the text written on the dialog to the fragment that requested the dialog
                         // adding a result to the parentFragmentManager.
                         Bundle result = new Bundle();
-                        result.putString(DIALOG_RESULT, binding.etIngredientInfo.getText().toString());
+                        result.putString(DIALOG_RESULT, description);
                         getParentFragmentManager().setFragmentResult(DIALOG_REQUEST, result);
                     }
                 })

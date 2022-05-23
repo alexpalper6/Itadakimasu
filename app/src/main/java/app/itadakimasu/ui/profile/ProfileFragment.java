@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -21,51 +23,41 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentResultListener;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.palette.graphics.Palette;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestFutureTarget;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.canhub.cropper.CropImageContract;
 import com.canhub.cropper.CropImageContractOptions;
 import com.canhub.cropper.CropImageView;
+import com.google.android.material.circularreveal.CircularRevealHelper;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import app.itadakimasu.R;
+import app.itadakimasu.data.model.FirebaseContract;
+import app.itadakimasu.data.repository.SharedPrefRepository;
+import app.itadakimasu.data.repository.StorageRepository;
 import app.itadakimasu.databinding.FragmentProfileBinding;
 import app.itadakimasu.utils.dialogs.SelectMediaDialogFragment;
 import app.itadakimasu.utils.ImageCompressorUtils;
 import app.itadakimasu.utils.ImageCropUtils;
 
 public class ProfileFragment extends Fragment {
-    public static final int TAKING_PHOTO_CAMERA = 0;
-    public static final int IMAGE_GALLERY = 1;
+
     private FragmentProfileBinding binding;
+    private ProfileRecipesAdapter adapter;
     private ProfileViewModel profileViewModel;
-    private String test;
 
-    // ActivityResultLauncher that will handle the permission requests
-    private ActivityResultLauncher<String> requestPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    startGalleryIntent();
-                } else {
-                    Snackbar.make(requireActivity().findViewById(android.R.id.content),
-                            R.string.gallery_perm_denied_info, BaseTransientBottomBar.LENGTH_LONG).show();
-                }
-            });
-
-    // ActivityResultLauncher that will handle Camera intent and its result
-    private ActivityResultLauncher<CropImageContractOptions> photoMediaLauncher =
-            registerForActivityResult(new CropImageContract(), new ActivityResultCallback<CropImageView.CropResult>() {
-                @Override
-                public void onActivityResult(CropImageView.CropResult result) {
-                    if (result.isSuccessful()) {
-                        Uri resultUri = result.getUriContent();
-                        profileViewModel.setPhotoUri(resultUri);
-                        profileViewModel.setPhotoPath(result.getUriFilePath(requireContext(), false));
-                    }
-                }
-            });
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -74,95 +66,59 @@ public class ProfileFragment extends Fragment {
                 new ViewModelProvider(this).get(ProfileViewModel.class);
 
         binding = FragmentProfileBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
-
-        //final TextView textView = binding.textNotifications;
-       // notificationsViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
-        return root;
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        // View model instantiation and setting username and photoUrl
         profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
-
-
         SharedPreferences sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
-        binding.etNewEmail.setText(sharedPreferences.getString(getString(R.string.saved_username_key), ""));
+        profileViewModel.setUsername(sharedPreferences.getString(SharedPrefRepository.SAVED_USERNAME_KEY, ""));
+        profileViewModel.setPhotoUrl(sharedPreferences.getString(SharedPrefRepository.SAVED_PHOTO_URL_KEY, ""));
+        profileViewModel.setFirstRecipes();
+
+        binding.tvUsername.setText(profileViewModel.getUsername());
+
+        adapter = new ProfileRecipesAdapter(requireActivity());
+        binding.rvRecipes.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.rvRecipes.setAdapter(adapter);
 
 
-        binding.btSignOut.setOnClickListener(v -> {
-            FirebaseAuth.getInstance().signOut();
-        });
 
-        binding.ivTest.setOnClickListener(v -> {
-            DialogFragment dialog = new SelectMediaDialogFragment();
-            dialog.show(getParentFragmentManager(), SelectMediaDialogFragment.TAG);
 
-        });
-        // Observes changes in the photo uri state from the ViewModel, setting the image uri on the ImageView
-        profileViewModel.getPhotoUri().observe(getViewLifecycleOwner(), new Observer<Uri>() {
-            @Override
-            public void onChanged(Uri uri) {
-                Glide.with(requireContext()).load(uri).circleCrop().into(binding.ivTest);
-            }
-        });
+        // Setting the image on the UI
+        StorageReference reference = FirebaseStorage.getInstance().getReference(profileViewModel.getPhotoUrl());
+        Glide.with(requireContext()).asBitmap().load(reference).circleCrop().diskCacheStrategy(DiskCacheStrategy.ALL).placeholder(R.drawable.ic_default_user_profile)
+                .listener(new RequestListener<Bitmap>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                        return false;
+                    }
 
-        // Recieves the result of the Dialog using FragmentResultListener
-        getParentFragmentManager().setFragmentResultListener(SelectMediaDialogFragment.DIALOG_REQUEST, this, new FragmentResultListener() {
-            @Override
-            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-                // Depending on the result, it will open the camera or the gallery
-                int which = result.getInt(SelectMediaDialogFragment.DIALOG_RESULT);
+                    @Override
+                    public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                        if (resource != null) {
+                            Palette p = Palette.from(resource).generate();
+                            // https://www.section.io/engineering-education/extracting-colors-from-image-using-palette-api-in-android/
+                            binding.getRoot().setBackgroundColor(p.getMutedColor(ContextCompat.getColor(requireContext(), R.color.primaryColor)));
+                            //binding.ibSignOut.setColorFilter(p.getDominantSwatch().getBodyTextColor());
+                            //binding.ibEdit.setColorFilter(p.getDominantSwatch().getBodyTextColor());
+                            //binding.tvUsername.setTextColor(p.getDominantSwatch().getBodyTextColor());
+                        }
+                        return false;
+                    }
+                }).into(binding.ivUserImage);
 
-                if (which == TAKING_PHOTO_CAMERA) {
-                    photoMediaLauncher.launch(ImageCropUtils.getProfilePictureCameraOptions());
-                } else if (which == IMAGE_GALLERY) {
 
-                        checkGalleryPermissions();
-                }
-            }
-        });
+        profileViewModel.getRecipeList().observe(getViewLifecycleOwner(), list -> adapter.submitList(list));
 
-        binding.button.setOnClickListener(v -> {
-            // Checks if the image is setted by the user
-            if (profileViewModel.getPhotoUri().getValue() != null) {
-                // Performs the photo uploading.
-                uploadPhotoStorageCompressed();
-            } else {
-                Snackbar.make(
-                        requireActivity().findViewById(android.R.id.content)
-                        , R.string.add_photo_info
-                        , BaseTransientBottomBar.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    private void uploadPhotoStorageCompressed() {
-        String photoPath = profileViewModel.getPhotoPath().getValue();
-        byte[] imageData = ImageCompressorUtils.compressImage(photoPath, ImageCompressorUtils.PROFILE_MAX_HEIGHT, ImageCompressorUtils.PROFILE_MAX_WIDTH);
-
-        profileViewModel.uploadPhotoStorage(imageData).observe(getViewLifecycleOwner(), result -> {
-            Snackbar.make(requireActivity().findViewById(android.R.id.content), "OK", BaseTransientBottomBar.LENGTH_LONG).show();
-        });
+        binding.ibSignOut.setOnClickListener(v -> profileViewModel.signOut());
 
     }
 
-    /**
-     * Checks for the permissions in order to access the gallery, if the user already granted it,
-     * then it will open the gallery, if not, it will show an explanation telling why we request permissions.
-     */
-    private void checkGalleryPermissions() {
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-            startGalleryIntent();
-        } else if (shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
-        } else {
-            requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
 
-        }
-
-    }
 
 
     @Override
@@ -172,10 +128,4 @@ public class ProfileFragment extends Fragment {
     }
 
 
-    /**
-     * Starts the ActivityResultLauncher for getting content on the gallery
-     */
-    private void startGalleryIntent() {
-        photoMediaLauncher.launch(ImageCropUtils.getProfilePictureGalleryOptions());
-    }
 }

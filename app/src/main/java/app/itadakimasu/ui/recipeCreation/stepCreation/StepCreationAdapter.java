@@ -1,6 +1,5 @@
 package app.itadakimasu.ui.recipeCreation.stepCreation;
 
-import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -15,8 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import app.itadakimasu.R;
 import app.itadakimasu.data.model.Step;
 import app.itadakimasu.databinding.ItemStepBinding;
-import app.itadakimasu.ui.recipeCreation.OnItemClickEditListener;
-import app.itadakimasu.ui.recipeCreation.OnItemClickRemoveListener;
+import app.itadakimasu.interfaces.OnItemClickEditListener;
+import app.itadakimasu.interfaces.OnItemClickRemoveListener;
 
 /**
  * Adapter for step's fragment RecyclerView.
