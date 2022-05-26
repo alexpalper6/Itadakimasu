@@ -1,5 +1,6 @@
 package app.itadakimasu;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.View;
 
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
 
     private ActivityMainBinding binding;
 
+    @SuppressLint("UnsafeOptInUsageWarning")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
         setContentView(binding.getRoot());
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.nav_view);
+
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_activity_main);
@@ -47,7 +50,8 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
                 R.id.navigation_photo_addition,
                 R.id.navigation_recipe_creation,
                 R.id.navigation_ingredient_creation,
-                R.id.navigation_step_Creation);
+                R.id.navigation_step_Creation,
+                R.id.navigation_details);
 
         // Adds a listener, when the navigation is triggered it'll check the destination's fragment.
         // If the fragment is one from the list, the BottomNavigation will be hidden; if not, it will be visible.
@@ -60,9 +64,13 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
         });
 
 
+
+
+
         // Set ups the navigation controller with the bottom navigation view,
         // so the user can navigate between fragments using this view.
-        NavigationUI.setupWithNavController(binding.navView, navController);
+        // We set saveState to false so the view models clears when navigating through the layouts.
+        NavigationUI.setupWithNavController(binding.navView, navController, false);
     }
 
     /**

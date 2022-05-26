@@ -1,8 +1,6 @@
 package app.itadakimasu.ui.auth.register.addPhoto;
 
 import android.Manifest;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -83,9 +81,7 @@ public class AddPhotoFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         addPhotoViewModel = new ViewModelProvider(this).get(AddPhotoViewModel.class);
-        SharedPreferences sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
-        String retrievedUsername = sharedPreferences.getString(SharedPrefRepository.SAVED_USERNAME_KEY, "");
-        addPhotoViewModel.setDisplayedUsername(retrievedUsername);
+        addPhotoViewModel.setDisplayedUsername(addPhotoViewModel.getAuthUsername());
 
         // Observes change in the username, so when the fragment gets the username, it will show it on screen.
         addPhotoViewModel.getDisplayedUsername().observe(getViewLifecycleOwner(),

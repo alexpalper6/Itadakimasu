@@ -32,7 +32,7 @@ public class FirebaseContract {
 
     }
 
-    public static class StorageReference {
+    public static class StoragePath {
         public static final String USER_PICTURES = "/users/";
         public static final String RECIPES_PICTURES = "/recipes/";
     }

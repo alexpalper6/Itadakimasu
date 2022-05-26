@@ -187,13 +187,9 @@ public class RegisterFragment extends Fragment {
             if (result instanceof Result.Success) {
                 binding.pbRegisterProgress.setVisibility(View.GONE);
 
-                SharedPreferences sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
+                registerViewModel.setAuthUsername(user.getUsername());
+                registerViewModel.setAuthUserPhotoUrl(user.getPhotoUrl());
 
-                editor.putString(SharedPrefRepository.SAVED_USERNAME_KEY, user.getUsername());
-                editor.putString(SharedPrefRepository.SAVED_PHOTO_URL_KEY, user.getPhotoUrl());
-
-                editor.apply();
 
                 NavHostFragment.findNavController(requireParentFragment()).navigate(R.id.action_navigation_register_to_addPhotoFragment);
             } else if (result instanceof  Result.Error){

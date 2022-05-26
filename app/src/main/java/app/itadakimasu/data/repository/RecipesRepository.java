@@ -5,11 +5,9 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.ServerTimestamp;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
@@ -61,7 +59,7 @@ public class RecipesRepository {
 
         DocumentReference recipeReference = dbFirestore.collection(FirebaseContract.RecipeEntry.COLLECTION_NAME).document();
         recipe.setId(recipeReference.getId());
-        recipe.setPhotoUrl(FirebaseContract.StorageReference.RECIPES_PICTURES + recipeReference.getId());
+        recipe.setPhotoUrl(FirebaseContract.StoragePath.RECIPES_PICTURES + recipeReference.getId());
 
         batch.set(recipeReference, recipe);
 
@@ -95,5 +93,27 @@ public class RecipesRepository {
                 .addOnSuccessListener(queryDocumentSnapshots -> list.setValue(queryDocumentSnapshots.toObjects(Recipe.class)));
 
         return list;
+    }
+
+    public LiveData<List<Ingredient>> getIngredientsFromRecipe(String recipeId) {
+        MutableLiveData<List<Ingredient>> ingredientsList = new MutableLiveData<>();
+
+        dbFirestore.collection(FirebaseContract.RecipeEntry.COLLECTION_NAME).document(recipeId)
+                .collection(FirebaseContract.RecipeEntry.IngredientEntry.COLLECTION_NAME)
+                .orderBy(FirebaseContract.RecipeEntry.IngredientEntry.POSITION).get()
+                .addOnSuccessListener(queryDocumentSnapshots -> ingredientsList.setValue(queryDocumentSnapshots.toObjects(Ingredient.class)));
+
+        return ingredientsList;
+    }
+
+    public LiveData<List<Step>> getStepsFromRecipe(String recipeId) {
+        MutableLiveData<List<Step>> stepsList = new MutableLiveData<>();
+
+        dbFirestore.collection(FirebaseContract.RecipeEntry.COLLECTION_NAME).document(recipeId)
+                .collection(FirebaseContract.RecipeEntry.StepEntry.COLLECTION_NAME)
+                .orderBy(FirebaseContract.RecipeEntry.StepEntry.POSITION).get()
+                .addOnSuccessListener(queryDocumentSnapshots -> stepsList.setValue(queryDocumentSnapshots.toObjects(Step.class)));
+
+        return stepsList;
     }
 }

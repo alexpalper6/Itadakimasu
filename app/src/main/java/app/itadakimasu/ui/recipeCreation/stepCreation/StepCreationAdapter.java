@@ -63,7 +63,7 @@ public class StepCreationAdapter extends ListAdapter<Step, StepCreationViewHolde
     public void onBindViewHolder(@NonNull StepCreationViewHolder holder, int position) {
         final Step step = getItem(position);
         holder.setStepDescription(step.getStepDescription());
-        holder.setStepPosition(Integer.toString(position));
+        holder.setStepPosition(Integer.toString(position + 1));
     }
 
     /**

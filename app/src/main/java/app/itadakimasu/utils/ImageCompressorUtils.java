@@ -41,7 +41,7 @@ public class ImageCompressorUtils {
         int actualWidth = options.outWidth;
 
         // We get the image ratio and the max ratio permitted dividing the width with the height.
-        float imgRatio = actualWidth / actualHeight;
+        float imgRatio = (float) actualWidth / (float) actualHeight;
         float maxRatio = maxWidth / maxHeight;
 
         // Width and height values are set maintaining the aspect ratio of the image
@@ -99,7 +99,7 @@ public class ImageCompressorUtils {
 
         Canvas canvas = new Canvas(scaledBitmap);
         canvas.setMatrix(scaleMatrix);
-        canvas.drawBitmap(bmp, middleX - bmp.getWidth() / 2, middleY - bmp.getHeight() / 2, new Paint(Paint.FILTER_BITMAP_FLAG));
+        canvas.drawBitmap(bmp, middleX - (float)bmp.getWidth() / 2, middleY - (float)bmp.getHeight() / 2, new Paint(Paint.FILTER_BITMAP_FLAG));
 
         // Check the rotation of the image and display it properly.
         ExifInterface exif;

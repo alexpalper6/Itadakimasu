@@ -8,6 +8,7 @@
     <string name="title_login">Login</string>
     <string name="title_register">Register</string>
     <string name="title_recipe_creation">Recipe Creation</string>
+    <string name="title_recipe_details">Recipe Details</string>
     <!-- Shared preferences keys -->
     <string name="saved_username_key">Saved_Username</string>
     <string name="saved_photo_url_key">Saved_Photo_Url</string>
@@ -111,5 +112,6 @@
     <string name="ingredients">Ingredients</string>
     <string name="steps">Steps</string>
     <string name="user_profile_image">User profile image</string>
+    <string name="list_retrieve_error">The list could not be retrieved</string>
 
 </resources>

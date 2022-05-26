@@ -140,13 +140,8 @@ public class LoginFragment extends Fragment implements FirebaseAuth.AuthStateLis
             loginViewModel.retrieveCurrentUserData().observe(getViewLifecycleOwner(), user -> {
                 if (user != null) {
                     // Obtains the user's data and saves it on an app file with Shared preferences.
-                    SharedPreferences sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString(SharedPrefRepository.SAVED_USERNAME_KEY, user.getUsername());
-                    editor.putString(SharedPrefRepository.SAVED_PHOTO_URL_KEY, user.getPhotoUrl());
-
-                    editor.apply();
-
+                    loginViewModel.setAuthUsername(user.getUsername());
+                    loginViewModel.setAuthUserPhotoUrl(user.getPhotoUrl());
                     NavHostFragment.findNavController(this).navigate(R.id.action_auth_navigation_to_navigation_home);
                 } else {
                     Snackbar.make(binding.getRoot(), R.string.username_data_error, BaseTransientBottomBar.LENGTH_LONG).show();

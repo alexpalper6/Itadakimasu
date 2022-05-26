@@ -1,6 +1,6 @@
 package app.itadakimasu.ui.profile;
 
-import android.app.Activity;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +22,7 @@ import app.itadakimasu.R;
 import app.itadakimasu.data.model.Recipe;
 import app.itadakimasu.data.repository.SharedPrefRepository;
 import app.itadakimasu.databinding.ItemMyRecipePreviewBinding;
+import app.itadakimasu.interfaces.OnItemClickDisplayListener;
 import app.itadakimasu.interfaces.OnItemClickEditListener;
 import app.itadakimasu.interfaces.OnItemClickRemoveListener;
 
@@ -50,17 +51,18 @@ public class ProfileRecipesAdapter extends ListAdapter<Recipe, ProfileRecipesVie
     private final SharedPrefRepository sharedPrefRepository;
     private OnItemClickEditListener editListener;
     private OnItemClickRemoveListener removeListener;
+    private OnItemClickDisplayListener displayListener;
 
-    public ProfileRecipesAdapter(Activity activity) {
+    public ProfileRecipesAdapter(Context context) {
         super(DIFF_CALLBACK);
-        this.sharedPrefRepository = SharedPrefRepository.getInstance(activity);
+        this.sharedPrefRepository = SharedPrefRepository.getInstance(context);
     }
 
     @NonNull
     @Override
     public ProfileRecipesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         ItemMyRecipePreviewBinding binding = ItemMyRecipePreviewBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-        return new ProfileRecipesViewHolder(binding, editListener, removeListener);
+        return new ProfileRecipesViewHolder(binding, editListener, removeListener, displayListener);
     }
 
     @Override
@@ -71,7 +73,7 @@ public class ProfileRecipesAdapter extends ListAdapter<Recipe, ProfileRecipesVie
         holder.setTitle(recipe.getTitle());
         holder.setDescription(recipe.getDescription());
 
-        if (!recipe.getAuthor().equals(sharedPrefRepository.getCurrentUsername())) {
+        if (!recipe.getAuthor().equals(sharedPrefRepository.getAuthUsername())) {
             holder.setIbMoreVisibility(View.GONE);
         }
 
@@ -92,6 +94,10 @@ public class ProfileRecipesAdapter extends ListAdapter<Recipe, ProfileRecipesVie
     public void setOnClickRemoveListener(OnItemClickRemoveListener listener) {
         this.removeListener = listener;
     }
+
+    public void setOnClickDisplayListener(OnItemClickDisplayListener listener) {
+        this.displayListener = listener;
+    }
 }
 
 class ProfileRecipesViewHolder extends RecyclerView.ViewHolder {
@@ -101,7 +107,8 @@ class ProfileRecipesViewHolder extends RecyclerView.ViewHolder {
     private final ImageButton ibMore;
 
 
-    public ProfileRecipesViewHolder(ItemMyRecipePreviewBinding binding, OnItemClickEditListener editListener, OnItemClickRemoveListener removeListener) {
+    public ProfileRecipesViewHolder(ItemMyRecipePreviewBinding binding, OnItemClickEditListener editListener, OnItemClickRemoveListener removeListener,
+                                    OnItemClickDisplayListener displayListener) {
         super(binding.getRoot());
         this.ivRecipeImage = binding.ivRecipeImage;
         this.tvTitle = binding.tvTitle;
@@ -131,6 +138,12 @@ class ProfileRecipesViewHolder extends RecyclerView.ViewHolder {
             popupMenu.setOnDismissListener(PopupMenu::dismiss);
 
             popupMenu.show();
+        });
+
+        binding.getRoot().setOnClickListener(v -> {
+            if (displayListener != null) {
+                displayListener.onItemClickDisplay(ProfileRecipesViewHolder.this.getAdapterPosition());
+            }
         });
     }
 

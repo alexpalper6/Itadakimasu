@@ -54,7 +54,7 @@ public class StorageRepository {
         String userId = Objects.requireNonNull(authInstance.getCurrentUser()).getUid();
         MutableLiveData<Result<?>> result = new MutableLiveData<>();
 
-        StorageReference userImage = dbStorage.getReference().child(FirebaseContract.StorageReference.USER_PICTURES + userId);
+        StorageReference userImage = dbStorage.getReference().child(FirebaseContract.StoragePath.USER_PICTURES + userId);
 
 
         userImage.putBytes(imageData)
@@ -74,4 +74,9 @@ public class StorageRepository {
         return result;
 
     }
+
+    public StorageReference getImageReference(String imageUrl) {
+        return dbStorage.getReference(imageUrl);
+    }
+
 }

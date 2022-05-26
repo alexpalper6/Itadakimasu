@@ -1,32 +1,38 @@
 package app.itadakimasu.ui.auth.login;
 
+import android.app.Application;
 import android.util.Patterns;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import app.itadakimasu.R;
 import app.itadakimasu.data.Result;
 import app.itadakimasu.data.model.User;
 import app.itadakimasu.data.repository.AppAuthRepository;
+import app.itadakimasu.data.repository.SharedPrefRepository;
 import app.itadakimasu.data.repository.UsersRepository;
 
 /**
  * View model for the login framgnet, contains the state of the login, notifying the user
  * for empty fields and the error result, used to notify the user for possible errors when logging in.
  */
-public class LoginViewModel extends ViewModel {
+public class LoginViewModel extends AndroidViewModel {
     // Repositories used to login and obtain user's data.
     private final AppAuthRepository loginRepository;
     private final UsersRepository usersRepository;
+    private final SharedPrefRepository sharedPrefRepository;
     // Form state and login error result.
     private final MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
     private final MutableLiveData<LoginErrorResult> loginErrorResult = new MutableLiveData<>();
 
-    public LoginViewModel() {
+    public LoginViewModel(@NonNull Application application) {
+        super(application);
         this.loginRepository = AppAuthRepository.getInstance();
         this.usersRepository = UsersRepository.getInstance();
+        this.sharedPrefRepository = SharedPrefRepository.getInstance(application.getApplicationContext());
     }
 
 
@@ -84,6 +90,22 @@ public class LoginViewModel extends ViewModel {
         } else {
             loginFormState.setValue(new LoginFormState(false));
         }
+    }
+
+    /**
+     * Sets the authenticated username on a SharedPreferences.
+     * @param username - the username.
+     */
+    public void setAuthUsername(String username) {
+        sharedPrefRepository.setAuthUsername(username);
+    }
+
+    /**
+     * Sets the authenticated user's photo url on a SharedPreferences.
+     * @param photoUrl - the photo's url.
+     */
+    public void setAuthUserPhotoUrl(String photoUrl) {
+        sharedPrefRepository.setAuthUserPhotoUrl(photoUrl);
     }
 
     /**

@@ -1,7 +1,10 @@
 package app.itadakimasu.ui.auth.register;
 
+import android.app.Application;
 import android.util.Patterns;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -13,13 +16,16 @@ import app.itadakimasu.R;
 import app.itadakimasu.data.Result;
 import app.itadakimasu.data.model.User;
 import app.itadakimasu.data.repository.AppAuthRepository;
+import app.itadakimasu.data.repository.SharedPrefRepository;
 import app.itadakimasu.data.repository.UsersRepository;
 
 /**
  * RegisterFragment's ViewModel, holds the UI State elements and data required to perform the registry,
  * making them able to survive configuration changes. UI States are stored in order to give the user proper feedback.
  */
-public class RegisterViewModel extends ViewModel {
+public class RegisterViewModel extends AndroidViewModel {
+    // Repository used to be able to store user's data on SharedPreferences
+    private final SharedPrefRepository sharedPrefRepository;
     // Repository that handles the business logic for authentication.
     private final AppAuthRepository authRepository;
     // Repository that handles the business logic for Users data in the database.
@@ -29,13 +35,15 @@ public class RegisterViewModel extends ViewModel {
     // Observable and mutable data, contains the result of the registry.
     private final MutableLiveData<RegisterErrorResult> registerResult;
 
-
-    public RegisterViewModel() {
+    public RegisterViewModel(@NonNull Application application) {
+        super(application);
+        this.sharedPrefRepository = SharedPrefRepository.getInstance(application.getApplicationContext());
         this.authRepository = AppAuthRepository.getInstance();
         this.usersRepository = UsersRepository.getInstance();
         this.registerFormState = new MutableLiveData<>();
         this.registerResult = new MutableLiveData<>();
     }
+
 
     /**
      * Returns the register form state.
@@ -202,4 +210,19 @@ public class RegisterViewModel extends ViewModel {
         return !repeatedPassword.trim().isEmpty() && repeatedPassword.equals(password);
     }
 
+    /**
+     * Sets the authenticated username on a SharedPreferences.
+     * @param username - the username.
+     */
+    public void setAuthUsername(String username) {
+        sharedPrefRepository.setAuthUsername(username);
+    }
+
+    /**
+     * Sets the authenticated user's photo url on a SharedPreferences.
+     * @param photoUrl - the photo's url.
+     */
+    public void setAuthUserPhotoUrl(String photoUrl) {
+        sharedPrefRepository.setAuthUserPhotoUrl(photoUrl);
+    }
 }

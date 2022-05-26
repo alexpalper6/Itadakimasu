@@ -1,31 +1,40 @@
 package app.itadakimasu.ui.auth.register.addPhoto;
 
+import android.app.Application;
 import android.net.Uri;
+import android.os.UserHandle;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import app.itadakimasu.data.Result;
+import app.itadakimasu.data.repository.SharedPrefRepository;
 import app.itadakimasu.data.repository.StorageRepository;
 
 /**
  * ViewModel of AddPhotoFragment, stores the data that is necessary to use and result states.
  */
-public class AddPhotoViewModel extends ViewModel {
+public class AddPhotoViewModel extends AndroidViewModel {
     private final StorageRepository storageRepository;
+    private final SharedPrefRepository sharedPrefRepository;
     private final MutableLiveData<String> usernameDisplayState;
     private final MutableLiveData<PhotoResultState> photoResultState;  
     private final MutableLiveData<Uri> photoUriState;
     private final MutableLiveData<String> photoPathState;
 
-    public AddPhotoViewModel() {
+    public AddPhotoViewModel(@NonNull Application application) {
+        super(application);
         this.storageRepository = StorageRepository.getInstance();
+        this.sharedPrefRepository = SharedPrefRepository.getInstance(application.getApplicationContext());
         this.usernameDisplayState = new MutableLiveData<>();
         this.photoUriState = new MutableLiveData<>();
         this.photoResultState = new MutableLiveData<>();
         this.photoPathState = new MutableLiveData<>();
     }
+
 
     /**
      * @return the username of the user that is given when the user registers from the RegisterFragment.
@@ -97,5 +106,12 @@ public class AddPhotoViewModel extends ViewModel {
      */
     public void setUploadPhotoErrorResult(int photoStorageError) {
         photoResultState.setValue(new PhotoResultState(photoStorageError));
+    }
+
+    /**
+     * @return the current authenticated user's username.
+     */
+    public String getAuthUsername() {
+        return sharedPrefRepository.getAuthUsername();
     }
 }

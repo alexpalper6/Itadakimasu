@@ -158,9 +158,8 @@ public class RecipeCreationFragment extends Fragment {
      * Obtains the user's data from the shared preferences and uploads the recipe to the database.
      */
     private void uploadRecipe() {
-        SharedPreferences userData = requireActivity().getPreferences(Context.MODE_PRIVATE);
-        String username = userData.getString(SharedPrefRepository.SAVED_USERNAME_KEY, "");
-        String userPhotoUrl = userData.getString(SharedPrefRepository.SAVED_PHOTO_URL_KEY, "");
+        String username = creationViewModel.getAuthUsername();
+        String userPhotoUrl = creationViewModel.getAuthUserPhotoUrl();
 
         // If the username or the user's photo url is empty then a Snackbar will prompt to the user telling
         // the user that theirs data couldn't be uploaded.
@@ -169,6 +168,7 @@ public class RecipeCreationFragment extends Fragment {
         if (username.length() == 0 || userPhotoUrl.length() == 0) {
             Snackbar.make(binding.getRoot(), R.string.user_data_retrieve_error, Snackbar.LENGTH_LONG)
                     .setAnchorView(binding.fabCreateRecipe).show();
+            binding.pbProgress.setVisibility(View.GONE);
             return;
         } 
 

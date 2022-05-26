@@ -1,7 +1,10 @@
 package app.itadakimasu.ui.recipeCreation;
 
+import android.app.Application;
 import android.net.Uri;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -15,14 +18,16 @@ import app.itadakimasu.data.model.Ingredient;
 import app.itadakimasu.data.model.Recipe;
 import app.itadakimasu.data.model.Step;
 import app.itadakimasu.data.repository.RecipesRepository;
+import app.itadakimasu.data.repository.SharedPrefRepository;
 import app.itadakimasu.data.repository.StorageRepository;
 
 /**
  * Shared ViewModel used on recipe, ingredients and steps fragments for creating a recipe.
  */
-public class CreationViewModel extends ViewModel {
+public class CreationViewModel extends AndroidViewModel {
     private final RecipesRepository recipesRepository;
     private final StorageRepository storageRepository;
+    private final SharedPrefRepository sharedPrefRepository;
 
 
     private final MutableLiveData<List<Ingredient>> ingredientList;
@@ -31,14 +36,16 @@ public class CreationViewModel extends ViewModel {
     private String photoPath;
     private int itemPositionToEdit;
 
-    public CreationViewModel() {
+    public CreationViewModel(@NonNull Application application) {
+        super(application);
         this.recipesRepository = RecipesRepository.getInstance();
         this.storageRepository = StorageRepository.getInstance();
+        this.sharedPrefRepository = SharedPrefRepository.getInstance(application.getApplicationContext());
         this.ingredientList = new MutableLiveData<>(new ArrayList<>());
         this.stepList = new MutableLiveData<>(new ArrayList<>());
         this.photoUri = new MutableLiveData<>();
-
     }
+
 
     public LiveData<Result<?>> uploadRecipe(String author, String photoAuthorUrl,String recipeTitle, String recipeDescription) {
         Recipe recipe = new Recipe(author, photoAuthorUrl, recipeTitle, recipeDescription);
@@ -281,6 +288,20 @@ public class CreationViewModel extends ViewModel {
             list.get(i).setStepPosition(i);
         }
         return list;
+    }
+
+    /**
+     * @return the authenticated user's username.
+     */
+    public String getAuthUsername() {
+        return sharedPrefRepository.getAuthUsername();
+    }
+
+    /**
+     * @return the authenticated user's photo url.
+     */
+    public String getAuthUserPhotoUrl() {
+        return sharedPrefRepository.getAuthUserPhotoUrl();
     }
 
 
