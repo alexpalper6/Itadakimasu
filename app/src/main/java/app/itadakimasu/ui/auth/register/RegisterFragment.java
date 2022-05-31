@@ -33,6 +33,7 @@ import app.itadakimasu.ui.auth.register.addPhoto.AddPhotoFragment;
 /**
  * Fragment that let the user interact with the system in order to register.
  */
+@SuppressWarnings("unchecked")
 public class RegisterFragment extends Fragment {
     // ViewModel that contains the UI States that this class will use to show the feedback to the user.
     private RegisterViewModel registerViewModel;

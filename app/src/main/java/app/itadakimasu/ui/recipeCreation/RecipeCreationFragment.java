@@ -5,6 +5,8 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentResultListener;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
@@ -31,10 +33,14 @@ import com.canhub.cropper.CropImageView;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.List;
 import java.util.Objects;
 
 import app.itadakimasu.R;
 import app.itadakimasu.data.Result;
+import app.itadakimasu.data.model.Ingredient;
+import app.itadakimasu.data.model.Recipe;
+import app.itadakimasu.data.model.Step;
 import app.itadakimasu.data.repository.SharedPrefRepository;
 import app.itadakimasu.databinding.FragmentRecipeCreationBinding;
 import app.itadakimasu.utils.ImageCompressorUtils;
@@ -46,6 +52,9 @@ import app.itadakimasu.utils.dialogs.WarningDialogFragment;
  * Main fragment for recipe's creation.
  */
 public class RecipeCreationFragment extends Fragment {
+    public static final String REQUEST = "app.itadakimasu.ui.recipeCreation.Request";
+    public static final String RESULT = "app.itadakimasu.ui.recipeCreation.Result";
+
     // Shared view model with the 3 fragments used to add data to the created recipe.
     private CreationViewModel creationViewModel;
     // Binding of the layout.
@@ -70,6 +79,7 @@ public class RecipeCreationFragment extends Fragment {
                     if (result.isSuccessful()) {
                         Uri resultUri = result.getUriContent();
                         String resultPath = result.getUriFilePath(requireContext(), false);
+
                         creationViewModel.setPhotoUri(resultUri);
                         creationViewModel.setPhotoPath(resultPath);
 
@@ -77,9 +87,6 @@ public class RecipeCreationFragment extends Fragment {
                 }
             });
 
-    public static RecipeCreationFragment newInstance() {
-        return new RecipeCreationFragment();
-    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -94,6 +101,32 @@ public class RecipeCreationFragment extends Fragment {
         // Shares ViewModel with the navigation graph.
         NavBackStackEntry backStackEntry = NavHostFragment.findNavController(this).getBackStackEntry(R.id.creation_navigation);
         creationViewModel = new ViewModelProvider(backStackEntry).get(CreationViewModel.class);
+
+        getParentFragmentManager().setFragmentResultListener(REQUEST, this, new FragmentResultListener() {
+            @Override
+            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                Recipe recipe = result.getParcelable(RESULT);
+                creationViewModel.setRecipeIdToEdit(recipe.getId());
+                creationViewModel.setRecipeDateToEdit(recipe.getCreationDate());
+
+                creationViewModel.setPhotoPath(recipe.getPhotoUrl());
+
+                binding.etAddRecipeTitle.setText(recipe.getTitle());
+                binding.etAddRecipeDescription.setText(recipe.getDescription());
+
+                setIngredientListToUpdate();
+                setStepListToUpdate();
+
+
+                creationViewModel.getEditedRecipeImage(recipe.getPhotoUrl()).observe(getViewLifecycleOwner(), imageResult -> {
+                    if (imageResult instanceof Result.Success) {
+                        creationViewModel.setPhotoUri(((Result.Success<Uri>) imageResult).getData());
+                    } else {
+                        Snackbar.make(binding.getRoot(), R.string.image_load_error, Snackbar.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
 
         // Sends to the fragment for adding ingredients to the list
         binding.btAddIngredients.setOnClickListener(v -> {
@@ -126,7 +159,11 @@ public class RecipeCreationFragment extends Fragment {
 
             if (creationViewModel.areFieldsFilled(recipeTitle, recipeDescription)) {
                 binding.pbProgress.setVisibility(View.VISIBLE);
-                uploadRecipe();
+                if (creationViewModel.getRecipeIdToEdit() == null && creationViewModel.getRecipeDateToEdit() == null) {
+                    uploadRecipe();
+                } else {
+                    updateRecipe();
+                }
 
             } else {
                 showEmptyFieldsDialog();
@@ -148,11 +185,13 @@ public class RecipeCreationFragment extends Fragment {
                 });
 
         // Observable to update the Image view with the image that the user loads.
-        creationViewModel.getPhotoUri().observe(getViewLifecycleOwner(), imageUir -> {
-            Glide.with(requireContext()).load(imageUir).centerCrop().into(binding.ivAddRecipeImage);
+        creationViewModel.getPhotoUri().observe(getViewLifecycleOwner(), imageUri -> {
+            Glide.with(requireContext()).load(imageUri).centerCrop().into(binding.ivAddRecipeImage);
         });
 
     }
+
+
 
     /**
      * Obtains the user's data from the shared preferences and uploads the recipe to the database.
@@ -185,7 +224,6 @@ public class RecipeCreationFragment extends Fragment {
                                 .setAnchorView(binding.fabCreateRecipe).setAction(R.string.retry, v -> uploadRecipe()).show();
                     }
                 });
-        
     }
 
     /**
@@ -211,6 +249,67 @@ public class RecipeCreationFragment extends Fragment {
             }
         });
     }
+
+
+
+    private void updateRecipe() {
+        String username = creationViewModel.getAuthUsername();
+        String userPhotoUrl = creationViewModel.getAuthUserPhotoUrl();
+
+        // If the username or the user's photo url is empty then a Snackbar will prompt to the user telling
+        // the user that theirs data couldn't be uploaded.
+
+        // Then the upload wont be performed, because the recipe must contain the username and user's image.
+        if (username.length() == 0 || userPhotoUrl.length() == 0) {
+            Snackbar.make(binding.getRoot(), R.string.user_data_retrieve_error, Snackbar.LENGTH_LONG)
+                    .setAnchorView(binding.fabCreateRecipe).show();
+            binding.pbProgress.setVisibility(View.GONE);
+            return;
+        }
+
+        creationViewModel.updateRecipe(username, userPhotoUrl, binding.etAddRecipeTitle.getText().toString(), binding.etAddRecipeDescription.getText().toString())
+                .observe(getViewLifecycleOwner(), result -> {
+                    if (result instanceof Result.Success) {
+                        if (creationViewModel.getPhotoPath() != null) {
+                            uploadPhotoStorage(((Result.Success<String>) result).getData());
+                        }
+                    } else {
+                        // If the updating is not successful a Snackbar will prompt to the user.
+                        // The user will be able to retry the update.
+                        Snackbar.make(binding.getRoot(), R.string.recipe_update_error, Snackbar.LENGTH_LONG)
+                                .setAnchorView(binding.fabCreateRecipe).setAction(R.string.retry, v -> updateRecipe()).show();
+                    }
+                });
+    }
+
+    private void setIngredientListToUpdate() {
+        binding.btAddIngredients.setEnabled(false);
+        creationViewModel.loadIngredientList().observe(getViewLifecycleOwner(), result -> {
+            binding.btAddIngredients.setEnabled(true);
+
+            if (result instanceof Result.Success) {
+                List<Ingredient> ingredientList = ((Result.Success<List<Ingredient>>) result).getData();
+                creationViewModel.setIngredientList(ingredientList);
+            } else {
+                Snackbar.make(binding.getRoot(), R.string.ingredient_list_load_error, BaseTransientBottomBar.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void setStepListToUpdate() {
+        binding.btAddSteps.setEnabled(false);
+        creationViewModel.loadStepList().observe(getViewLifecycleOwner(), result -> {
+            binding.btAddSteps.setEnabled(true);
+
+            if (result instanceof Result.Success) {
+                List<Step> stepList = ((Result.Success<List<Step>>) result).getData();
+                creationViewModel.setStepList(stepList);
+            } else {
+                Snackbar.make(binding.getRoot(), R.string.step_list_load_error, BaseTransientBottomBar.LENGTH_LONG).show();
+            }
+        });
+    }
+
 
     /**
      * Prompts an Alert Dialog to the user, telling that the recipe has empty fields.

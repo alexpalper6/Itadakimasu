@@ -33,7 +33,7 @@ public class IngredientCreationAdapter extends ListAdapter<Ingredient, Ingredien
 
         @Override
         public boolean areContentsTheSame(@NonNull Ingredient oldItem, @NonNull Ingredient newItem) {
-            return false;
+            return oldItem.equals(newItem);
         }
     };
     // Interfaces that are used to establish actions on the "more" options from every ingredient on the list.

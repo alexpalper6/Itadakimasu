@@ -20,6 +20,8 @@ import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 
+import app.itadakimasu.data.Result;
+import app.itadakimasu.data.model.User;
 import app.itadakimasu.data.repository.SharedPrefRepository;
 import app.itadakimasu.databinding.FragmentLoginBinding;
 
@@ -137,11 +139,11 @@ public class LoginFragment extends Fragment implements FirebaseAuth.AuthStateLis
         if (firebaseAuth.getCurrentUser() != null) {
             binding.loading.setVisibility(View.GONE);
             // Obtains the user's data in order to save it on a Shared preference.
-            loginViewModel.retrieveCurrentUserData().observe(getViewLifecycleOwner(), user -> {
-                if (user != null) {
+            loginViewModel.retrieveCurrentUserData().observe(getViewLifecycleOwner(), result -> {
+                if (result instanceof Result.Success) {
                     // Obtains the user's data and saves it on an app file with Shared preferences.
-                    loginViewModel.setAuthUsername(user.getUsername());
-                    loginViewModel.setAuthUserPhotoUrl(user.getPhotoUrl());
+                    loginViewModel.setAuthUsername(((Result.Success<User>) result).getData().getUsername());
+                    loginViewModel.setAuthUserPhotoUrl(((Result.Success<User>) result).getData().getPhotoUrl());
                     NavHostFragment.findNavController(this).navigate(R.id.action_auth_navigation_to_navigation_home);
                 } else {
                     Snackbar.make(binding.getRoot(), R.string.username_data_error, BaseTransientBottomBar.LENGTH_LONG).show();

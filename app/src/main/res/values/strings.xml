@@ -106,6 +106,9 @@
     <string name="username_data_error">Error, username data could not be retrieved</string>
     <string name="user_data_retrieve_error">User data could not be retrieved</string>
     <string name="recipe_upload_error">The recipe could not be uploaded</string>
+    <string name="recipe_update_error">The recipe could not be updated</string>
+    <string name="ingredient_list_load_error">The ingredient list could not be loaded</string>
+    <string name="step_list_load_error">The step list could not be loaded</string>
 
     <string name="created_by">Created by: %1$s</string>
     <string name="recipe_details">Recipe Details</string>
@@ -113,5 +116,10 @@
     <string name="steps">Steps</string>
     <string name="user_profile_image">User profile image</string>
     <string name="list_retrieve_error">The list could not be retrieved</string>
+    <string name="delete_recipe">Delete recipe?</string>
+    <string name="delete_recipe_desc">%s:\nAre you sure to delete this recipe?</string>
+    <string name="delete">Delete</string>
+    <string name="recipe_delete_error">The recipe could not be deleted</string>
+    <string name="image_load_error">Image could not be loaded</string>
 
 </resources>

@@ -40,7 +40,7 @@ public class LoginViewModel extends AndroidViewModel {
      * Obtains the current user's data.
      * @return the current user's data obtained.
      */
-    LiveData<User> retrieveCurrentUserData() {
+    LiveData<Result<?>> retrieveCurrentUserData() {
         return usersRepository.retrieveCurrentUserData();
     }
     //

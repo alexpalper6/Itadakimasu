@@ -11,6 +11,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.Objects;
 
+import app.itadakimasu.R;
 import app.itadakimasu.data.Result;
 import app.itadakimasu.data.model.FirebaseContract;
 
@@ -75,8 +76,26 @@ public class StorageRepository {
 
     }
 
+    public LiveData<Result<?>> deleteRecipeImage(String photoUrlReference) {
+        MutableLiveData<Result<?>> result = new MutableLiveData<>();
+
+        StorageReference reference = dbStorage.getReference().child(photoUrlReference);
+
+        reference.delete().addOnSuccessListener(success -> result.setValue(new Result.Success<Object>(null)))
+                .addOnFailureListener(faliure -> result.setValue(new Result.Error(faliure)));
+
+        return result;
+    }
+
     public StorageReference getImageReference(String imageUrl) {
         return dbStorage.getReference(imageUrl);
     }
 
+    public LiveData<Result<?>> getImageUri(String imageUrl) {
+        MutableLiveData<Result<?>> result = new MutableLiveData<>();
+        dbStorage.getReference(imageUrl).getDownloadUrl().addOnSuccessListener(uri -> result.setValue(new Result.Success(uri)))
+                .addOnFailureListener(failure -> result.setValue(new Result.Error(failure)));
+
+        return result;
+    }
 }

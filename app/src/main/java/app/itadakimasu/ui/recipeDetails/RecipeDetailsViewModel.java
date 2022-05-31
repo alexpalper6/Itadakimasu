@@ -14,6 +14,7 @@ import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import app.itadakimasu.data.Result;
 import app.itadakimasu.data.model.Ingredient;
 import app.itadakimasu.data.model.Recipe;
 import app.itadakimasu.data.model.Step;
@@ -61,11 +62,11 @@ public class RecipeDetailsViewModel extends AndroidViewModel {
         return stepList;
     }
 
-    public LiveData<List<Ingredient>> loadIngredientList(String recipeId) {
+    public LiveData<Result<?>> loadIngredientList(String recipeId) {
         return recipesRepository.getIngredientsFromRecipe(recipeId);
     }
 
-    public LiveData<List<Step>> loadStepsList(String recipeId) {
+    public LiveData<Result<?>> loadStepsList(String recipeId) {
         return recipesRepository.getStepsFromRecipe(recipeId);
     }
     /**

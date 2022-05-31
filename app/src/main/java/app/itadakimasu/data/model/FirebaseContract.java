@@ -32,6 +32,12 @@ public class FirebaseContract {
 
     }
 
+    public static class FavouritesEntry {
+        public static final String COLLECTION_NAME = "favourites";
+        public static final String USERNAME = "username";
+        public static final String RECIPE_ID = "recipeId";
+    }
+
     public static class StoragePath {
         public static final String USER_PICTURES = "/users/";
         public static final String RECIPES_PICTURES = "/recipes/";

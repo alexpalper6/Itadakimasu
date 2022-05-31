@@ -9,7 +9,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.firebase.storage.StorageReference;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,6 +38,10 @@ public class CreationViewModel extends AndroidViewModel {
     private final MutableLiveData<Uri> photoUri;
     private String photoPath;
     private int itemPositionToEdit;
+    // If this is null then there is no recipe to edit
+    private String recipeIdToEdit;
+    // Saves the date when the recipe to edit was created, the data won't be updated.
+    private Date recipeDateToEdit;
 
     public CreationViewModel(@NonNull Application application) {
         super(application);
@@ -54,17 +61,32 @@ public class CreationViewModel extends AndroidViewModel {
 
     }
 
+    public LiveData<Result<?>> updateRecipe(String author, String photoAuthorUrl, String recipeTitle, String recipeDescription) {
+        Recipe recipe = new Recipe(author, photoAuthorUrl, recipeTitle, recipeDescription);
+
+        return recipesRepository.updateRecipe(recipeIdToEdit, recipeDateToEdit, recipe, getIngredientListToUpload(), getStepListToUpload());
+
+    }
+
     public LiveData<Result<?>> uploadPhotoStorage(String recipePhotoUrl, byte[] imageData) {
         return storageRepository.updateRecipeImage(recipePhotoUrl, imageData);
+    }
+    public LiveData<List<Ingredient>> getIngredientList() {
+        return ingredientList;
+    }
+
+    public LiveData<Result<?>> loadIngredientList() {
+        return recipesRepository.getIngredientsFromRecipe(recipeIdToEdit);
     }
 
     public LiveData<List<Step>> getStepList() {
         return stepList;
     }
 
-    public LiveData<List<Ingredient>> getIngredientList() {
-        return ingredientList;
+    public LiveData<Result<?>> loadStepList() {
+        return recipesRepository.getStepsFromRecipe(recipeIdToEdit);
     }
+
 
     public LiveData<Uri> getPhotoUri() {
         return photoUri;
@@ -304,5 +326,54 @@ public class CreationViewModel extends AndroidViewModel {
         return sharedPrefRepository.getAuthUserPhotoUrl();
     }
 
+    /**
+     * @return the recipe's id to edit, if it returns null, then the recipe is new, is not editable.
+     */
+    public String getRecipeIdToEdit() {
+        return recipeIdToEdit;
+    }
 
+    /**
+     * Sets the recipe's id to edit.
+     * @param recipeId - the recipe's id to edit, obtained from a result fragment.
+     */
+    public void setRecipeIdToEdit(String recipeId) {
+        this.recipeIdToEdit = recipeId;
+    }
+
+    /**
+     * @return the recipe's date that is edited.
+     */
+    public Date getRecipeDateToEdit() {
+        return recipeDateToEdit;
+    }
+
+    /**
+     * Sets the recipe's date that is being edited, this is used because when the recipe is edited,
+     * the recipe creation date will remain the same when it was created for the first time.
+     * @param recipeDateToEdit - the recipe's date that is being edited.
+     */
+    public void setRecipeDateToEdit(Date recipeDateToEdit) {
+        this.recipeDateToEdit = recipeDateToEdit;
+    }
+
+    /**
+     * Sets the ingredient list when a recipe is going to be edited.
+     * @param ingredientList - the list of ingredients from the recipe to edit.
+     */
+    public void setIngredientList(List<Ingredient> ingredientList) {
+        this.ingredientList.setValue(ingredientList);
+    }
+
+    /**
+     * Sets the step list when a recipe is going to be edited.
+     * @param stepList - the list of steps from the recipe to edit.
+     */
+    public void setStepList(List<Step> stepList) {
+        this.stepList.setValue(stepList);
+    }
+
+    public LiveData<Result<?>> getEditedRecipeImage(String imageUrl) {
+        return storageRepository.getImageUri(imageUrl);
+    }
 }

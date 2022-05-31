@@ -17,8 +17,13 @@ import android.view.ViewGroup;
 import com.bumptech.glide.Glide;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.List;
+
 import app.itadakimasu.R;
+import app.itadakimasu.data.Result;
+import app.itadakimasu.data.model.Ingredient;
 import app.itadakimasu.data.model.Recipe;
+import app.itadakimasu.data.model.Step;
 import app.itadakimasu.databinding.FragmentRecipeDetailsBinding;
 
 //TODO: Check that is in favourites
@@ -83,17 +88,17 @@ public class RecipeDetailsFragment extends Fragment {
     }
 
     private void loadIngredientsList(String id) {
-        detailsViewModel.loadIngredientList(id).observe(getViewLifecycleOwner(), ingredientList -> {
-            if (ingredientList != null) {
-                detailsViewModel.setIngredientList(ingredientList);
+        detailsViewModel.loadIngredientList(id).observe(getViewLifecycleOwner(), result -> {
+            if (result instanceof Result.Success) {
+                detailsViewModel.setIngredientList(((Result.Success<List<Ingredient>>) result).getData());
             }
         });
     }
 
     private void loadStepsList(String id) {
-        detailsViewModel.loadStepsList(id).observe(getViewLifecycleOwner(), stepList -> {
-            if (stepList != null) {
-                detailsViewModel.setStepList(stepList);
+        detailsViewModel.loadStepsList(id).observe(getViewLifecycleOwner(), result -> {
+            if (result instanceof Result.Success) {
+                detailsViewModel.setStepList(((Result.Success<List<Step>>) result).getData());
             }
         });
     }

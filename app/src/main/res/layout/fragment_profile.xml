@@ -7,6 +7,8 @@
     android:background="?attr/colorPrimary"
     tools:context=".ui.profile.ProfileFragment">
 
+
+
     <ImageButton
         android:id="@+id/ib_sign_out"
         style="@android:style/Widget.Material.ImageButton"
@@ -64,19 +66,24 @@
         app:layout_constraintVertical_bias="0.566"
         tools:ignore="TextContrastCheck" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvRecipes"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/srl_refresh"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@drawable/list_profile_background"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        app:circularflow_radiusInDP="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline5"
-        tools:listitem="@layout/item_my_recipe_preview" />
+        app:layout_constraintTop_toTopOf="@+id/guideline5">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvRecipes"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            tools:listitem="@layout/item_my_recipe_preview" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline5"
@@ -92,7 +99,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/rvRecipes"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

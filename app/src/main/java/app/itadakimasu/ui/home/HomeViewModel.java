@@ -1,19 +1,180 @@
 package app.itadakimasu.ui.home;
 
+import android.app.Application;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
-public class HomeViewModel extends ViewModel {
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-    private final MutableLiveData<String> mText;
+import app.itadakimasu.data.Result;
+import app.itadakimasu.data.model.Recipe;
+import app.itadakimasu.data.repository.FavouritesRepository;
+import app.itadakimasu.data.repository.RecipesRepository;
+import app.itadakimasu.data.repository.SharedPrefRepository;
 
-    public HomeViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("This is home fragment");
+/**
+ * Sate holder for the HomeFragment.
+ */
+public class HomeViewModel extends AndroidViewModel {
+    private final RecipesRepository recipesRepository;
+    private final FavouritesRepository favouritesRepository;
+    private final SharedPrefRepository sharedPrefRepository;
+
+
+    private final MutableLiveData<List<Recipe>> recipeList;
+    private final MutableLiveData<String> mSearchCondition;
+    private boolean loadingData;
+    // Boolean used to check when the user's retrieve a list when paginating and it returns nothing.
+    // This one should be checked to false when the list is reloaded.
+    private boolean reachedEndPagination;
+    // Synchronized flag that is used to add the list retrieved when every recipe has been checked
+    // if its marked as favourite
+    private int recipesToProcessFlag;
+
+    public HomeViewModel(@NonNull Application application) {
+        super(application);
+        this.recipesRepository = RecipesRepository.getInstance();
+        this.favouritesRepository = FavouritesRepository.getInstance();
+        this.sharedPrefRepository = SharedPrefRepository.getInstance(application.getApplicationContext());
+        this.recipeList = new MutableLiveData<>(new ArrayList<>());
+        this.mSearchCondition = new MutableLiveData<>();
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    /**
+     * @return the list of the recipes stored on the view model.
+     */
+    public LiveData<List<Recipe>> getRecipeList() {
+        return recipeList;
     }
+
+    /**
+     * @return the newest recipes fetched from the database.
+     */
+    public LiveData<Result<?>> loadFirstRecipes() {
+        return recipesRepository.getNewestRecipes();
+    }
+
+    /**
+     * Pagination of the recipes with no filter.
+     * @return more recipes starting from the last recipe fetched previously.
+     */
+    public LiveData<Result<?>> loadNextRecipes() {
+        Date lastRecipeDate = getRecipeAt(getListSize() - 1).getCreationDate();
+        return recipesRepository.loadNextRecipes(lastRecipeDate);
+    }
+
+    /**
+     * Checks if a document with the user's authenticated username and the recipe's id exists in favourites collection.
+     * @param recipe - the recipe's data to check if its one of the user's favourite.
+     * @return
+     */
+    public LiveData<Result<?>> isRecipeFavourite(Recipe recipe) {
+        return favouritesRepository.findVafouriteRecipe(getAuthUsername(), recipe.getId());
+    }
+
+    /**
+     * Add recipes to favourite.
+     * @param position - recipe's position to add to favourite.
+     * @return success result with  if its added; error if something wrong happened.
+     */
+    public LiveData<Result<?>> addRecipeToFavourites(int position) {
+        Recipe recipeToAddFav = getRecipeAt(position);
+        return favouritesRepository.addToFavourites(getAuthUsername(), recipeToAddFav.getId());
+    }
+
+    /**
+     * Deletes the recipe from favourites.
+     * @param position - the position where the recipe is located in the list.
+     * @return success result if it's deleted; error if something goes wrong.
+     */
+    public LiveData<Result<?>> removeRecipeFromFavourites(int position) {
+        Recipe recipeToRemoveFav = getRecipeAt(position);
+        return favouritesRepository.removeFromFavourites(getAuthUsername(), recipeToRemoveFav.getId());
+    }
+
+    /**
+     * Obtains recipes from given position.
+     * @param position - the position where the recipe will be retrieved.
+     * @return a recipe from the view model's list.
+     */
+    public Recipe getRecipeAt(int position) {
+        return recipeList.getValue().get(position);
+    }
+
+    /**
+     * @return the size of the list of recipes.
+     */
+    public int getListSize() {
+        return recipeList.getValue().size();
+    }
+
+    /**
+     * @return true if the recipe's list is empty; false if not.
+     */
+    public boolean isListEmpty() {
+        return recipeList.getValue().isEmpty();
+    }
+
+
+    /**
+     * @return true if data is being added or removed from the database; false if not.
+     */
+    public boolean isLoadingData() {
+        return loadingData;
+    }
+
+    /**
+     * Sets the recipe's list given a list of recipes, normally from the database.
+     * @param recipeList
+     */
+    public void setRecipeList(List<Recipe> recipeList) {
+        this.recipeList.setValue(recipeList);
+    }
+
+    /**
+     * Sets the quantity of recipes that must be checked if its on favourites collection corresponding
+     * with the authenticated user.
+     * @param quantity - the size of the list retrieved from the database.
+     */
+    public void setRecipesToProcess(int quantity) {
+        this.recipesToProcessFlag = quantity;
+    }
+
+    /**
+     * Sets the state of data loading.
+     * @param state - boolean state, use true when data is being processed from the database, false when it finish.
+     */
+    public void setLoadingDataState(boolean state) {
+        this.loadingData = state;
+    }
+
+    /**
+     * Synchronous method that decreases the number of recipes to check as favourite and returns what is left.
+     * @return the quantity of recipes after one being processed.
+     */
+    public synchronized int recipeIsProcessed() {
+        recipesToProcessFlag -= 1;
+        return recipesToProcessFlag;
+    }
+
+    /**
+     * Sets the search condition, recipe's title should match this.
+     * @param condition - the string which recipe's title must match with.
+     */
+    public void setSearchCondition(String condition) {
+        mSearchCondition.setValue(condition);
+    }
+
+    /**
+     * @return the authenticated user's username.
+     */
+    public String getAuthUsername() {
+        return sharedPrefRepository.getAuthUsername();
+    }
+
 }

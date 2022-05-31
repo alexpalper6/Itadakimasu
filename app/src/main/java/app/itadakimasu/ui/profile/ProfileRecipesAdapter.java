@@ -21,15 +21,19 @@ import com.google.firebase.storage.StorageReference;
 import app.itadakimasu.R;
 import app.itadakimasu.data.model.Recipe;
 import app.itadakimasu.data.repository.SharedPrefRepository;
+import app.itadakimasu.data.repository.StorageRepository;
 import app.itadakimasu.databinding.ItemMyRecipePreviewBinding;
 import app.itadakimasu.interfaces.OnItemClickDisplayListener;
 import app.itadakimasu.interfaces.OnItemClickEditListener;
 import app.itadakimasu.interfaces.OnItemClickRemoveListener;
 
-
+/**
+ * Adapter used on the profile's RecyclerView with the item "my recipe preview"
+ */
 public class ProfileRecipesAdapter extends ListAdapter<Recipe, ProfileRecipesViewHolder> {
 
-    public static final DiffUtil.ItemCallback<Recipe> DIFF_CALLBACK = new DiffUtil.ItemCallback<Recipe>() {
+    // Diff callback to check the difference between recipes.
+    public static final DiffUtil.ItemCallback<Recipe> DIFF_CALLBACK = new DiffUtil.ItemCallback<>() {
         @Override
         public boolean areItemsTheSame(@NonNull Recipe oldItem, @NonNull Recipe newItem) {
             return oldItem.equals(newItem);
@@ -47,8 +51,9 @@ public class ProfileRecipesAdapter extends ListAdapter<Recipe, ProfileRecipesVie
             return sameAuthor && sameAuthorPhoto && sameTitle && sameDesc && samePhoto;
         }
     };
-
+    // Shared repository to remove 'more' buttons if  the username is the same as the authenticated user.
     private final SharedPrefRepository sharedPrefRepository;
+    private final StorageRepository storageRepository;
     private OnItemClickEditListener editListener;
     private OnItemClickRemoveListener removeListener;
     private OnItemClickDisplayListener displayListener;
@@ -56,8 +61,12 @@ public class ProfileRecipesAdapter extends ListAdapter<Recipe, ProfileRecipesVie
     public ProfileRecipesAdapter(Context context) {
         super(DIFF_CALLBACK);
         this.sharedPrefRepository = SharedPrefRepository.getInstance(context);
+        this.storageRepository = StorageRepository.getInstance();
     }
 
+    /**
+     * Called when the recycler view needs to inflate the view holder when an item is created.
+     */
     @NonNull
     @Override
     public ProfileRecipesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -65,10 +74,15 @@ public class ProfileRecipesAdapter extends ListAdapter<Recipe, ProfileRecipesVie
         return new ProfileRecipesViewHolder(binding, editListener, removeListener, displayListener);
     }
 
+    /**
+     * Displays the data on specified position on the list of the recycler view.
+     * @param holder - the layout of the item, in this case the ingredient item.
+     * @param position - the position where this item should appear.
+     */
     @Override
     public void onBindViewHolder(@NonNull ProfileRecipesViewHolder holder, int position) {
         final Recipe recipe = getItem(position);
-        StorageReference reference = FirebaseStorage.getInstance().getReference(recipe.getPhotoUrl());
+        StorageReference reference = storageRepository.getImageReference(recipe.getPhotoUrl());
         holder.setRecipeImage(reference);
         holder.setTitle(recipe.getTitle());
         holder.setDescription(recipe.getDescription());
@@ -95,18 +109,32 @@ public class ProfileRecipesAdapter extends ListAdapter<Recipe, ProfileRecipesVie
         this.removeListener = listener;
     }
 
+    /**
+     * Establish the click listener for this adapter.
+     * @param listener - the implementation of this listener.
+     */
     public void setOnClickDisplayListener(OnItemClickDisplayListener listener) {
         this.displayListener = listener;
     }
 }
 
+/**
+ * ViewHolder class for the adapter of profile's recipes.
+ */
 class ProfileRecipesViewHolder extends RecyclerView.ViewHolder {
     private final ImageView ivRecipeImage;
     private final TextView tvTitle;
     private final TextView tvDescription;
     private final ImageButton ibMore;
 
-
+    /**
+     * Given a binding of a layout and the implementation of the interfaces, establish all the views
+     * and actions on the 'more' button and on the card view when is tapped.
+     * @param binding - the inflated layout (item_my_recipe_preview).
+     * @param editListener - implementation of edit listener.
+     * @param removeListener - implementation of remove listener.
+     * @param displayListener - implementation of display listener.
+     */
     public ProfileRecipesViewHolder(ItemMyRecipePreviewBinding binding, OnItemClickEditListener editListener, OnItemClickRemoveListener removeListener,
                                     OnItemClickDisplayListener displayListener) {
         super(binding.getRoot());
@@ -140,6 +168,8 @@ class ProfileRecipesViewHolder extends RecyclerView.ViewHolder {
             popupMenu.show();
         });
 
+        // When the card view is tapped the displayListener interface will be performed, using the
+        // position of the tapped item.
         binding.getRoot().setOnClickListener(v -> {
             if (displayListener != null) {
                 displayListener.onItemClickDisplay(ProfileRecipesViewHolder.this.getAdapterPosition());
@@ -147,18 +177,34 @@ class ProfileRecipesViewHolder extends RecyclerView.ViewHolder {
         });
     }
 
+    /**
+     * Sets the image using glide and the image reference on the recipe's image view.
+     * @param imageReference - the image reference of the recipe's image.
+     */
     public void setRecipeImage(StorageReference imageReference) {
         Glide.with(ivRecipeImage.getContext()).load(imageReference).centerCrop().into(ivRecipeImage);
     }
 
+    /**
+     * Sets the recipe's title.
+     * @param title - the title of the recipe.
+     */
     public void setTitle(String title) {
         this.tvTitle.setText(title);
     }
 
+    /**
+     * Sets the recipe's description.
+     * @param description - the recipe's description.
+     */
     public void setDescription(String description) {
         this.tvDescription.setText(description);
     }
 
+    /**
+     * Sets the 'more' button visibility.
+     * @param visibility View.GONE for invisible, View.VISIBLE for visible.
+     */
     public void setIbMoreVisibility(int visibility) {
         this.ibMore.setVisibility(visibility);
     }

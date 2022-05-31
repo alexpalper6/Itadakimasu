@@ -102,14 +102,15 @@ public class UsersRepository {
     }
 
 
-    public LiveData<User> retrieveCurrentUserData() {
-        MutableLiveData<User> result = new MutableLiveData<>();
+    public LiveData<Result<?>> retrieveCurrentUserData() {
+        MutableLiveData<Result<?>> result = new MutableLiveData<>();
 
         dbFirestore.collection(FirebaseContract.UserEntry.COLLECTION_NAME)
                 .document(firebaseAuth.getCurrentUser().getUid())
                 .get().addOnSuccessListener(documentSnapshot -> {
-                    result.setValue(documentSnapshot.toObject(User.class));
-                });
+                    result.setValue(new Result.Success<User>(documentSnapshot.toObject(User.class)));
+                })
+                .addOnFailureListener(failure -> result.setValue(new Result.Error(failure)));
 
         return result;
     }
