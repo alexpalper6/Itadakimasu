@@ -28,19 +28,24 @@ import app.itadakimasu.data.repository.StorageRepository;
  * Shared ViewModel used on recipe, ingredients and steps fragments for creating a recipe.
  */
 public class CreationViewModel extends AndroidViewModel {
+    // Repositories to load, modify and add data from the database.
     private final RecipesRepository recipesRepository;
     private final StorageRepository storageRepository;
+    // This repository is used to obtain the data from the shared preferences.
     private final SharedPrefRepository sharedPrefRepository;
 
-
+    // The list of ingredients of the recipe, that will store the ingredients and show it to the user.
     private final MutableLiveData<List<Ingredient>> ingredientList;
+    // The list of steps of the recipe, that will store the steps and show it to the user.
     private final MutableLiveData<List<Step>> stepList;
+    // Photo uri that observes for changes to update the UI.
     private final MutableLiveData<Uri> photoUri;
+    // Photo path where it will be uploaded to the storage.
     private String photoPath;
     private int itemPositionToEdit;
     // If this is null then there is no recipe to edit
     private String recipeIdToEdit;
-    // Saves the date when the recipe to edit was created, the data won't be updated.
+    // Saves the date when the recipe to edit was created, this data won't be updated.
     private Date recipeDateToEdit;
 
     public CreationViewModel(@NonNull Application application) {
@@ -53,7 +58,12 @@ public class CreationViewModel extends AndroidViewModel {
         this.photoUri = new MutableLiveData<>();
     }
 
-
+    /**
+     * Uploads a recipe to the database, given the data that the user has input and its username and
+     * photo.
+     *
+     * @return result success with the recipe image url to upload to sotrage; result error if it fails.
+     */
     public LiveData<Result<?>> uploadRecipe(String author, String photoAuthorUrl,String recipeTitle, String recipeDescription) {
         Recipe recipe = new Recipe(author, photoAuthorUrl, recipeTitle, recipeDescription);
 
@@ -61,36 +71,61 @@ public class CreationViewModel extends AndroidViewModel {
 
     }
 
+    /**
+     * Updates an existed recipe's image, title and description, the edited recipe's id and date
+     * must be passed as parameter.
+     *
+     * @return result success with the recipe image url to upload to sotrage; result error if it fails.
+     */
     public LiveData<Result<?>> updateRecipe(String author, String photoAuthorUrl, String recipeTitle, String recipeDescription) {
         Recipe recipe = new Recipe(author, photoAuthorUrl, recipeTitle, recipeDescription);
 
-        return recipesRepository.updateRecipe(recipeIdToEdit, recipeDateToEdit, recipe, getIngredientListToUpload(), getStepListToUpload());
+        return recipesRepository.updateRecipe(recipeIdToEdit, recipeDateToEdit, recipe);
 
     }
 
+    /**
+     * Uploads to the storage the recipe image's data on given photo url.
+     * @param recipePhotoUrl - the url path where the image will be uploaded.
+     * @param imageData - the image compressed data.
+     * @return result success if it's uploaded successfully; error if not.
+     */
     public LiveData<Result<?>> uploadPhotoStorage(String recipePhotoUrl, byte[] imageData) {
         return storageRepository.updateRecipeImage(recipePhotoUrl, imageData);
     }
+
+    /**
+     * Downloads the image data as a uri.
+     * @param imageUrl - the image path where the image will be retrieved from the storage.
+     * @return result success with image's uri if successful; error if not.
+     */
+    public LiveData<Result<?>> getEditedRecipeImage(String imageUrl) {
+        return storageRepository.getImageUri(imageUrl);
+    }
+
+    /**
+     * @return the ingredient's list from the view model.
+     */
     public LiveData<List<Ingredient>> getIngredientList() {
         return ingredientList;
     }
 
-    public LiveData<Result<?>> loadIngredientList() {
-        return recipesRepository.getIngredientsFromRecipe(recipeIdToEdit);
-    }
-
+    /**
+     * @return the step's list from the view model.
+     */
     public LiveData<List<Step>> getStepList() {
         return stepList;
     }
 
-    public LiveData<Result<?>> loadStepList() {
-        return recipesRepository.getStepsFromRecipe(recipeIdToEdit);
-    }
 
-
+    /**
+     * @return the photo uri, used to change the ImageView UI from the fragment.
+     */
     public LiveData<Uri> getPhotoUri() {
         return photoUri;
     }
+
+
 
 
     // Methods for ingredient list
@@ -357,23 +392,6 @@ public class CreationViewModel extends AndroidViewModel {
         this.recipeDateToEdit = recipeDateToEdit;
     }
 
-    /**
-     * Sets the ingredient list when a recipe is going to be edited.
-     * @param ingredientList - the list of ingredients from the recipe to edit.
-     */
-    public void setIngredientList(List<Ingredient> ingredientList) {
-        this.ingredientList.setValue(ingredientList);
-    }
 
-    /**
-     * Sets the step list when a recipe is going to be edited.
-     * @param stepList - the list of steps from the recipe to edit.
-     */
-    public void setStepList(List<Step> stepList) {
-        this.stepList.setValue(stepList);
-    }
 
-    public LiveData<Result<?>> getEditedRecipeImage(String imageUrl) {
-        return storageRepository.getImageUri(imageUrl);
-    }
 }

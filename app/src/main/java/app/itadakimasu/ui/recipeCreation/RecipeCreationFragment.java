@@ -102,31 +102,7 @@ public class RecipeCreationFragment extends Fragment {
         NavBackStackEntry backStackEntry = NavHostFragment.findNavController(this).getBackStackEntry(R.id.creation_navigation);
         creationViewModel = new ViewModelProvider(backStackEntry).get(CreationViewModel.class);
 
-        getParentFragmentManager().setFragmentResultListener(REQUEST, this, new FragmentResultListener() {
-            @Override
-            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-                Recipe recipe = result.getParcelable(RESULT);
-                creationViewModel.setRecipeIdToEdit(recipe.getId());
-                creationViewModel.setRecipeDateToEdit(recipe.getCreationDate());
-
-                creationViewModel.setPhotoPath(recipe.getPhotoUrl());
-
-                binding.etAddRecipeTitle.setText(recipe.getTitle());
-                binding.etAddRecipeDescription.setText(recipe.getDescription());
-
-                setIngredientListToUpdate();
-                setStepListToUpdate();
-
-
-                creationViewModel.getEditedRecipeImage(recipe.getPhotoUrl()).observe(getViewLifecycleOwner(), imageResult -> {
-                    if (imageResult instanceof Result.Success) {
-                        creationViewModel.setPhotoUri(((Result.Success<Uri>) imageResult).getData());
-                    } else {
-                        Snackbar.make(binding.getRoot(), R.string.image_load_error, Snackbar.LENGTH_LONG).show();
-                    }
-                });
-            }
-        });
+        setResultListenerForEdit();
 
         // Sends to the fragment for adding ingredients to the list
         binding.btAddIngredients.setOnClickListener(v -> {
@@ -159,6 +135,9 @@ public class RecipeCreationFragment extends Fragment {
 
             if (creationViewModel.areFieldsFilled(recipeTitle, recipeDescription)) {
                 binding.pbProgress.setVisibility(View.VISIBLE);
+                // If the variables recipeIdToEdit and recipeDateToEdit are null, then the recipe is new
+                // so it  will be uploaded; if they aren't null, then the recipe is not new, so it will
+                // be updated.
                 if (creationViewModel.getRecipeIdToEdit() == null && creationViewModel.getRecipeDateToEdit() == null) {
                     uploadRecipe();
                 } else {
@@ -191,7 +170,38 @@ public class RecipeCreationFragment extends Fragment {
 
     }
 
+    /**
+     * Sets a fragment result listener, this will get a recipe in order to edit it.
+     * If this fragment is going to be used to edit a recipe, the buttons for adding
+     * ingredients and steps will be disabled.
+     */
+    private void setResultListenerForEdit() {
+        getParentFragmentManager().setFragmentResultListener(REQUEST, this, (requestKey, result) -> {
 
+            Recipe recipe = result.getParcelable(RESULT);
+            creationViewModel.setRecipeIdToEdit(recipe.getId());
+            creationViewModel.setRecipeDateToEdit(recipe.getCreationDate());
+
+            creationViewModel.setPhotoPath(recipe.getPhotoUrl());
+
+            binding.etAddRecipeTitle.setText(recipe.getTitle());
+            binding.etAddRecipeDescription.setText(recipe.getDescription());
+
+            binding.btAddIngredients.setEnabled(false);
+            binding.btAddSteps.setEnabled(false);
+
+            // Obtains the image as an uri, so the image uri can be stored on the view model.
+            // The image url path won't be settled, it will when the user changes the image. This serves
+            // as a way to tell if the image is edited, so the app will be able to compress the image.
+            creationViewModel.getEditedRecipeImage(recipe.getPhotoUrl()).observe(getViewLifecycleOwner(), imageResult -> {
+                if (imageResult instanceof Result.Success) {
+                    creationViewModel.setPhotoUri(((Result.Success<Uri>) imageResult).getData());
+                } else {
+                    Snackbar.make(binding.getRoot(), R.string.image_load_error, Snackbar.LENGTH_LONG).show();
+                }
+            });
+        });
+    }
 
     /**
      * Obtains the user's data from the shared preferences and uploads the recipe to the database.
@@ -250,8 +260,9 @@ public class RecipeCreationFragment extends Fragment {
         });
     }
 
-
-
+    /**
+     * Updates an existed recipe, used when its edited.
+     */
     private void updateRecipe() {
         String username = creationViewModel.getAuthUsername();
         String userPhotoUrl = creationViewModel.getAuthUserPhotoUrl();
@@ -262,14 +273,18 @@ public class RecipeCreationFragment extends Fragment {
         // Then the upload wont be performed, because the recipe must contain the username and user's image.
         if (username.length() == 0 || userPhotoUrl.length() == 0) {
             Snackbar.make(binding.getRoot(), R.string.user_data_retrieve_error, Snackbar.LENGTH_LONG)
-                    .setAnchorView(binding.fabCreateRecipe).show();
+                    .setAnchorView(binding.fabCreateRecipe)
+                    .show();
             binding.pbProgress.setVisibility(View.GONE);
             return;
         }
 
-        creationViewModel.updateRecipe(username, userPhotoUrl, binding.etAddRecipeTitle.getText().toString(), binding.etAddRecipeDescription.getText().toString())
-                .observe(getViewLifecycleOwner(), result -> {
+        creationViewModel.updateRecipe(username, userPhotoUrl, binding.etAddRecipeTitle.getText().toString(),
+                binding.etAddRecipeDescription.getText().toString()).observe(getViewLifecycleOwner(), result -> {
+
                     if (result instanceof Result.Success) {
+                        // Checks if the image was edited by the user.
+                        //This serves as a way to tell if the image is edited, so the app will be able to compress the image.
                         if (creationViewModel.getPhotoPath() != null) {
                             uploadPhotoStorage(((Result.Success<String>) result).getData());
                         }
@@ -281,35 +296,6 @@ public class RecipeCreationFragment extends Fragment {
                     }
                 });
     }
-
-    private void setIngredientListToUpdate() {
-        binding.btAddIngredients.setEnabled(false);
-        creationViewModel.loadIngredientList().observe(getViewLifecycleOwner(), result -> {
-            binding.btAddIngredients.setEnabled(true);
-
-            if (result instanceof Result.Success) {
-                List<Ingredient> ingredientList = ((Result.Success<List<Ingredient>>) result).getData();
-                creationViewModel.setIngredientList(ingredientList);
-            } else {
-                Snackbar.make(binding.getRoot(), R.string.ingredient_list_load_error, BaseTransientBottomBar.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    private void setStepListToUpdate() {
-        binding.btAddSteps.setEnabled(false);
-        creationViewModel.loadStepList().observe(getViewLifecycleOwner(), result -> {
-            binding.btAddSteps.setEnabled(true);
-
-            if (result instanceof Result.Success) {
-                List<Step> stepList = ((Result.Success<List<Step>>) result).getData();
-                creationViewModel.setStepList(stepList);
-            } else {
-                Snackbar.make(binding.getRoot(), R.string.step_list_load_error, BaseTransientBottomBar.LENGTH_LONG).show();
-            }
-        });
-    }
-
 
     /**
      * Prompts an Alert Dialog to the user, telling that the recipe has empty fields.
