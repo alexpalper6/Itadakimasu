@@ -27,7 +27,7 @@ public class HomeViewModel extends AndroidViewModel {
 
 
     private final MutableLiveData<List<Recipe>> recipeList;
-    private final MutableLiveData<String> mSearchCondition;
+
     private boolean loadingData;
     // Boolean used to check when the user's retrieve a list when paginating and it returns nothing.
     // This one should be checked to false when the list is reloaded.
@@ -36,13 +36,13 @@ public class HomeViewModel extends AndroidViewModel {
     // if its marked as favourite
     private int recipesToProcessFlag;
 
+
     public HomeViewModel(@NonNull Application application) {
         super(application);
         this.recipesRepository = RecipesRepository.getInstance();
         this.favouritesRepository = FavouritesRepository.getInstance();
         this.sharedPrefRepository = SharedPrefRepository.getInstance(application.getApplicationContext());
         this.recipeList = new MutableLiveData<>(new ArrayList<>());
-        this.mSearchCondition = new MutableLiveData<>();
     }
 
     /**
@@ -59,14 +59,16 @@ public class HomeViewModel extends AndroidViewModel {
         return recipesRepository.getNewestRecipes();
     }
 
+
     /**
      * Pagination of the recipes with no filter.
      * @return more recipes starting from the last recipe fetched previously.
      */
     public LiveData<Result<?>> loadNextRecipes() {
         Date lastRecipeDate = getRecipeAt(getListSize() - 1).getCreationDate();
-        return recipesRepository.loadNextRecipes(lastRecipeDate);
+        return recipesRepository.getNextRecipes(lastRecipeDate);
     }
+
 
     /**
      * Checks if a document with the user's authenticated username and the recipe's id exists in favourites collection.
@@ -129,6 +131,42 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
     /**
+     * Boolean used to disable pagination when the user tries to paginate data and the list doesn't
+     * return any item, because the list reached its end.
+     * @return true if after paginating the result of the list is empty; false if not.
+     */
+    public boolean reachedEndPagination() {
+        return reachedEndPagination;
+    }
+
+
+    /**
+     * Sets or unsets a recipe as a favourite, using the position of the recipe to mark and a boolean
+     * that tells if the recipe will be marked as favourite (true) or not (false).
+     * @param position
+     * @param isFavourite
+     */
+    public void markRecipeFavouriteAt(int position, boolean isFavourite) {
+        List<Recipe> updatedRecipeList = recipeList.getValue();
+        assert updatedRecipeList != null;
+
+        Recipe recipe = updatedRecipeList.get(position);
+        recipe.setFavourite(isFavourite);
+        updatedRecipeList.set(position, recipe);
+
+        recipeList.setValue(updatedRecipeList);
+    }
+
+    /**
+     * Sets the boolean that checks if the user can't paginate more because there are no more recipes
+     * to fetch.
+     * @param state
+     */
+    public void setReachedEndPaginationState(boolean state) {
+        this.reachedEndPagination = state;
+    }
+
+    /**
      * Sets the recipe's list given a list of recipes, normally from the database.
      * @param recipeList
      */
@@ -163,18 +201,19 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
     /**
-     * Sets the search condition, recipe's title should match this.
-     * @param condition - the string which recipe's title must match with.
-     */
-    public void setSearchCondition(String condition) {
-        mSearchCondition.setValue(condition);
-    }
-
-    /**
      * @return the authenticated user's username.
      */
     public String getAuthUsername() {
         return sharedPrefRepository.getAuthUsername();
     }
 
+    public void addRetrievedRecipes(List<Recipe> retrievedList) {
+        if (!retrievedList.isEmpty()) {
+            List<Recipe> list = recipeList.getValue();
+            assert list != null;
+            list.addAll(retrievedList);
+
+            recipeList.setValue(list);
+        }
+    }
 }

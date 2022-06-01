@@ -46,6 +46,8 @@ public class ProfileViewModel extends AndroidViewModel {
         this.recipesList = new MutableLiveData<>(new ArrayList<>());
         this.loadingDataState = true;
         this.reachedEndPagination = false;
+        this.profileUsername = "";
+        this.photoUrl = "";
     }
 
     /**
@@ -69,7 +71,7 @@ public class ProfileViewModel extends AndroidViewModel {
      */
     public LiveData<Result<?>> loadNextRecipes() {
         Date lastRecipeDate = recipesList.getValue().get(getListSize() - 1).getCreationDate();
-        return recipesRepository.loadNextRecipesByUser(profileUsername, lastRecipeDate);
+        return recipesRepository.getNextRecipesByUser(profileUsername, lastRecipeDate);
     }
 
     public LiveData<Result<?>> deleteRecipe(String recipeId) {

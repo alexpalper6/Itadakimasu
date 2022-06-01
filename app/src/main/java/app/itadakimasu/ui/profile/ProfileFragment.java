@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentResultListener;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.palette.graphics.Palette;
@@ -41,6 +42,9 @@ import app.itadakimasu.ui.recipeDetails.RecipeDetailsFragment;
 // TODO: Add the functionality to retrieve the profile of another user when tapping on their image
 //      on the recipe. For this, use a fragmentResultManager!
 public class ProfileFragment extends Fragment {
+    public static final String REQUEST = "app.itadakimasu.ui.profile.Request";
+    public static final String RESULT_USERNAME = "app.itadakimasu.ui.profile.ResultUsername";
+    public static final String RESULT_USER_PHOTO = "app.itadakimasu.ui.profile.ResultUserPhoto";
 
     private FragmentProfileBinding binding;
     private ProfileRecipesAdapter adapter;
@@ -67,8 +71,22 @@ public class ProfileFragment extends Fragment {
         //      via fregmentResultListener when the user image is tapped on a recipe.
         //      Keep in mind that these 2 lines will have to be keeped in order to retrieve the user data
         //      when the authenticated user goest to their profile using the bottom navigation menu.
-        profileViewModel.setProfileUsername(profileViewModel.getAuthUsername());
-        profileViewModel.setPhotoUrl(profileViewModel.getAuthUserPhotoUrl());
+
+        getParentFragmentManager().setFragmentResultListener(REQUEST, this, new FragmentResultListener() {
+            @Override
+            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                String username = result.getString(RESULT_USERNAME);
+                String userPhotoUrl = result.getString(RESULT_USER_PHOTO);
+
+                profileViewModel.setProfileUsername(username);
+                profileViewModel.setPhotoUrl(userPhotoUrl);
+            }
+        });
+
+        if (profileViewModel.getProfileUsername().length() == 0 && profileViewModel.getPhotoUrl().length() == 0) {
+            profileViewModel.setProfileUsername(profileViewModel.getAuthUsername());
+            profileViewModel.setPhotoUrl(profileViewModel.getAuthUserPhotoUrl());
+        }
 
         binding.tvUsername.setText(profileViewModel.getProfileUsername());
         binding.srlRefresh.setColorSchemeResources(R.color.primaryColor);
@@ -124,7 +142,6 @@ public class ProfileFragment extends Fragment {
                 super.onScrollStateChanged(recyclerView, newState);
                 // With loadingData we assure that when is loading the user wont be able to call for data again
                 if ((!recyclerView.canScrollVertically(1)) && !profileViewModel.isLoadingData() && !profileViewModel.reachedEndPagination()) {
-                    profileViewModel.setLoadingDataState(true);
                     loadNextRecipes();
                 }
             }
@@ -136,24 +153,10 @@ public class ProfileFragment extends Fragment {
 
     }
 
-    /**
-     * First, the recipe's image will be removed.
-     */
-    private void deleteRecipeImage(String recipePhotoUrl) {
-
-        profileViewModel.deleteRecipeImage(recipePhotoUrl).observe(getViewLifecycleOwner(), result -> {
-            binding.pbProgress.setVisibility(View.GONE);
-            profileViewModel.setLoadingDataState(false);
-            if (result instanceof Result.Error) {
-                Snackbar.make(binding.getRoot(), R.string.recipe_delete_error, BaseTransientBottomBar.LENGTH_LONG).show();
-            }
-        });
-    }
 
     //TODO: Remove every document from favourites collection that matches the recipeId
     private void removeRecipe(Recipe recipeToDelete, int itemPosition) {
-        binding.pbProgress.setVisibility(View.VISIBLE);
-        profileViewModel.setLoadingDataState(true);
+        setDataIsLoading();
 
         profileViewModel.deleteRecipe(recipeToDelete.getId()).observe(getViewLifecycleOwner(), result -> {
             if (result instanceof Result.Success) {
@@ -161,12 +164,24 @@ public class ProfileFragment extends Fragment {
                 deleteRecipeImage(recipeToDelete.getPhotoUrl());
             } else {
                 Snackbar.make(binding.getRoot(), R.string.recipe_delete_error, BaseTransientBottomBar.LENGTH_LONG).show();
-                binding.pbProgress.setVisibility(View.GONE);
-                profileViewModel.setLoadingDataState(false);
+                setDataIsRetrieved();
             }
         });
     }
 
+
+    /**
+     * First, the recipe's image will be removed.
+     */
+    private void deleteRecipeImage(String recipePhotoUrl) {
+
+        profileViewModel.deleteRecipeImage(recipePhotoUrl).observe(getViewLifecycleOwner(), result -> {
+            setDataIsRetrieved();
+            if (result instanceof Result.Error) {
+                Snackbar.make(binding.getRoot(), R.string.recipe_delete_error, BaseTransientBottomBar.LENGTH_LONG).show();
+            }
+        });
+    }
 
     /**
      * Loads the user's image getting the Image Reference.
@@ -202,10 +217,11 @@ public class ProfileFragment extends Fragment {
      * when it loads the fragment for first time.
      */
     private void loadFirstRecipes() {
+        setDataIsLoading();
+
         profileViewModel.loadFirstRecipes().observe(getViewLifecycleOwner(), result -> {
-            binding.pbProgress.setVisibility(View.GONE);
+            setDataIsRetrieved();
             binding.srlRefresh.setRefreshing(false);
-            profileViewModel.setLoadingDataState(false);
             profileViewModel.setPaginationEndState(false);
 
             if (result instanceof Result.Success) {
@@ -226,10 +242,10 @@ public class ProfileFragment extends Fragment {
      */
     private void loadNextRecipes() {
         if (profileViewModel.getListSize() % RecipesRepository.LIMIT_QUERY == 0) {
-            binding.pbProgress.setVisibility(View.VISIBLE);
+            setDataIsLoading();
+
             profileViewModel.loadNextRecipes().observe(getViewLifecycleOwner(), result -> {
-                binding.pbProgress.setVisibility(View.GONE);
-                profileViewModel.setLoadingDataState(false);
+                setDataIsRetrieved();
 
                 if (result instanceof Result.Success) {
                     List<Recipe> recipeList = ((Result.Success<List<Recipe>>) result).getData();
@@ -239,8 +255,11 @@ public class ProfileFragment extends Fragment {
                     Snackbar.make(binding.getRoot(), R.string.list_retrieve_error, BaseTransientBottomBar.LENGTH_LONG).show();
                 }
             });
+        } else {
+            profileViewModel.setPaginationEndState(true);
         }
     }
+
 
     /**
      * Initiates the adapter and recycler layout manager.
@@ -250,6 +269,17 @@ public class ProfileFragment extends Fragment {
         binding.rvRecipes.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvRecipes.setAdapter(adapter);
     }
+
+    private void setDataIsLoading() {
+        binding.pbProgress.setVisibility(View.VISIBLE);
+        profileViewModel.setLoadingDataState(true);
+    }
+
+    private void setDataIsRetrieved() {
+        binding.pbProgress.setVisibility(View.GONE);
+        profileViewModel.setLoadingDataState(false);
+    }
+
 
     @Override
     public void onDestroyView() {

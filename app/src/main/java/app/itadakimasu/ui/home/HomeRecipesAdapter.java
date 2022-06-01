@@ -23,6 +23,7 @@ import app.itadakimasu.data.repository.StorageRepository;
 import app.itadakimasu.databinding.ItemRecipePreviewBinding;
 import app.itadakimasu.interfaces.OnItemClickAddFavListener;
 import app.itadakimasu.interfaces.OnItemClickDisplayListener;
+import app.itadakimasu.interfaces.OnItemClickShowProfileListener;
 
 /**
  * Adapter used on the home fragment's recycler view.
@@ -56,6 +57,7 @@ public class HomeRecipesAdapter extends ListAdapter<Recipe, HomeRecipesViewHolde
 
     private OnItemClickDisplayListener displayListener;
     private OnItemClickAddFavListener favListener;
+    private OnItemClickShowProfileListener showProfileListener;
 
     protected HomeRecipesAdapter(Context context) {
         super(DIFF_CALLBACK);
@@ -70,7 +72,7 @@ public class HomeRecipesAdapter extends ListAdapter<Recipe, HomeRecipesViewHolde
     @Override
     public HomeRecipesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         ItemRecipePreviewBinding binding = ItemRecipePreviewBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-        return new HomeRecipesViewHolder(binding, displayListener, favListener);
+        return new HomeRecipesViewHolder(binding, displayListener, favListener, showProfileListener);
     }
 
     /**
@@ -105,6 +107,10 @@ public class HomeRecipesAdapter extends ListAdapter<Recipe, HomeRecipesViewHolde
         this.displayListener = listener;
     }
 
+    public void setOnClickShowProfileListener(OnItemClickShowProfileListener listener) {
+        this.showProfileListener = listener;
+    }
+
     /**
      * Establish the click listener for this adapter, to add to favourites.
      * @param listener - the implementation of this listener.
@@ -126,7 +132,8 @@ class HomeRecipesViewHolder extends RecyclerView.ViewHolder {
     private final TextView tvUsername;
     private final TextView tvDescription;
 
-    public HomeRecipesViewHolder(ItemRecipePreviewBinding binding, OnItemClickDisplayListener displayListener, OnItemClickAddFavListener favListener) {
+    public HomeRecipesViewHolder(ItemRecipePreviewBinding binding, OnItemClickDisplayListener displayListener, OnItemClickAddFavListener favListener,
+                                 OnItemClickShowProfileListener showProfileListener) {
         super(binding.getRoot());
         this.ivRecipeImage = binding.ivRecipeImage;
         this.cbFavourite = binding.cbFavourite;
@@ -143,6 +150,11 @@ class HomeRecipesViewHolder extends RecyclerView.ViewHolder {
             }
         });
 
+        this.ivUserImage.setOnClickListener(v -> {
+            if (showProfileListener != null) {
+                showProfileListener.onItemShowProfile(HomeRecipesViewHolder.this.getAdapterPosition());
+            }
+        });
         // Used to implement the method of the interface on the fragment to show the detailed data
         // of the selected recipe.
         binding.getRoot().setOnClickListener(v -> {

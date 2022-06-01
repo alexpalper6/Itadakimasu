@@ -157,7 +157,7 @@ public class RecipesRepository {
     }
 
 
-    public LiveData<Result<?>> loadNextRecipes(Date lastRecipeDate) {
+    public LiveData<Result<?>> getNextRecipes(Date lastRecipeDate) {
         MutableLiveData<Result<?>> result = new MutableLiveData<>();
 
         dbFirestore.collection(FirebaseContract.RecipeEntry.COLLECTION_NAME)
@@ -178,6 +178,8 @@ public class RecipesRepository {
 
         return result;
     }
+
+
 
     /**
      * Obtains the first recipes of given username. The list is ordered by creation date descending and
@@ -206,7 +208,7 @@ public class RecipesRepository {
      * @param lastRecipeDate - the last recipe's date, will be used as a cursor for the pagination.
      * @return Result.Success with the list if is successful; Result.Error if it fails.
      */
-    public LiveData<Result<?>> loadNextRecipesByUser(String profileUsername, Date lastRecipeDate) {
+    public LiveData<Result<?>> getNextRecipesByUser(String profileUsername, Date lastRecipeDate) {
         MutableLiveData<Result<?>> result = new MutableLiveData<>();
 
         dbFirestore.collection(FirebaseContract.RecipeEntry.COLLECTION_NAME)
