@@ -8,6 +8,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import com.bumptech.glide.Glide;
 import com.canhub.cropper.CropImageContract;
 import com.canhub.cropper.CropImageContractOptions;
 import com.canhub.cropper.CropImageView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -104,7 +106,7 @@ public class RecipeCreationFragment extends Fragment {
                 NavHostFragment.findNavController(this).navigate(R.id.action_navigation_recipe_creation_to_navigation_step_Creation));
 
         // Top button to going back to the home fragment.
-        binding.ibGoBack.setOnClickListener(v -> NavHostFragment.findNavController(this).popBackStack());
+        binding.ibGoBack.setOnClickListener(v -> showSureToExitDialog());
 
         // Opens dialog for adding the image to the recipe.
         binding.ivAddRecipeImage.setOnClickListener(v -> {
@@ -322,9 +324,20 @@ public class RecipeCreationFragment extends Fragment {
         imageMediaLauncher.launch(ImageCropUtils.getRecipePictureGalleryOptions());
     }
 
+    private void showSureToExitDialog() {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
+        builder.setTitle(R.string.exit_without_creating)
+                .setMessage(R.string.recie_data_lost_warning)
+                .setPositiveButton(R.string.delete, (dialog, which) -> NavHostFragment.findNavController(this).popBackStack())
+                .setNegativeButton(R.string.cancel, ((dialog, which) -> dialog.cancel()));
+
+        builder.show();
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         binding = null;
     }
+
 }

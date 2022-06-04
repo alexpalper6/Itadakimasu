@@ -157,19 +157,22 @@ public class FavouritesRepository {
                 .whereEqualTo(FirebaseContract.FavouritesEntry.RECIPE_ID, recipeId)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    Favourite favourite = queryDocumentSnapshots.getDocuments().get(0).toObject(Favourite.class);
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        Favourite favourite = queryDocumentSnapshots.getDocuments().get(0).toObject(Favourite.class);
 
-                    assert favourite != null;
-                    dbFirestore.collection(FirebaseContract.FavouritesEntry.COLLECTION_NAME).document(favourite.getId()).delete()
-                            .addOnSuccessListener(success -> {
-                                Log.i(TAG, "removeFromFavourites: favourite entry removed");
-                                result.setValue(new Result.Success<Object>(null));
-                            })
-                            .addOnFailureListener(failure -> {
-                                Log.e(TAG, "removeFromFavourites: error removing recipe", failure);
-                                result.setValue(new Result.Error(failure));
-                            });
-
+                        assert favourite != null;
+                        dbFirestore.collection(FirebaseContract.FavouritesEntry.COLLECTION_NAME).document(favourite.getId()).delete()
+                                .addOnSuccessListener(success -> {
+                                    Log.i(TAG, "removeFromFavourites: favourite entry removed");
+                                    result.setValue(new Result.Success<Object>(null));
+                                })
+                                .addOnFailureListener(failure -> {
+                                    Log.e(TAG, "removeFromFavourites: error removing recipe", failure);
+                                    result.setValue(new Result.Error(failure));
+                                });
+                    } else {
+                        result.setValue(new Result.Success<Object>(null));
+                    }
 
                 }).addOnFailureListener(failure -> {
                     Log.e(TAG, "removeFromFavourites: couldn't retrieve favourite entry", failure);

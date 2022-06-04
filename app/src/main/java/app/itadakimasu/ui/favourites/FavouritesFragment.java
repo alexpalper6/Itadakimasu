@@ -159,6 +159,7 @@ public class FavouritesFragment extends Fragment {
                     favouritesViewModel.setLastFavDate(favouriteList.get(favouriteList.size() - 1).getAdditionDate());
                     loadRecipesData(favouriteList);
                 } else {
+                    binding.srlRefresh.setRefreshing(false);
                     setDataIsRetrieved();
                 }
             } else {
@@ -187,6 +188,7 @@ public class FavouritesFragment extends Fragment {
                     favouritesViewModel.setLastFavDate(favouriteList.get(favouriteList.size() - 1).getAdditionDate());
                     loadRecipesData(favouriteList);
                 } else {
+                    binding.srlRefresh.setRefreshing(false);
                     setDataIsRetrieved();
                 }
             } else {

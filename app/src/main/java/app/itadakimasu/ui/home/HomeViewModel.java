@@ -83,11 +83,17 @@ public class HomeViewModel extends AndroidViewModel {
      * @param recipeToFav - recipe to add to favourite.
      * @return success result with  if its added; error if something wrong happened.
      */
-    public LiveData<Result<?>> addRemoveFavourite(Recipe recipeToFav) {
-        if (recipeToFav.isFavourite()) {
-            return favouritesRepository.removeFromFavourites(getAuthUsername(), recipeToFav.getId());
-        }
+    public LiveData<Result<?>> addRecipeToFavourites(Recipe recipeToFav) {
         return favouritesRepository.addToFavourites(getAuthUsername(), recipeToFav.getId());
+    }
+
+    /**
+     * Removes recipe from favourites.
+     * @param recipeToDeleteFav - the recipe to delete from favs.
+     * @return result success if deleted; error if something goes wrong.
+     */
+    public LiveData<Result<?>> removeFromFavourites(Recipe recipeToDeleteFav) {
+        return favouritesRepository.removeFromFavourites(getAuthUsername(), recipeToDeleteFav.getId());
     }
 
     /**
@@ -155,13 +161,14 @@ public class HomeViewModel extends AndroidViewModel {
      * Sets or unsets a recipe as a favourite, using the position of the recipe to mark and a boolean
      * that tells if the recipe will be marked as favourite (true) or not (false).
      * @param position - position of the recipe to change the favourite state.
+     * @param state - true if is favourite; false if not
      */
-    public void markRecipeFavouriteAt(int position) {
+    public void markRecipeFavouriteAt(int position, boolean state) {
         List<Recipe> updatedRecipeList = recipeList.getValue();
         assert updatedRecipeList != null;
 
         Recipe recipe = updatedRecipeList.get(position);
-        recipe.setFavourite(!recipe.isFavourite());
+        recipe.setFavourite(state);
         updatedRecipeList.set(position, recipe);
 
         recipeList.setValue(updatedRecipeList);

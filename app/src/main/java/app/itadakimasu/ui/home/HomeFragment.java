@@ -59,8 +59,6 @@ public class HomeFragment extends Fragment {
         // Changes the color of the refresh layout icon.
         binding.srlRefresh.setColorSchemeResources(R.color.primaryColor);
 
-        // When the list is empty (the view model is created along with the fragment) then it fetches
-        // the newest recipes.
         if (homeViewModel.isListEmpty()) {
             loadFirstRecipes();
         }
@@ -73,7 +71,7 @@ public class HomeFragment extends Fragment {
         // Shows the user the details of the selected recipe.
         adapter.setOnClickDisplayListener(this::displayRecipeDetails);
         // Add a selected recipes to favourites.
-        adapter.setOnClickAddFavListener(this::addRecipeToFavourites);
+        adapter.setOnClickAddFavListener(this::addRemoveFavourite);
 
         // Listener for the refresh layout, when refreshed, it fetches the newest recipes.
         binding.srlRefresh.setOnRefreshListener(this::loadFirstRecipes);
@@ -123,25 +121,60 @@ public class HomeFragment extends Fragment {
     /**
      * Adds a recipe to favourites collection as an document, if the upload is successful, then
      * the recipe's checkbox will be checked.
+     * Or removes if ts marked as favourite.
      * @param recipePosition - the selected recipe's position on the list.
      */
-    private void addRecipeToFavourites(int recipePosition) {
+    private void addRemoveFavourite(int recipePosition) {
         // If the author is the same as the authenticated user, it won't be added to favourites.
         Recipe recipeToFav = homeViewModel.getRecipeAt(recipePosition);
         if (!recipeToFav.getAuthor().equals(homeViewModel.getAuthUsername())) {
             setDataIsLoading();
-            homeViewModel.addRemoveFavourite(recipeToFav).observe(getViewLifecycleOwner(), result -> {
-                setDataIsRetrieved();
-                if (result instanceof Result.Success) {
-                    homeViewModel.markRecipeFavouriteAt(recipePosition);
-                    // Notifies the adapter that the item state changed.
-                    adapter.notifyItemChanged(recipePosition);
-                } else {
-                    Snackbar.make(binding.getRoot(), R.string.add_fav_error, Snackbar.LENGTH_SHORT).show();
-                }
-            });
+            if (!recipeToFav.isFavourite()) {
+                addToFavourites(recipePosition, recipeToFav);
+            } else {
+                removeFromFavourites(recipePosition, recipeToFav);
+            }
         }
     }
+
+    /**
+     * Removes recipe from favourites.
+     * @param recipePosition - the recipe's position from the list.
+     * @param recipeFav - the recipe's data.
+     */
+    private void removeFromFavourites(int recipePosition, Recipe recipeFav) {
+        homeViewModel.removeFromFavourites(recipeFav).observe(getViewLifecycleOwner(), result -> {
+            setDataIsRetrieved();
+            if (result instanceof Result.Success) {
+                homeViewModel.markRecipeFavouriteAt(recipePosition, false);
+                // Notifies the adapter that the item state changed.
+                adapter.notifyItemChanged(recipePosition);
+            } else {
+                Snackbar.make(binding.getRoot(), R.string.remove_fav_error, Snackbar.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * Adds recipe to favourites.
+     * @param recipePosition - the recipe's position from the list.
+     * @param recipeToFav - the recipe to fav.
+     */
+    private void addToFavourites(int recipePosition, Recipe recipeToFav) {
+        homeViewModel.addRecipeToFavourites(recipeToFav).observe(getViewLifecycleOwner(), result -> {
+            setDataIsRetrieved();
+            if (result instanceof Result.Success) {
+                homeViewModel.markRecipeFavouriteAt(recipePosition, true);
+                // Notifies the adapter that the item state changed.
+                adapter.notifyItemChanged(recipePosition);
+            } else {
+                Snackbar.make(binding.getRoot(), R.string.add_fav_error, Snackbar.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+
 
     /**
      * Loads the first newest recipes on the list, when the list is fetched, then every recipe inside

@@ -81,4 +81,6 @@
     <string name="remove_fav_error">La recepta no s\'ha pogut eliminar de favorits</string>
     <string name="load_recipe_data_fav_error">No s\'han pogut obtindre les dades d\'algunes receptes</string>
     <string name="edit_profile_data">Editeu el vostre perfil</string>
+    <string name="exit_without_creating">Sortir sense crear?</string>
+    <string name="recie_data_lost_warning">Les dades de la recepta es perdran</string>
 </resources>

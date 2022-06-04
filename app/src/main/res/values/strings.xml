@@ -133,4 +133,6 @@
 
     <!-- Strings for profile edition -->
     <string name="edit_profile_data">Edit your profile</string>
+    <string name="exit_without_creating">Exit without creating?</string>
+    <string name="recie_data_lost_warning">The recipe\'s data will be lost</string>
 </resources>
