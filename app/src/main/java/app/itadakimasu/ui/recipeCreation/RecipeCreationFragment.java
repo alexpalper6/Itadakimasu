@@ -119,20 +119,20 @@ public class RecipeCreationFragment extends Fragment {
         binding.fabCreateRecipe.setOnClickListener(v -> {
             String recipeTitle = binding.etAddRecipeTitle.getText().toString().trim();
             String recipeDescription = binding.etAddRecipeDescription.getText().toString().trim();
-
-            if (creationViewModel.areFieldsFilledEdited(recipeTitle, recipeDescription)) {
-                binding.pbProgress.setVisibility(View.VISIBLE);
-                updateRecipe();
-                return;
+            if (creationViewModel.isEdited()) {
+                if (creationViewModel.areFieldsFilledEdited(recipeTitle, recipeDescription)) {
+                    binding.pbProgress.setVisibility(View.VISIBLE);
+                    updateRecipe();
+                } else {
+                    showEmptyFieldsDialog();
+                }
             } else {
-                showEmptyFieldsDialog();
-            }
-
-            if (creationViewModel.areFieldsFilled(recipeTitle, recipeDescription)) {
-                binding.pbProgress.setVisibility(View.VISIBLE);
-                uploadRecipe();
-            } else {
-                showEmptyFieldsDialog();
+                if (creationViewModel.areFieldsFilled(recipeTitle, recipeDescription)) {
+                    binding.pbProgress.setVisibility(View.VISIBLE);
+                    uploadRecipe();
+                } else {
+                    showEmptyFieldsDialog();
+                }
             }
         });
 

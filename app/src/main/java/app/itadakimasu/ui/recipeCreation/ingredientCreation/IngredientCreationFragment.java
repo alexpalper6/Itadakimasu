@@ -29,6 +29,7 @@ import app.itadakimasu.utils.dialogs.EditDescriptionDialogFragment;
  * Fragment where the user can create, edit and remove ingredients from the recipe.
  */
 public class IngredientCreationFragment extends Fragment {
+
     private CreationViewModel creationViewModel;
     private IngredientCreationAdapter adapter;
     private FragmentIngredientCreationBinding binding;

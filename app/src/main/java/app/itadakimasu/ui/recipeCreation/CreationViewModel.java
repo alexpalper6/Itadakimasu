@@ -334,7 +334,7 @@ public class CreationViewModel extends AndroidViewModel {
         boolean descriptionIsFilled = recipeDescription.length() != 0;
         boolean photoFieldFilled = (photoPath != null && photoPath.length() != 0) && photoUri.getValue() != null;
 
-        return titleIsFilled && descriptionIsFilled && photoFieldFilled && isEdited;
+        return titleIsFilled && descriptionIsFilled && photoFieldFilled;
     }
 
     /**
