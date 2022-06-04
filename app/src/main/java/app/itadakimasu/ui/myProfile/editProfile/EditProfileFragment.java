@@ -1,19 +1,20 @@
-package app.itadakimasu.ui.auth.register.addPhoto;
+package app.itadakimasu.ui.myProfile.editProfile;
+
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.view.LayoutInflater;
@@ -28,17 +29,19 @@ import com.google.android.material.snackbar.Snackbar;
 
 import app.itadakimasu.R;
 import app.itadakimasu.data.Result;
-import app.itadakimasu.databinding.FragmentAddPhotoBinding;
-import app.itadakimasu.utils.dialogs.SelectMediaDialogFragment;
+import app.itadakimasu.databinding.FragmentEditProfileBinding;
 import app.itadakimasu.utils.ImageCompressorUtils;
 import app.itadakimasu.utils.ImageCropUtils;
+import app.itadakimasu.utils.dialogs.SelectMediaDialogFragment;
 
 /**
- * Fragment that prompts when the user registers, asking them to set their profile's image.
+ * Fragment for editing authenticated user's profile data, for now, it only edits the image.
  */
-public class AddPhotoFragment extends Fragment {
-    private AddPhotoViewModel addPhotoViewModel;
-    private FragmentAddPhotoBinding binding;
+@SuppressWarnings("unchecked")
+public class EditProfileFragment extends Fragment {
+
+    private EditProfileViewModel editProfileViewModel;
+    private FragmentEditProfileBinding binding;
 
     // ActivityResultLauncher that will handle the permission requests
     private final ActivityResultLauncher<String> requestPermissionLauncher =
@@ -59,8 +62,8 @@ public class AddPhotoFragment extends Fragment {
                     if (result.isSuccessful()) {
                         Uri resultUri = result.getUriContent();
                         String resultPath = result.getUriFilePath(requireContext(), false);
-                        addPhotoViewModel.setPhotoUriState(resultUri);
-                        addPhotoViewModel.setPhotoPathState(resultPath);
+                        editProfileViewModel.setPhotoUri(resultUri);
+                        editProfileViewModel.setPhotoPath(resultPath);
                     }
                 }
             });
@@ -69,46 +72,28 @@ public class AddPhotoFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-
-        binding = FragmentAddPhotoBinding.inflate(inflater, container, false);
-        return binding.getRoot();
+        binding = FragmentEditProfileBinding.inflate(inflater, container, false);
+        return  binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        addPhotoViewModel = new ViewModelProvider(this).get(AddPhotoViewModel.class);
-        addPhotoViewModel.setDisplayedUsername(addPhotoViewModel.getAuthUsername());
+        editProfileViewModel = new ViewModelProvider(this).get(EditProfileViewModel.class);
+        obtainCurrentUserPhoto();
 
-        // Observes change in the username, so when the fragment gets the username, it will show it on screen.
-        addPhotoViewModel.getDisplayedUsername().observe(getViewLifecycleOwner(),
-                username -> binding.tvWelcome.setText(getString(R.string.welcome, username)));
+        // Observes for the photo uri obtained from the database or from the user's input.
+        editProfileViewModel.getPhotoUri().observe(getViewLifecycleOwner(), photoUri ->
+                Glide.with(requireContext()).load(photoUri).circleCrop().error(R.drawable.ic_default_user_profile).into(binding.ivNewPhoto));
 
-        // Observes changes in the photo uri state from the ViewModel, setting the image uri on the ImageView.
-        addPhotoViewModel.getPhotoUriState().observe(getViewLifecycleOwner(),
-                uri -> Glide.with(requireContext()).load(uri).circleCrop().into(binding.ivNewPhoto));
-
-        // Observes the result of error that could be triggered by a failure uploading an image
-        // to the storage.
-        addPhotoViewModel.getPhotoResultState().observe(getViewLifecycleOwner(), photoResultState -> {
-            binding.pbAddPhoto.setVisibility(View.GONE);
-            if (photoResultState.getPhotoStorageError() != null) {
-                showStorageErrorSnackbar(photoResultState.getPhotoStorageError());
-            }
-        });
-
-        // When clicking the image view, it will display the dialog that will let the user
-        // to set a photo by camera or gallery.
         binding.ivNewPhoto.setOnClickListener(v -> {
             DialogFragment dialog = new SelectMediaDialogFragment();
             dialog.show(getParentFragmentManager(), SelectMediaDialogFragment.TAG);
-
         });
 
         // Receives the result of the Dialog using FragmentResultListener.
         getParentFragmentManager().setFragmentResultListener(SelectMediaDialogFragment.DIALOG_REQUEST,
-                this,
-                (requestKey, result) -> {
+                this, (requestKey, result) -> {
                     // Depending on the result, it will open the camera or the gallery
                     int which = result.getInt(SelectMediaDialogFragment.DIALOG_RESULT);
 
@@ -119,60 +104,51 @@ public class AddPhotoFragment extends Fragment {
                     }
                 });
 
-        // If the user declines, they will be redirected to the home fragment
-        binding.btDecline.setOnClickListener(v ->
-            NavHostFragment.findNavController(this).navigate(R.id.action_auth_navigation_to_navigation_home));
-
         // If the clicks done, it will upload the photo on the storage and the user database's info
         binding.btDone.setOnClickListener(v -> {
             // Checks if the image is settled by the user
-            if (addPhotoViewModel.getPhotoUriState().getValue() != null) {
+            if (editProfileViewModel.getPhotoPath() != null) {
                 // Performs the photo uploading.
                 uploadPhotoStorage();
                 binding.pbAddPhoto.setVisibility(View.VISIBLE);
             } else {
-                Snackbar.make(
-                        binding.getRoot()
-                        , R.string.add_photo_info
-                        , Snackbar.LENGTH_LONG).show();
+                NavHostFragment.findNavController(this).popBackStack();
             }
         });
 
     }
 
-
     /**
-     * Shows a snack bar with the Storage error message.
-     *
-     * @param photoStorageError - the error message.
-     */
-    private void showStorageErrorSnackbar(Integer photoStorageError) {
-        Snackbar.make(
-                binding.getRoot()
-                , photoStorageError
-                , Snackbar.LENGTH_LONG
-        ).setAction(R.string.retry, v -> uploadPhotoStorage()).show();
-    }
-
-
-    /**
-     * With the photo's path obtained from the user image's input, upload to the storage the photo compressed.
-     * If the result is successful it will redirect the user to the home section.
-     * If it fails, it will set an upload photo error on the result state.
+     * Uploads the selected photo data to the storage, changing the actual data that it has.
      */
     private void uploadPhotoStorage() {
-        String imagePath = addPhotoViewModel.getPhotoPathState().getValue();
+        String imagePath = editProfileViewModel.getPhotoPath();
         byte[] imageData = ImageCompressorUtils.compressImage(imagePath, ImageCompressorUtils.PROFILE_MAX_HEIGHT, ImageCompressorUtils.PROFILE_MAX_WIDTH);
 
-        addPhotoViewModel.uploadPhotoStorage(imageData).observe(getViewLifecycleOwner(), result -> {
+        editProfileViewModel.uploadPhotoStorage(imageData).observe(getViewLifecycleOwner(), result -> {
+            binding.pbAddPhoto.setVisibility(View.GONE);
             if (result instanceof Result.Success) {
-                binding.pbAddPhoto.setVisibility(View.GONE);
-                NavHostFragment.findNavController(this).navigate(R.id.action_auth_navigation_to_navigation_home);
+
+                NavHostFragment.findNavController(this).popBackStack();
             } else {
-                addPhotoViewModel.setUploadPhotoErrorResult(R.string.image_upload_error);
+                Snackbar.make(binding.getRoot(), R.string.image_upload_error, Snackbar.LENGTH_SHORT).show();
             }
         });
+    }
 
+    /**
+     * Obtains the image as an uri, so the image uri can be stored on the view model.
+     * The image url path won't be settled, it will when the user changes the image. This serves
+     * as a way to tell if the image is edited, so the app will be able to compress the image.
+     */
+    private void obtainCurrentUserPhoto() {
+        editProfileViewModel.loadUserPhotoUri().observe(getViewLifecycleOwner(), imageResult -> {
+            if (imageResult instanceof Result.Success) {
+                editProfileViewModel.setPhotoUri(((Result.Success<Uri>) imageResult).getData());
+            } else {
+                Snackbar.make(binding.getRoot(), R.string.image_load_error, Snackbar.LENGTH_LONG).show();
+            }
+        });
     }
 
     /**
@@ -191,15 +167,9 @@ public class AddPhotoFragment extends Fragment {
     }
 
     /**
-     * Starts the ActivityResultLauncher for getting content on the gallery
+     * Starts the ActivityResultLauncher for getting content on the gallery.
      */
     private void startGalleryIntent() {
         imageMediaLauncher.launch(ImageCropUtils.getProfilePictureGalleryOptions());
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        binding = null;
     }
 }

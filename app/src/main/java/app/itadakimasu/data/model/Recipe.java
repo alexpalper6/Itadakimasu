@@ -9,7 +9,9 @@ import com.google.firebase.firestore.ServerTimestamp;
 
 import java.util.Date;
 import java.util.Objects;
-
+/**
+ * Model class for recipe documents on its firebase collection.
+ */
 public class Recipe implements Parcelable {
     private String author;
     private String photoAuthorUrl;
@@ -23,34 +25,25 @@ public class Recipe implements Parcelable {
     @Exclude
     private boolean isFavourite;
 
-    public Recipe(String author, String photoAuthorUrl, String id, String title, String description, String photoUrl) {
+    /**
+     * Creates recipe with author's name, their photo, recipe's title and description.
+     * @param author - the author's username.
+     * @param photoAuthorUrl - the author's photo url that is stored in firebase storage.
+     * @param title - the recipe's title.
+     * @param description - the recipe's description.
+     */
+    public Recipe(String author, String photoAuthorUrl, String title, String description) {
+        this.id = "";
         this.author = author;
         this.photoAuthorUrl = photoAuthorUrl;
-        this.id = id;
         this.title = title;
         this.description = description;
-        this.photoUrl = photoUrl;
         this.isFavourite = false;
     }
 
-    public Recipe(String author, String photoAuthorUrl, String id, String title, String description, String photoUrl, boolean isFavourite) {
-        this.author = author;
-        this.photoAuthorUrl = photoAuthorUrl;
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.photoUrl = photoUrl;
-        this.isFavourite = isFavourite;
-    }
-
-    public Recipe(String author, String photoAuthorUrl, String title, String description) {
-        this.author = author;
-        this.photoAuthorUrl = photoAuthorUrl;
-        this.id = id;
-        this.title = title;
-        this.description = description;
-    }
-
+    /**
+     * Default constructor that is required for firebase.
+     */
     public Recipe() {
     }
 

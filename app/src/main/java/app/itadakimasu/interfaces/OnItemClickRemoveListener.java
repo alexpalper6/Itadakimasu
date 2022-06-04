@@ -1,11 +1,11 @@
 package app.itadakimasu.interfaces;
 /**
- * Interface used to implement the removing feature on items in the fragments.
+ * Interface used to implement the removing feature on recipe in the fragments.
  */
 public interface OnItemClickRemoveListener {
     /**
      * Method that will be used to implement the removing feature on every item on an adapter.
-     * @param itemPosition - the position of the item selected.
+     * @param recipePosition - the position of the item selected.
      */
-    void onItemClickRemove(int itemPosition);
+    void onItemClickRemove(int recipePosition);
 }

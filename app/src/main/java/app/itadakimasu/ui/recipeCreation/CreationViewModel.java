@@ -7,14 +7,10 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
-
-import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 import app.itadakimasu.data.Result;
 import app.itadakimasu.data.model.Ingredient;
@@ -47,6 +43,8 @@ public class CreationViewModel extends AndroidViewModel {
     private String recipeIdToEdit;
     // Saves the date when the recipe to edit was created, this data won't be updated.
     private Date recipeDateToEdit;
+    // Boolean to know if the recipe is being edited
+    private boolean isEdited;
 
     public CreationViewModel(@NonNull Application application) {
         super(application);
@@ -56,13 +54,14 @@ public class CreationViewModel extends AndroidViewModel {
         this.ingredientList = new MutableLiveData<>(new ArrayList<>());
         this.stepList = new MutableLiveData<>(new ArrayList<>());
         this.photoUri = new MutableLiveData<>();
+        this.isEdited = false;
     }
 
     /**
      * Uploads a recipe to the database, given the data that the user has input and its username and
      * photo.
      *
-     * @return result success with the recipe image url to upload to sotrage; result error if it fails.
+     * @return result success with the recipe image url to upload to storage; result error if it fails.
      */
     public LiveData<Result<?>> uploadRecipe(String author, String photoAuthorUrl,String recipeTitle, String recipeDescription) {
         Recipe recipe = new Recipe(author, photoAuthorUrl, recipeTitle, recipeDescription);
@@ -75,7 +74,7 @@ public class CreationViewModel extends AndroidViewModel {
      * Updates an existed recipe's image, title and description, the edited recipe's id and date
      * must be passed as parameter.
      *
-     * @return result success with the recipe image url to upload to sotrage; result error if it fails.
+     * @return result success with the recipe image url to upload to storage; result error if it fails.
      */
     public LiveData<Result<?>> updateRecipe(String author, String photoAuthorUrl, String recipeTitle, String recipeDescription) {
         Recipe recipe = new Recipe(author, photoAuthorUrl, recipeTitle, recipeDescription);
@@ -322,6 +321,23 @@ public class CreationViewModel extends AndroidViewModel {
     }
 
     /**
+     * Checks if all fields are filled when editing.
+     * @param recipeTitle - the recipe's title EditText from the RecipeCreationFragment.
+     * @param recipeDescription - the recipe's description EditText from the RecipeCreationFragment.
+     * @return true if every field is filled; false if not.
+     */
+    public boolean areFieldsFilledEdited(String recipeTitle, String recipeDescription) {
+        assert ingredientList.getValue() != null;
+        assert stepList.getValue() != null;
+
+        boolean titleIsFilled = recipeTitle.length() != 0;
+        boolean descriptionIsFilled = recipeDescription.length() != 0;
+        boolean photoFieldFilled = (photoPath != null && photoPath.length() != 0) && photoUri.getValue() != null;
+
+        return titleIsFilled && descriptionIsFilled && photoFieldFilled && isEdited;
+    }
+
+    /**
      * @return a list of the ingredients that are going to be uploaded, with their position updated.
      */
     private List<Ingredient> getIngredientListToUpload() {
@@ -392,6 +408,18 @@ public class CreationViewModel extends AndroidViewModel {
         this.recipeDateToEdit = recipeDateToEdit;
     }
 
+    /**
+     * Sets if the recipe is being edited or not.
+     * @param state - true if is being edited; false if not.
+     */
+    public void setEdited(boolean state) {
+        this.isEdited = state;
+    }
 
-
+    /**
+     * @return true if the recipe is being edited; false if not.
+     */
+    public boolean isEdited() {
+        return isEdited;
+    }
 }

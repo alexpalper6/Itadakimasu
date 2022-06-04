@@ -45,6 +45,7 @@ public class HomeViewModel extends AndroidViewModel {
         this.recipeList = new MutableLiveData<>(new ArrayList<>());
     }
 
+
     /**
      * @return the list of the recipes stored on the view model.
      */
@@ -59,7 +60,6 @@ public class HomeViewModel extends AndroidViewModel {
         return recipesRepository.getNewestRecipes();
     }
 
-
     /**
      * Pagination of the recipes with no filter.
      * @return more recipes starting from the last recipe fetched previously.
@@ -69,34 +69,25 @@ public class HomeViewModel extends AndroidViewModel {
         return recipesRepository.getNextRecipes(lastRecipeDate);
     }
 
-
     /**
      * Checks if a document with the user's authenticated username and the recipe's id exists in favourites collection.
      * @param recipe - the recipe's data to check if its one of the user's favourite.
-     * @return
+     * @return observable result that contains a boolean if the entry has been found or not; false if an error happens.
      */
     public LiveData<Result<?>> isRecipeFavourite(Recipe recipe) {
-        return favouritesRepository.findVafouriteRecipe(getAuthUsername(), recipe.getId());
+        return favouritesRepository.findFavouriteRecipe(getAuthUsername(), recipe.getId());
     }
 
     /**
      * Add recipes to favourite.
-     * @param position - recipe's position to add to favourite.
+     * @param recipeToFav - recipe to add to favourite.
      * @return success result with  if its added; error if something wrong happened.
      */
-    public LiveData<Result<?>> addRecipeToFavourites(int position) {
-        Recipe recipeToAddFav = getRecipeAt(position);
-        return favouritesRepository.addToFavourites(getAuthUsername(), recipeToAddFav.getId());
-    }
-
-    /**
-     * Deletes the recipe from favourites.
-     * @param position - the position where the recipe is located in the list.
-     * @return success result if it's deleted; error if something goes wrong.
-     */
-    public LiveData<Result<?>> removeRecipeFromFavourites(int position) {
-        Recipe recipeToRemoveFav = getRecipeAt(position);
-        return favouritesRepository.removeFromFavourites(getAuthUsername(), recipeToRemoveFav.getId());
+    public LiveData<Result<?>> addRemoveFavourite(Recipe recipeToFav) {
+        if (recipeToFav.isFavourite()) {
+            return favouritesRepository.removeFromFavourites(getAuthUsername(), recipeToFav.getId());
+        }
+        return favouritesRepository.addToFavourites(getAuthUsername(), recipeToFav.getId());
     }
 
     /**
@@ -139,19 +130,38 @@ public class HomeViewModel extends AndroidViewModel {
         return reachedEndPagination;
     }
 
+    /**
+     * Add new recipes on the list.
+     * @param retrievedList - the new recipes that have been retrieved.
+     */
+    public void addRetrievedRecipes(List<Recipe> retrievedList) {
+        if (!retrievedList.isEmpty()) {
+            List<Recipe> list = recipeList.getValue();
+            assert list != null;
+            list.addAll(retrievedList);
+
+            recipeList.setValue(list);
+        }
+    }
+
+    /**
+     * Clears the recipe list.
+     */
+    public void clearRecipeList() {
+        recipeList.getValue().clear();
+    }
 
     /**
      * Sets or unsets a recipe as a favourite, using the position of the recipe to mark and a boolean
      * that tells if the recipe will be marked as favourite (true) or not (false).
-     * @param position
-     * @param isFavourite
+     * @param position - position of the recipe to change the favourite state.
      */
-    public void markRecipeFavouriteAt(int position, boolean isFavourite) {
+    public void markRecipeFavouriteAt(int position) {
         List<Recipe> updatedRecipeList = recipeList.getValue();
         assert updatedRecipeList != null;
 
         Recipe recipe = updatedRecipeList.get(position);
-        recipe.setFavourite(isFavourite);
+        recipe.setFavourite(!recipe.isFavourite());
         updatedRecipeList.set(position, recipe);
 
         recipeList.setValue(updatedRecipeList);
@@ -160,18 +170,10 @@ public class HomeViewModel extends AndroidViewModel {
     /**
      * Sets the boolean that checks if the user can't paginate more because there are no more recipes
      * to fetch.
-     * @param state
+     * @param state - the new state: true if there is no more entries to fetch; false if else.
      */
     public void setReachedEndPaginationState(boolean state) {
         this.reachedEndPagination = state;
-    }
-
-    /**
-     * Sets the recipe's list given a list of recipes, normally from the database.
-     * @param recipeList
-     */
-    public void setRecipeList(List<Recipe> recipeList) {
-        this.recipeList.setValue(recipeList);
     }
 
     /**
@@ -205,15 +207,5 @@ public class HomeViewModel extends AndroidViewModel {
      */
     public String getAuthUsername() {
         return sharedPrefRepository.getAuthUsername();
-    }
-
-    public void addRetrievedRecipes(List<Recipe> retrievedList) {
-        if (!retrievedList.isEmpty()) {
-            List<Recipe> list = recipeList.getValue();
-            assert list != null;
-            list.addAll(retrievedList);
-
-            recipeList.setValue(list);
-        }
     }
 }

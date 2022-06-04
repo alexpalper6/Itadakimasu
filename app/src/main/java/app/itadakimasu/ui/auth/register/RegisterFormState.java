@@ -3,7 +3,7 @@ package app.itadakimasu.ui.auth.register;
 import androidx.annotation.Nullable;
 
 /**
- * UI State that will hold state of the form, the input fields. The fragment will use it in order to give feedback
+ * UI State that will hold state of the form, the input fields error. The fragment will use it in order to give feedback
  * to the user when the data on the input fields are invalid or not.
  */
 class RegisterFormState {
@@ -24,10 +24,10 @@ class RegisterFormState {
 
     /**
      * Constructor to set different possible errors at once.
-     * @param emailError - the email error message from String resources or null
-     * @param usernameError - the username error from String resources or null
-     * @param passwordError - the password error from String resources or null
-     * @param repeatedPasswordError - the repeated from password error String resources or null
+     * @param emailError - the email error message from String resources or null.
+     * @param usernameError - the username error from String resources or null.
+     * @param passwordError - the password error from String resources or null.
+     * @param repeatedPasswordError - the repeated from password error String resources or null.
      */
     RegisterFormState(@Nullable Integer emailError, @Nullable Integer usernameError, @Nullable Integer passwordError, @Nullable Integer repeatedPasswordError) {
         this.emailError = emailError;
@@ -41,7 +41,7 @@ class RegisterFormState {
      * Constructor to set only the boolean value.
      * You may use this constructor if you use the below one and want to establish data valid as true
      * and remove error messages from the UI State.
-     * @param isDataValid - true if all data is valid, false if not
+     * @param isDataValid - true if all data is valid; false if not.
      */
     RegisterFormState(boolean isDataValid) {
         this.emailError = null;

@@ -39,7 +39,7 @@ public class AddDescriptionDialogFragment extends DialogFragment {
         }
 
         builder.setTitle(title)
-                // We set the layout, the root is null because this is only going to the dialog's layout
+                // We set the layout with the layout's binding.
                 .setView(binding.getRoot())
                 .setPositiveButton(R.string.ok, (dialog, which) -> {
                     String description = binding.etIngredientInfo.getText().toString().trim();
@@ -47,7 +47,7 @@ public class AddDescriptionDialogFragment extends DialogFragment {
                     if (description.length() == 0) {
                         AddDescriptionDialogFragment.this.getDialog().dismiss();
                     } else {
-                        // Sends the text written on the dialog to the fragment that requested the dialog
+                        // Sends the text written on the dialog to the fragment that requested it,
                         // adding a result to the parentFragmentManager.
                         Bundle result = new Bundle();
                         result.putString(DIALOG_RESULT, binding.etIngredientInfo.getText().toString());

@@ -1,8 +1,6 @@
 package app.itadakimasu.utils.dialogs;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,7 +12,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import app.itadakimasu.R;
 
 /**
- * Dialog fragment that will display when the user wants to adds an image
+ * Dialog fragment that will display when the user wants to adds an image.
  */
 public class SelectMediaDialogFragment extends DialogFragment {
     // Identificator of the DialogFragment that is used on DialogFragment.show();

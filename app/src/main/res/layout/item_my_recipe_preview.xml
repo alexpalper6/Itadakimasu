@@ -37,19 +37,17 @@
             android:layout_marginEnd="16dp"
             android:ellipsize="end"
             android:lines="1"
-            android:text="Panqueues de patatas fritas sin harina comprimida"
             android:textAppearance="?attr/textAppearanceHeadline6"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/iv_recipe_image" />
 
         <TextView
             android:id="@+id/tv_description"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:ellipsize="end"
             android:lines="3"
-            android:text="testesesssssssssssssssssssssssssssssssssssssssssssssssssssssssssaaaaasssss"
             android:textAppearance="?attr/textAppearanceBody2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

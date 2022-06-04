@@ -3,8 +3,6 @@ package app.itadakimasu.ui.auth.register;
 
 import androidx.lifecycle.ViewModelProvider;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -19,19 +17,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 
-import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
 
 import app.itadakimasu.R;
 import app.itadakimasu.data.Result;
 import app.itadakimasu.data.model.User;
-import app.itadakimasu.data.repository.SharedPrefRepository;
 import app.itadakimasu.databinding.FragmentRegisterBinding;
-import app.itadakimasu.ui.auth.register.addPhoto.AddPhotoFragment;
 
 /**
- * Fragment that let the user interact with the system in order to register.
+ * Fragment that lets the user interact with the system in order to register.
  */
 @SuppressWarnings("unchecked")
 public class RegisterFragment extends Fragment {
@@ -58,37 +53,8 @@ public class RegisterFragment extends Fragment {
         registerViewModel.getRegisterFormState().observe(getViewLifecycleOwner(), this::checkFormState);
 
         // Observes for the data error changes that is established by the registration.
-        registerViewModel.getRegisterResult().observe(getViewLifecycleOwner(), registerResult -> {
-            if (registerResult == null) {
-                return;
-            }
-            binding.pbRegisterProgress.setVisibility(View.GONE);
+        registerViewModel.getRegisterResult().observe(getViewLifecycleOwner(), this::checkErrorsRegisterResult);
 
-            if (registerResult.getUsernameError() != null) {
-                binding.etNewUsername.setText("");
-                if (getContext() != null && getContext().getApplicationContext() != null) {
-                    Snackbar.make(binding.getRoot(),
-                            registerResult.getUsernameError(),
-                            BaseTransientBottomBar.LENGTH_LONG).show();
-                }
-            }
-            // If the transaction fails, the registry error result will have the user's data
-            // so a SnackBar will appear asking the user for retry.
-            if (registerResult.getUser() != null && registerResult.getError() != null) {
-                Snackbar.make(binding.getRoot(), registerResult.getError(), BaseTransientBottomBar.LENGTH_LONG)
-                        .setAction(R.string.retry, v -> completeRegisterTransaction(registerResult.getUser()))
-                        .show();
-            }
-
-            if (registerResult.getError() != null && registerResult.getUser() == null) {
-                if (getContext() != null && getContext().getApplicationContext() != null) {
-                    Snackbar.make(binding.getRoot(),
-                            registerResult.getError(),
-                            BaseTransientBottomBar.LENGTH_LONG).show();
-                }
-                binding.btCreateAccount.setEnabled(true);
-            }
-        });
 
         // Instantiate a TextWatcher that will update the state of  the RegisterFormState from the ViewModel.
         TextWatcher afterTextChangedListener = new TextWatcher() {
@@ -131,6 +97,35 @@ public class RegisterFragment extends Fragment {
 
     }
 
+    /**
+     * Checks for the errors that happens when the register result's data is changed.
+     * @param registerResult - the register result data obtained when the live data changes on the view model.
+     */
+    private void checkErrorsRegisterResult(RegisterErrorResult registerResult) {
+        if (registerResult == null) {
+            return;
+        }
+        binding.pbRegisterProgress.setVisibility(View.GONE);
+        // If the error is a username one, shows the error to the user and clears the username's field.
+        if (registerResult.getUsernameError() != null) {
+            binding.etNewUsername.setText("");
+            Snackbar.make(binding.getRoot(), registerResult.getUsernameError(), Snackbar.LENGTH_LONG).show();
+
+        }
+        // If the transaction fails, the registry error result will have the user's data
+        // so a SnackBar will appear asking the user for retry.
+        if (registerResult.getUser() != null && registerResult.getError() != null) {
+            Snackbar.make(binding.getRoot(), registerResult.getError(), Snackbar.LENGTH_LONG)
+                    .setAction(R.string.retry, v -> completeRegisterTransaction(registerResult.getUser()))
+                    .show();
+        }
+
+        // If it fails but the user is not added, then the user couldn't be registered..
+        if (registerResult.getError() != null && registerResult.getUser() == null) {
+            Snackbar.make(binding.getRoot(), registerResult.getError(), Snackbar.LENGTH_LONG).show();
+            binding.btCreateAccount.setEnabled(true);
+        }
+    }
 
     /**
      * The user will try to create the account, the username will be search on the database, if it doesn't exist,

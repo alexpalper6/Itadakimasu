@@ -5,20 +5,35 @@ import android.os.Parcelable;
 
 import java.util.Objects;
 
+/**
+ * Model class for step documents on its firebase collection (a recipe sub-collection).
+ */
 public class Step implements Parcelable {
     private int stepPosition;
     private String stepDescription;
 
-
+    /**
+     * Creates step with its position on the list and its description.
+     * @param stepPosition - the position on the list.
+     * @param stepDescription - step's description.
+     */
     public Step(int stepPosition, String stepDescription) {
         this.stepPosition = stepPosition;
         this.stepDescription = stepDescription;
     }
 
+    /**
+     * Creates steps with its description.
+     * @param stepDescription - step's description.
+     */
     public Step(String stepDescription) {
+        this.stepPosition = 0;
         this.stepDescription = stepDescription;
     }
 
+    /**
+     * Default constructor that is required for firebase.
+     */
     public Step() {
     }
 

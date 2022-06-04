@@ -15,6 +15,7 @@ import java.io.IOException;
 /**
  * Class util that resize and compress the image so it's file size is lighter when uploaded to the server.
  * Credit to Jitty Andyan for posting the method to resize and compress the image.
+ * The method is changed to fit my requirements and to fix some errors.
  * https://stackoverflow.com/questions/28424942/decrease-image-size-without-losing-its-quality-in-android
  */
 public class ImageCompressorUtils {
@@ -24,8 +25,8 @@ public class ImageCompressorUtils {
     public static float LANDSCAPE_MAX_WIDTH= 1080.0f;
 
     /**
-     * Compress an image
-     * @param imageUri - the path of the image
+     * Compress an image.
+     * @param imageUri - the path of the image.
      * @return the bytes of the image that will be uploaded to the server.
      */
     public static byte[] compressImage(String imageUri, float maxHeight, float maxWidth) {
@@ -44,7 +45,7 @@ public class ImageCompressorUtils {
         float imgRatio = (float) actualWidth / (float) actualHeight;
         float maxRatio = maxWidth / maxHeight;
 
-        // Width and height values are set maintaining the aspect ratio of the image
+        // Width and height values are set maintaining the aspect ratio of the image.
 
         if (actualHeight > maxHeight || actualWidth > maxWidth) {
             if (imgRatio < maxRatio) {
@@ -66,15 +67,15 @@ public class ImageCompressorUtils {
         // Setting inSampleSize value allows to load a scaled down version of the original image.
         options.inSampleSize = calculateInSampleSize(options, actualWidth, actualHeight);
 
-        // InJustDecodeBounds set to false to load the actual bitmap
+        // InJustDecodeBounds set to false to load the actual bitmap.
         options.inJustDecodeBounds = false;
 
-        // This options allow android to claim the bitmap memory if it runs low on memory
+        // This options allow android to claim the bitmap memory if it runs low on memory.
         options.inBitmap = bmp;
         options.inTempStorage = new byte[16 * 1024];
 
         try {
-            // Load the bitmap from its path
+            // Load the bitmap from its path.
             bmp = BitmapFactory.decodeFile(imageUri, options);
         } catch (OutOfMemoryError exception) {
             exception.printStackTrace();
@@ -88,7 +89,7 @@ public class ImageCompressorUtils {
         } catch (OutOfMemoryError exception) {
             exception.printStackTrace();
         }
-
+        // Sets the ratio of the image to scale.
         float ratioX = actualWidth / (float) options.outWidth;
         float ratioY = actualHeight / (float) options.outHeight;
         float middleX = actualWidth / 2.0f;
@@ -116,6 +117,7 @@ public class ImageCompressorUtils {
             } else if (orientation == 8) {
                 matrix.postRotate(270);
             }
+            assert scaledBitmap != null;
             scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0,
                     scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix,
                     true);
@@ -126,6 +128,7 @@ public class ImageCompressorUtils {
         byte[] compressedImageData = null;
 
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            assert scaledBitmap != null;
             scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
             compressedImageData = baos.toByteArray();
         } catch (IOException e) {

@@ -26,6 +26,12 @@ public class RegisterErrorResult {
     @Nullable
     private final User user;
 
+    /**
+     * Creates an instance of the class.
+     * @param usernameError - the username error message from string resources.
+     * @param error - the error message that is obtained from the firebase's result.
+     * @param user - the user's data.
+     */
     public RegisterErrorResult(@Nullable Integer usernameError, @Nullable String error, @Nullable User user) {
         this.usernameError = usernameError;
         this.error = error;

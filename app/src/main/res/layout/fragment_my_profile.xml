@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorPrimary"
-    tools:context=".ui.profile.ProfileFragment">
+    tools:context=".ui.myProfile.MyProfileFragment">
 
 
 
@@ -80,6 +80,8 @@
             android:id="@+id/rvRecipes"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:paddingTop="16dp"
+            android:clipToPadding="false"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             tools:listitem="@layout/item_my_recipe_preview" />

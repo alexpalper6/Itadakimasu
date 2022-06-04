@@ -53,31 +53,15 @@ public class StepCreationFragment extends Fragment {
         binding.rvSteps.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvSteps.setAdapter(adapter);
 
-        // Shows dialog where the user can input the step's description.
-        binding.fabAddStep.setOnClickListener(v -> {
-            AddDescriptionDialogFragment dialog = new AddDescriptionDialogFragment();
-            Bundle bundle = new Bundle();
 
-            bundle.putInt(AddDescriptionDialogFragment.DIALOG_TITLE, R.string.add_step_information);
-            dialog.show(getParentFragmentManager(), AddDescriptionDialogFragment.TAG);
-        });
 
         // Sets the back button the event to go back to the previous fragment.
         binding.ibGoBack.setOnClickListener(v -> NavHostFragment.findNavController(this).popBackStack());
 
+        // Shows dialog where the user can input the step's description.
+        binding.fabAddStep.setOnClickListener(v -> addStep());
         // Shows dialog with the step's description, allowing the user to edit it.
-        adapter.setOnClickEditListener(ingredientPosition -> {
-            creationViewModel.setItemPositionToEdit(ingredientPosition);
-
-            EditDescriptionDialogFragment dialog = new EditDescriptionDialogFragment();
-            Bundle bundle = new Bundle();
-
-            bundle.putInt(EditDescriptionDialogFragment.DIALOG_TITLE, R.string.step_description_edit);
-            bundle.putString(EditDescriptionDialogFragment.TEXT_TO_EDIT, creationViewModel.getStepList().getValue().get(ingredientPosition).getStepDescription());
-            dialog.setArguments(bundle);
-
-            dialog.show(getParentFragmentManager(), EditDescriptionDialogFragment.TAG);
-        });
+        adapter.setOnClickEditListener(this::editStep);
 
         // Removes the step selected when the user selects the 'Remove' option
         adapter.setOnClickRemoveListener(itemPosition -> creationViewModel.removeStepAt(itemPosition));
@@ -124,5 +108,34 @@ public class StepCreationFragment extends Fragment {
                 super.onScrollStateChanged(recyclerView, newState);
             }
         });
+    }
+
+    /**
+     * Shows dialog that lets the user to set a step's description and add it to the list.
+     */
+    private void addStep() {
+        AddDescriptionDialogFragment dialog = new AddDescriptionDialogFragment();
+        Bundle bundle = new Bundle();
+
+        bundle.putInt(AddDescriptionDialogFragment.DIALOG_TITLE, R.string.add_step_information);
+        dialog.show(getParentFragmentManager(), AddDescriptionDialogFragment.TAG);
+    }
+
+    /**
+     * Dialogs that prompts with a step's data in order to edit it.
+     * @param stepPosition - the step from the list that will be edited.
+     */
+    private void editStep(int stepPosition) {
+        // Sets the position of the edited item for future usage when the data is returned by the dialog.
+        creationViewModel.setItemPositionToEdit(stepPosition);
+
+        EditDescriptionDialogFragment dialog = new EditDescriptionDialogFragment();
+        Bundle bundle = new Bundle();
+
+        bundle.putInt(EditDescriptionDialogFragment.DIALOG_TITLE, R.string.step_description_edit);
+        bundle.putString(EditDescriptionDialogFragment.TEXT_TO_EDIT, creationViewModel.getStepList().getValue().get(stepPosition).getStepDescription());
+        dialog.setArguments(bundle);
+
+        dialog.show(getParentFragmentManager(), EditDescriptionDialogFragment.TAG);
     }
 }

@@ -52,31 +52,15 @@ public class IngredientCreationFragment extends Fragment {
         binding.rvIngredients.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvIngredients.setAdapter(adapter);
 
-        // Creates a dialog where the user can write the ingredient's description.
-        binding.fabAddIngredient.setOnClickListener(v -> {
-            AddDescriptionDialogFragment dialog = new AddDescriptionDialogFragment();
-            Bundle bundle = new Bundle();
-
-            bundle.putInt(AddDescriptionDialogFragment.DIALOG_TITLE, R.string.add_ingredient_information);
-            dialog.show(getParentFragmentManager(), AddDescriptionDialogFragment.TAG);
-        });
 
         // Sets the back button the event to go back to the previous fragment.
         binding.ibGoBack.setOnClickListener(v -> NavHostFragment.findNavController(this).popBackStack());
 
+        // Creates a dialog where the user can write the ingredient's description.
+        binding.fabAddIngredient.setOnClickListener(v -> addIngredient());
+
         // Shows dialog with the ingredient's description, allowing the user to edit it.
-        adapter.setOnClickEditListener(ingredientPosition -> {
-            creationViewModel.setItemPositionToEdit(ingredientPosition);
-
-            EditDescriptionDialogFragment dialog = new EditDescriptionDialogFragment();
-            Bundle bundle = new Bundle();
-
-            bundle.putInt(EditDescriptionDialogFragment.DIALOG_TITLE, R.string.ingredient_description_edit);
-            bundle.putString(EditDescriptionDialogFragment.TEXT_TO_EDIT, creationViewModel.getIngredientList().getValue().get(ingredientPosition).getIngredientDescription());
-            dialog.setArguments(bundle);
-
-            dialog.show(getParentFragmentManager(), EditDescriptionDialogFragment.TAG);
-        });
+        adapter.setOnClickEditListener(this::editIngredient);
 
         // The remove option will remove the element that the user interacted with, using its position.
         adapter.setOnClickRemoveListener(ingredientPosition -> creationViewModel.removeIngredientAt(ingredientPosition));
@@ -121,5 +105,34 @@ public class IngredientCreationFragment extends Fragment {
                 super.onScrollStateChanged(recyclerView, newState);
             }
         });
+    }
+
+    /**
+     * Shows dialog to user that lets it enter the ingredient's description.
+     */
+    private void addIngredient() {
+        AddDescriptionDialogFragment dialog = new AddDescriptionDialogFragment();
+        Bundle bundle = new Bundle();
+
+        bundle.putInt(AddDescriptionDialogFragment.DIALOG_TITLE, R.string.add_ingredient_information);
+        dialog.show(getParentFragmentManager(), AddDescriptionDialogFragment.TAG);
+    }
+
+    /**
+     * Shows dialog with the ingredient's description, allowing the user to edit it.
+     * @param ingredientPosition - the position of the ingredient in the list that is edited.
+     */
+    private void editIngredient(int ingredientPosition) {
+        // Stores the position to edit for later use when the result of the dialog is obtained.
+        creationViewModel.setItemPositionToEdit(ingredientPosition);
+
+        EditDescriptionDialogFragment dialog = new EditDescriptionDialogFragment();
+        Bundle bundle = new Bundle();
+
+        bundle.putInt(EditDescriptionDialogFragment.DIALOG_TITLE, R.string.ingredient_description_edit);
+        bundle.putString(EditDescriptionDialogFragment.TEXT_TO_EDIT, creationViewModel.getIngredientList().getValue().get(ingredientPosition).getIngredientDescription());
+        dialog.setArguments(bundle);
+
+        dialog.show(getParentFragmentManager(), EditDescriptionDialogFragment.TAG);
     }
 }

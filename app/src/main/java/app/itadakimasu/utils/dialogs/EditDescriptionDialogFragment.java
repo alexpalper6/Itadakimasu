@@ -50,7 +50,7 @@ public class EditDescriptionDialogFragment extends DialogFragment {
                     if (description.length() == 0) {
                         EditDescriptionDialogFragment.this.getDialog().dismiss();
                     } else {
-                        // Sends the text written on the dialog to the fragment that requested the dialog
+                        // Sends the text written on the dialog to the fragment that requested it,
                         // adding a result to the parentFragmentManager.
                         Bundle result = new Bundle();
                         result.putString(DIALOG_RESULT, description);

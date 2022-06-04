@@ -1,8 +1,13 @@
 package app.itadakimasu.interfaces;
 
-import app.itadakimasu.data.model.Recipe;
-
+/**
+ * Interface used to show the details of a recipe.
+ */
 public interface OnItemClickDisplayListener {
-    void onItemClickDisplay(int itemPosition);
+    /**
+     * Method to implement the interface functionality.
+     * @param recipePosition - the recipe's position.
+     */
+    void onItemClickDisplay(int recipePosition);
 
 }

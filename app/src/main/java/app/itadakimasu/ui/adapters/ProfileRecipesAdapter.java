@@ -1,6 +1,7 @@
-package app.itadakimasu.ui.profile;
+package app.itadakimasu.ui.adapters;
 
 import android.content.Context;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,15 +11,16 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import app.itadakimasu.R;
+import app.itadakimasu.data.Result;
 import app.itadakimasu.data.model.Recipe;
 import app.itadakimasu.data.repository.SharedPrefRepository;
 import app.itadakimasu.data.repository.StorageRepository;
@@ -30,6 +32,7 @@ import app.itadakimasu.interfaces.OnItemClickRemoveListener;
 /**
  * Adapter used on the profile's RecyclerView with the item "my recipe preview"
  */
+@SuppressWarnings("unchecked")
 public class ProfileRecipesAdapter extends ListAdapter<Recipe, ProfileRecipesViewHolder> {
 
     // Diff callback to check the difference between recipes.
@@ -53,13 +56,24 @@ public class ProfileRecipesAdapter extends ListAdapter<Recipe, ProfileRecipesVie
     };
     // Shared repository to remove 'more' buttons if  the username is the same as the authenticated user.
     private final SharedPrefRepository sharedPrefRepository;
+    // Storage repository to load the image.
     private final StorageRepository storageRepository;
+    // Lifecycle to download image's data.
+    private final LifecycleOwner lifecycleOwner;
+    // Interfaces from display, edit and remove  a recipe implementation.
+    private OnItemClickDisplayListener displayListener;
     private OnItemClickEditListener editListener;
     private OnItemClickRemoveListener removeListener;
-    private OnItemClickDisplayListener displayListener;
 
-    public ProfileRecipesAdapter(Context context) {
+
+    /**
+     * Constructor of the adapter.
+     * @param context - the context of the app for loading the SharedPref repository.
+     * @param viewLifecycleOwner - the lifecycler owner of the fragment
+     */
+    public ProfileRecipesAdapter(Context context, LifecycleOwner viewLifecycleOwner) {
         super(DIFF_CALLBACK);
+        this.lifecycleOwner = viewLifecycleOwner;
         this.sharedPrefRepository = SharedPrefRepository.getInstance(context);
         this.storageRepository = StorageRepository.getInstance();
     }
@@ -76,14 +90,22 @@ public class ProfileRecipesAdapter extends ListAdapter<Recipe, ProfileRecipesVie
 
     /**
      * Displays the data on specified position on the list of the recycler view.
-     * @param holder - the layout of the item, in this case the ingredient item.
+     * @param holder - the layout of the item, in this case the recipe item.
      * @param position - the position where this item should appear.
      */
     @Override
     public void onBindViewHolder(@NonNull ProfileRecipesViewHolder holder, int position) {
         final Recipe recipe = getItem(position);
-        StorageReference reference = storageRepository.getImageReference(recipe.getPhotoUrl());
-        holder.setRecipeImage(reference);
+
+        // Downloads the image's data
+        storageRepository.getImageUri(recipe.getPhotoUrl()).observe(lifecycleOwner, result -> {
+            if (result instanceof Result.Success) {
+                Uri uriImage = ((Result.Success<Uri>) result).getData();
+                holder.setRecipeImage(uriImage);
+            }
+        });
+
+
         holder.setTitle(recipe.getTitle());
         holder.setDescription(recipe.getDescription());
 
@@ -91,6 +113,14 @@ public class ProfileRecipesAdapter extends ListAdapter<Recipe, ProfileRecipesVie
             holder.setIbMoreVisibility(View.GONE);
         }
 
+    }
+
+    /**
+     * Establish the display listener for this adapter.
+     * @param listener - the implementation of this listener.
+     */
+    public void setOnClickDisplayListener(OnItemClickDisplayListener listener) {
+        this.displayListener = listener;
     }
 
     /**
@@ -108,18 +138,10 @@ public class ProfileRecipesAdapter extends ListAdapter<Recipe, ProfileRecipesVie
     public void setOnClickRemoveListener(OnItemClickRemoveListener listener) {
         this.removeListener = listener;
     }
-
-    /**
-     * Establish the click listener for this adapter.
-     * @param listener - the implementation of this listener.
-     */
-    public void setOnClickDisplayListener(OnItemClickDisplayListener listener) {
-        this.displayListener = listener;
-    }
 }
 
 /**
- * ViewHolder class for the adapter of profile's recipes.
+ * ViewHolder class for the adapter of profiles' recipes.
  */
 class ProfileRecipesViewHolder extends RecyclerView.ViewHolder {
     private final ImageView ivRecipeImage;
@@ -128,7 +150,7 @@ class ProfileRecipesViewHolder extends RecyclerView.ViewHolder {
     private final ImageButton ibMore;
 
     /**
-     * Given a binding of a layout and the implementation of the interfaces, establish all the views
+     * Given a binding of a layout and the implementation of the interfaces, set all the views
      * and actions on the 'more' button and on the card view when is tapped.
      * @param binding - the inflated layout (item_my_recipe_preview).
      * @param editListener - implementation of edit listener.
@@ -179,10 +201,10 @@ class ProfileRecipesViewHolder extends RecyclerView.ViewHolder {
 
     /**
      * Sets the image using glide and the image reference on the recipe's image view.
-     * @param imageReference - the image reference of the recipe's image.
+     * @param uriImage - the downloaded image's uri.
      */
-    public void setRecipeImage(StorageReference imageReference) {
-        Glide.with(ivRecipeImage.getContext()).load(imageReference).centerCrop().into(ivRecipeImage);
+    public void setRecipeImage(Uri uriImage) {
+        Glide.with(ivRecipeImage.getContext()).load(uriImage).centerCrop().into(ivRecipeImage);
     }
 
     /**

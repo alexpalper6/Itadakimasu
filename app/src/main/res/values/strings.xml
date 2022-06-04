@@ -1,6 +1,6 @@
 <resources>
     <!-- App title strings -->
-    <string name="app_name">Itadakimasu</string>
+    <string name="app_name" translatable="false">Itadakimasu</string>
     <string name="title_home">Home</string>
     <string name="title_new_recipe">New Recipe</string>
     <string name="title_favourites">My Favourites</string>
@@ -10,12 +10,10 @@
     <string name="title_recipe_creation">Recipe Creation</string>
     <string name="title_recipe_details">Recipe Details</string>
     <!-- Shared preferences keys -->
-    <string name="saved_username_key">Saved_Username</string>
-    <string name="saved_photo_url_key">Saved_Photo_Url</string>
     <!-- Strings related to login and register -->
     <string name="app_logo">App logo</string>
 
-    <string name="prompt_email">Email</string>
+    <string name="prompt_email" translatable="false">Email</string>
     <string name="prompt_username">Username</string>
     <string name="prompt_password">Password</string>
     <string name="prompt_repeat_password">Repeat password</string>
@@ -29,14 +27,14 @@
 
     <string name="welcome">"Welcome, %1$s!"</string>
     <string name="prompt_add_photo">Finish setting up your profile by adding a photo!</string>
-    <string name="add_photo_info">Add a photo by clicking on the image</string>
+    <string name="add_photo_info">Add a photo by tapping on the image</string>
 
     <!-- Error messages for login and register -->
     <string name="invalid_email">Not a valid email</string>
     <string name="invalid_username">Not a valid username</string>
     <string name="username_chosen">The username is already chosen!</string>
     <string name="invalid_password">Password must be greater than 8 characters, lesser or equal than 30 and must contain numbers</string>
-    <string name="invalid_repeated_apssword">The password does not match</string>
+    <string name="invalid_repeated_password">The password does not match</string>
 
     <string name="login_failed">"Login failed"</string>
     <string name="image_error">Image couldn\'t be established</string>
@@ -52,7 +50,7 @@
         <item>Gallery</item>
     </string-array>
 
-    <string name="ok">OK</string>
+    <string name="ok" translatable="false">OK</string>
     <string name="done">Done!</string>
 
     <string name="cancel">Cancel</string>
@@ -64,6 +62,11 @@
 
     <string name="more">More</string>
     <string name="go_back">Go back</string>
+
+    <string name="delete">Delete</string>
+    <string name="delete_recipe">Delete recipe?</string>
+    <string name="delete_recipe_desc">%s:\nAre you sure to delete this recipe? Other users could have added this recipe as favourite</string>
+
 
     <!-- SelectMedia dialog -->
     <string name="select_media_method">Set the photo with</string>
@@ -78,7 +81,7 @@
     <string name="create_recipe">Create Recipe</string>
     <string name="add_description">Add description</string>
 
-    <string name="fill_every_field">Please fill every field, including photo, ingredients and steps.</string>
+    <string name="fill_every_field">Please, fill every field, including photo, ingredients and steps</string>
     <string name="fields_empty">Fields empty</string>
 
 
@@ -97,29 +100,37 @@
     <!-- String for item layouts -->
     <string name="ingredient">Ingredient</string>
     <string name="step">Step</string>
-    <string name="step_position">0</string>
+    <string name="step_position" translatable="false">0</string>
     <!-- Card layouts image descriptions -->
     <string name="user_image_description">User\'s image</string>
     <string name="recipes_image_description">Recipe\'s image</string>
 
+    <!-- Strings for recipe details -->
+    <string name="recipe_details">Recipe Details</string>
+    <string name="user_profile_image">User profile image</string>
+    <string name="created_by">Created by: %1$s</string>
+    <string name="ingredients">Ingredients</string>
+    <string name="steps">Steps</string>
+
+
     <!-- Error messages inside the app -->
     <string name="username_data_error">Error, username data could not be retrieved</string>
     <string name="user_data_retrieve_error">User data could not be retrieved</string>
+
     <string name="recipe_upload_error">The recipe could not be uploaded</string>
     <string name="recipe_update_error">The recipe could not be updated</string>
+    <string name="recipe_delete_error">The recipe could not be deleted</string>
+
+    <string name="list_retrieve_error">The list could not be retrieved</string>
     <string name="ingredient_list_load_error">The ingredient list could not be loaded</string>
     <string name="step_list_load_error">The step list could not be loaded</string>
 
-    <string name="created_by">Created by: %1$s</string>
-    <string name="recipe_details">Recipe Details</string>
-    <string name="ingredients">Ingredients</string>
-    <string name="steps">Steps</string>
-    <string name="user_profile_image">User profile image</string>
-    <string name="list_retrieve_error">The list could not be retrieved</string>
-    <string name="delete_recipe">Delete recipe?</string>
-    <string name="delete_recipe_desc">%s:\nAre you sure to delete this recipe?</string>
-    <string name="delete">Delete</string>
-    <string name="recipe_delete_error">The recipe could not be deleted</string>
     <string name="image_load_error">Image could not be loaded</string>
 
+    <string name="add_fav_error">Recipe could not be added to favourites</string>
+    <string name="remove_fav_error">Recipe could not be removed from favourites</string>
+    <string name="load_recipe_data_fav_error">Some recipes data could not be retrieved</string>
+
+    <!-- Strings for profile edition -->
+    <string name="edit_profile_data">Edit your profile</string>
 </resources>

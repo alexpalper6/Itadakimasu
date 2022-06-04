@@ -1,22 +1,25 @@
-package app.itadakimasu.ui.home;
+package app.itadakimasu.ui.adapters;
 
 import android.content.Context;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.storage.StorageReference;
 
+import app.itadakimasu.data.Result;
 import app.itadakimasu.data.model.Recipe;
 import app.itadakimasu.data.repository.SharedPrefRepository;
 import app.itadakimasu.data.repository.StorageRepository;
@@ -26,12 +29,13 @@ import app.itadakimasu.interfaces.OnItemClickDisplayListener;
 import app.itadakimasu.interfaces.OnItemClickShowProfileListener;
 
 /**
- * Adapter used on the home fragment's recycler view.
+ * Adapter used on the home fragment and favourites fragment's recycler view.
  */
-public class HomeRecipesAdapter extends ListAdapter<Recipe, HomeRecipesViewHolder> {
+@SuppressWarnings("unchecked")
+public class RecipePreviewAdapter extends ListAdapter<Recipe, RecipePreviewViewHolder> {
 
     // Diff callback to check the difference between recipes.
-    public static final DiffUtil.ItemCallback<Recipe> DIFF_CALLBACK = new DiffUtil.ItemCallback<Recipe>() {
+    public static final DiffUtil.ItemCallback<Recipe> DIFF_CALLBACK = new DiffUtil.ItemCallback<>() {
         @Override
         public boolean areItemsTheSame(@NonNull Recipe oldItem, @NonNull Recipe newItem) {
             return oldItem.equals(newItem);
@@ -45,8 +49,8 @@ public class HomeRecipesAdapter extends ListAdapter<Recipe, HomeRecipesViewHolde
             boolean sameTitle = oldItem.getTitle().equals(newItem.getTitle());
             boolean sameDesc = oldItem.getDescription().equals(newItem.getDescription());
             boolean samePhoto = oldItem.getPhotoUrl().equals(newItem.getPhotoUrl());
-
-            return sameAuthor && sameAuthorPhoto && sameTitle && sameDesc && samePhoto;
+            boolean isSameFav = oldItem.isFavourite().equals(newItem.isFavourite());
+            return sameAuthor && sameAuthorPhoto && sameTitle && sameDesc && samePhoto && isSameFav;
         }
     };
 
@@ -54,13 +58,18 @@ public class HomeRecipesAdapter extends ListAdapter<Recipe, HomeRecipesViewHolde
     private final SharedPrefRepository sharedPrefRepository;
     // Used to load the images on their respective view using storage references.
     private final StorageRepository storageRepository;
+    // Lifecycle to download images' data.
+    private final LifecycleOwner lifecycleOwner;
 
+    // Implementations of interfaces in order to display, add to favourites a recipe and to visit
+    // the author's profile.
     private OnItemClickDisplayListener displayListener;
     private OnItemClickAddFavListener favListener;
     private OnItemClickShowProfileListener showProfileListener;
 
-    protected HomeRecipesAdapter(Context context) {
+    public RecipePreviewAdapter(Context context, LifecycleOwner viewLifecycleOwner) {
         super(DIFF_CALLBACK);
+        this.lifecycleOwner = viewLifecycleOwner;
         this.sharedPrefRepository = SharedPrefRepository.getInstance(context);
         this.storageRepository = StorageRepository.getInstance();
     }
@@ -70,9 +79,9 @@ public class HomeRecipesAdapter extends ListAdapter<Recipe, HomeRecipesViewHolde
      */
     @NonNull
     @Override
-    public HomeRecipesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecipePreviewViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         ItemRecipePreviewBinding binding = ItemRecipePreviewBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-        return new HomeRecipesViewHolder(binding, displayListener, favListener, showProfileListener);
+        return new RecipePreviewViewHolder(binding, displayListener, favListener, showProfileListener);
     }
 
     /**
@@ -80,18 +89,28 @@ public class HomeRecipesAdapter extends ListAdapter<Recipe, HomeRecipesViewHolde
      * @param position - the position where the recipe is on the list.
      */
     @Override
-    public void onBindViewHolder(@NonNull HomeRecipesViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecipePreviewViewHolder holder, int position) {
         final Recipe recipe = getItem(position);
 
         if (sharedPrefRepository.getAuthUsername().equals(recipe.getAuthor())) {
             holder.setCheckVisibility(View.GONE);
         }
 
-        StorageReference recipeImageReference = storageRepository.getImageReference(recipe.getPhotoUrl());
-        holder.setRecipeImage(recipeImageReference);
+        // Downloads and sets the recipe image.
+        storageRepository.getImageUri(recipe.getPhotoUrl()).observe(lifecycleOwner, result -> {
+            if (result instanceof Result.Success) {
+                Uri uriImage = ((Result.Success<Uri>) result).getData();
+                holder.setRecipeImage(uriImage);
+            }
+        });
 
-        StorageReference userImageReference = storageRepository.getImageReference(recipe.getPhotoAuthorUrl());
-        holder.setUserImage(userImageReference);
+        // Downloads and sets the author's image.
+        storageRepository.getImageUri(recipe.getPhotoAuthorUrl()).observe(lifecycleOwner, result -> {
+            if (result instanceof Result.Success) {
+                Uri uriImage = ((Result.Success<Uri>) result).getData();
+                holder.setUserImage(uriImage);
+            }
+        });
 
         holder.setCheckedFavourite(recipe.isFavourite());
         holder.setTitle(recipe.getTitle());
@@ -124,7 +143,7 @@ public class HomeRecipesAdapter extends ListAdapter<Recipe, HomeRecipesViewHolde
  * Holder that describes the recipe preview views and establish the listeners.
  * This layout has every part of the ui for the recipes preview cards.
  */
-class HomeRecipesViewHolder extends RecyclerView.ViewHolder {
+class RecipePreviewViewHolder extends RecyclerView.ViewHolder {
     private final ImageView ivRecipeImage;
     private final CheckBox cbFavourite;
     private final ImageView ivUserImage;
@@ -132,8 +151,16 @@ class HomeRecipesViewHolder extends RecyclerView.ViewHolder {
     private final TextView tvUsername;
     private final TextView tvDescription;
 
-    public HomeRecipesViewHolder(ItemRecipePreviewBinding binding, OnItemClickDisplayListener displayListener, OnItemClickAddFavListener favListener,
-                                 OnItemClickShowProfileListener showProfileListener) {
+    /**
+     *  Given an inflation of the layout and the implementation of the interfaces, set all the views
+     *  and actions on their respective views.
+     * @param binding - the inflation of item_recipe_preview.
+     * @param displayListener - implementation of OnItemClickDisplayListener.
+     * @param favListener - implementation of OnItemClickAddFavListener.
+     * @param showProfileListener - implementation of OnItemClickDisplayListener.
+     */
+    public RecipePreviewViewHolder(ItemRecipePreviewBinding binding, OnItemClickDisplayListener displayListener, OnItemClickAddFavListener favListener,
+                                   OnItemClickShowProfileListener showProfileListener) {
         super(binding.getRoot());
         this.ivRecipeImage = binding.ivRecipeImage;
         this.cbFavourite = binding.cbFavourite;
@@ -146,21 +173,29 @@ class HomeRecipesViewHolder extends RecyclerView.ViewHolder {
         // favourites
         this.cbFavourite.setOnClickListener(v -> {
             if (favListener != null) {
-                favListener.onItemAddFavListener(HomeRecipesViewHolder.this.getAdapterPosition());
+                favListener.onItemAddFavListener(RecipePreviewViewHolder.this.getAdapterPosition());
             }
         });
 
         this.ivUserImage.setOnClickListener(v -> {
             if (showProfileListener != null) {
-                showProfileListener.onItemShowProfile(HomeRecipesViewHolder.this.getAdapterPosition());
+                showProfileListener.onItemShowProfile(RecipePreviewViewHolder.this.getAdapterPosition());
             }
         });
         // Used to implement the method of the interface on the fragment to show the detailed data
         // of the selected recipe.
         binding.getRoot().setOnClickListener(v -> {
             if (displayListener != null) {
-                displayListener.onItemClickDisplay(HomeRecipesViewHolder.this.getAdapterPosition());
+                displayListener.onItemClickDisplay(RecipePreviewViewHolder.this.getAdapterPosition());
             }
+        });
+
+        binding.getRoot().setOnLongClickListener(v -> {
+            if (favListener != null) {
+                favListener.onItemAddFavListener(RecipePreviewViewHolder.this.getAdapterPosition());
+                return true;
+            }
+           return false;
         });
     }
 
@@ -170,6 +205,14 @@ class HomeRecipesViewHolder extends RecyclerView.ViewHolder {
      */
     public void setRecipeImage(StorageReference storageReference) {
         Glide.with(ivRecipeImage.getContext()).load(storageReference).centerCrop().into(ivRecipeImage);
+    }
+
+    /**
+     * Loads the recipe's image.
+     * @param uriImage - the downloaded image's uri.
+     */
+    public void setRecipeImage(Uri uriImage) {
+        Glide.with(ivRecipeImage.getContext()).load(uriImage).centerCrop().into(ivRecipeImage);
     }
 
     /**
@@ -186,6 +229,14 @@ class HomeRecipesViewHolder extends RecyclerView.ViewHolder {
      */
     public void setUserImage(StorageReference storageReference) {
         Glide.with(ivUserImage.getContext()).load(storageReference).circleCrop().into(ivUserImage);
+    }
+
+    /**
+     * Loads the user that uploaded the recipe image.
+     * @param uriImage - the downloaded image's uri.
+     */
+    public void setUserImage(Uri uriImage) {
+        Glide.with(ivUserImage.getContext()).load(uriImage).circleCrop().into(ivUserImage);
     }
 
     /**

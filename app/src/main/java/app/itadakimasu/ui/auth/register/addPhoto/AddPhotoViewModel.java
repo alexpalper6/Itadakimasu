@@ -2,13 +2,11 @@ package app.itadakimasu.ui.auth.register.addPhoto;
 
 import android.app.Application;
 import android.net.Uri;
-import android.os.UserHandle;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import app.itadakimasu.data.Result;
 import app.itadakimasu.data.repository.SharedPrefRepository;
@@ -71,8 +69,7 @@ public class AddPhotoViewModel extends AndroidViewModel {
      * @return a result that could be successful if the image is uploaded or not.
      */
     public LiveData<Result<?>> uploadPhotoStorage(byte[] imageData) {
-
-        return storageRepository.updateUserImage(imageData);
+        return storageRepository.updateUserImage(getAuthUserPhotoUrl(), imageData);
     }
 
 
@@ -113,5 +110,12 @@ public class AddPhotoViewModel extends AndroidViewModel {
      */
     public String getAuthUsername() {
         return sharedPrefRepository.getAuthUsername();
+    }
+
+    /**
+     * @return the current authenticated user's image path.
+     */
+    public String getAuthUserPhotoUrl() {
+        return sharedPrefRepository.getAuthUserPhotoUrl();
     }
 }

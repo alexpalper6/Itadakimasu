@@ -5,18 +5,39 @@ import android.os.Parcelable;
 
 import java.util.Objects;
 
+/**
+ * Model class for ingredients documents on its firebase collection (a recipe sub-collection).
+ */
 public class Ingredient implements Parcelable {
     private int ingredientPosition;
     private String ingredientDescription;
 
+    /**
+     * Creates an ingredient with its description and its position on the list.
+     * @param ingredientPosition - the position of the ingredient on the list.
+     * @param ingredientDescription - its description.
+     */
     public Ingredient(int ingredientPosition, String ingredientDescription) {
         this.ingredientPosition = ingredientPosition;
         this.ingredientDescription = ingredientDescription;
     }
 
+    /**
+     * Creates an ingredient with its description.
+     * @param ingredientDescription - the ingredient description.
+     */
     public Ingredient(String ingredientDescription) {
+        this.ingredientPosition = 0;
         this.ingredientDescription = ingredientDescription;
     }
+
+    /**
+     * Default constructor that is required for firebase.
+     */
+    public Ingredient() {
+
+    }
+
 
     public int getIngredientPosition() {
         return ingredientPosition;
@@ -34,9 +55,7 @@ public class Ingredient implements Parcelable {
         this.ingredientDescription = ingredientDescription;
     }
 
-    public Ingredient() {
-
-    }
+    // Auto generated parcelable //
 
     @Override
     public boolean equals(Object o) {

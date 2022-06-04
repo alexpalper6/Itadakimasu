@@ -5,13 +5,9 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentResultListener;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -33,15 +29,9 @@ import com.canhub.cropper.CropImageView;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.util.List;
-import java.util.Objects;
-
 import app.itadakimasu.R;
 import app.itadakimasu.data.Result;
-import app.itadakimasu.data.model.Ingredient;
 import app.itadakimasu.data.model.Recipe;
-import app.itadakimasu.data.model.Step;
-import app.itadakimasu.data.repository.SharedPrefRepository;
 import app.itadakimasu.databinding.FragmentRecipeCreationBinding;
 import app.itadakimasu.utils.ImageCompressorUtils;
 import app.itadakimasu.utils.ImageCropUtils;
@@ -51,6 +41,7 @@ import app.itadakimasu.utils.dialogs.WarningDialogFragment;
 /**
  * Main fragment for recipe's creation.
  */
+@SuppressWarnings("unchecked")
 public class RecipeCreationFragment extends Fragment {
     public static final String REQUEST = "app.itadakimasu.ui.recipeCreation.Request";
     public static final String RESULT = "app.itadakimasu.ui.recipeCreation.Result";
@@ -105,21 +96,17 @@ public class RecipeCreationFragment extends Fragment {
         setResultListenerForEdit();
 
         // Sends to the fragment for adding ingredients to the list
-        binding.btAddIngredients.setOnClickListener(v -> {
-            NavHostFragment.findNavController(this).navigate(R.id.action_navigation_recipe_creation_to_navigation_ingredient_creation);
-        });
+        binding.btAddIngredients.setOnClickListener(v ->
+                NavHostFragment.findNavController(this).navigate(R.id.action_navigation_recipe_creation_to_navigation_ingredient_creation));
 
         // Sends to the fragment for adding steps to the list
-        binding.btAddSteps.setOnClickListener(v -> {
-            NavHostFragment.findNavController(this).navigate(R.id.action_navigation_recipe_creation_to_navigation_step_Creation);
-        });
+        binding.btAddSteps.setOnClickListener(v ->
+                NavHostFragment.findNavController(this).navigate(R.id.action_navigation_recipe_creation_to_navigation_step_Creation));
 
         // Top button to going back to the home fragment.
-        binding.ibGoBack.setOnClickListener(v -> {
-            NavHostFragment.findNavController(this).popBackStack();
-        });
+        binding.ibGoBack.setOnClickListener(v -> NavHostFragment.findNavController(this).popBackStack());
 
-        // Opens dialog for adding the image to the recipe
+        // Opens dialog for adding the image to the recipe.
         binding.ivAddRecipeImage.setOnClickListener(v -> {
             DialogFragment dialog = new SelectMediaDialogFragment();
             dialog.show(getParentFragmentManager(), SelectMediaDialogFragment.TAG);
@@ -133,17 +120,17 @@ public class RecipeCreationFragment extends Fragment {
             String recipeTitle = binding.etAddRecipeTitle.getText().toString().trim();
             String recipeDescription = binding.etAddRecipeDescription.getText().toString().trim();
 
+            if (creationViewModel.areFieldsFilledEdited(recipeTitle, recipeDescription)) {
+                binding.pbProgress.setVisibility(View.VISIBLE);
+                updateRecipe();
+                return;
+            } else {
+                showEmptyFieldsDialog();
+            }
+
             if (creationViewModel.areFieldsFilled(recipeTitle, recipeDescription)) {
                 binding.pbProgress.setVisibility(View.VISIBLE);
-                // If the variables recipeIdToEdit and recipeDateToEdit are null, then the recipe is new
-                // so it  will be uploaded; if they aren't null, then the recipe is not new, so it will
-                // be updated.
-                if (creationViewModel.getRecipeIdToEdit() == null && creationViewModel.getRecipeDateToEdit() == null) {
-                    uploadRecipe();
-                } else {
-                    updateRecipe();
-                }
-
+                uploadRecipe();
             } else {
                 showEmptyFieldsDialog();
             }
@@ -164,9 +151,8 @@ public class RecipeCreationFragment extends Fragment {
                 });
 
         // Observable to update the Image view with the image that the user loads.
-        creationViewModel.getPhotoUri().observe(getViewLifecycleOwner(), imageUri -> {
-            Glide.with(requireContext()).load(imageUri).centerCrop().into(binding.ivAddRecipeImage);
-        });
+        creationViewModel.getPhotoUri().observe(getViewLifecycleOwner(), imageUri ->
+                Glide.with(requireContext()).load(imageUri).centerCrop().error(R.drawable.ic_baseline_image_not_supported_24).into(binding.ivAddRecipeImage));
 
     }
 
@@ -179,6 +165,7 @@ public class RecipeCreationFragment extends Fragment {
         getParentFragmentManager().setFragmentResultListener(REQUEST, this, (requestKey, result) -> {
 
             Recipe recipe = result.getParcelable(RESULT);
+            creationViewModel.setEdited(true);
             creationViewModel.setRecipeIdToEdit(recipe.getId());
             creationViewModel.setRecipeDateToEdit(recipe.getCreationDate());
 
@@ -200,6 +187,8 @@ public class RecipeCreationFragment extends Fragment {
                     Snackbar.make(binding.getRoot(), R.string.image_load_error, Snackbar.LENGTH_LONG).show();
                 }
             });
+
+
         });
     }
 
@@ -210,7 +199,7 @@ public class RecipeCreationFragment extends Fragment {
         String username = creationViewModel.getAuthUsername();
         String userPhotoUrl = creationViewModel.getAuthUserPhotoUrl();
 
-        // If the username or the user's photo url is empty then a Snackbar will prompt to the user telling
+        // If the username or the user's photo url is empty then a snack bar will prompt to the user telling
         // the user that theirs data couldn't be uploaded.
 
         // Then the upload wont be performed, because the recipe must contain the username and user's image.
@@ -228,7 +217,7 @@ public class RecipeCreationFragment extends Fragment {
                     if (result instanceof Result.Success) {
                         uploadPhotoStorage(((Result.Success<String>) result).getData());
                     } else {
-                        // If the uploading is not successful a Snackbar will prompt to the user.
+                        // If the uploading is not successful a snack bar will prompt to the user.
                         // The user will be able to retry the upload.
                         Snackbar.make(binding.getRoot(), R.string.recipe_upload_error, Snackbar.LENGTH_LONG)
                                 .setAnchorView(binding.fabCreateRecipe).setAction(R.string.retry, v -> uploadRecipe()).show();
@@ -253,7 +242,7 @@ public class RecipeCreationFragment extends Fragment {
                 NavHostFragment.findNavController(this).popBackStack();
 
             } else {
-                // If the upload fails the user will be informed via a Snackbar, they will be able to retry to upload it again.
+                // If the upload fails the user will be informed via a snack bar, they will be able to retry to upload it again.
                 Snackbar.make(binding.getRoot(), R.string.image_upload_error, Snackbar.LENGTH_LONG)
                         .setAnchorView(binding.fabCreateRecipe).setAction(R.string.retry, v -> uploadPhotoStorage(recipePhotoUrl)).show();
             }
@@ -267,7 +256,7 @@ public class RecipeCreationFragment extends Fragment {
         String username = creationViewModel.getAuthUsername();
         String userPhotoUrl = creationViewModel.getAuthUserPhotoUrl();
 
-        // If the username or the user's photo url is empty then a Snackbar will prompt to the user telling
+        // If the username or the user's photo url is empty then a snack bar will prompt to the user telling
         // the user that theirs data couldn't be uploaded.
 
         // Then the upload wont be performed, because the recipe must contain the username and user's image.
@@ -289,7 +278,7 @@ public class RecipeCreationFragment extends Fragment {
                             uploadPhotoStorage(((Result.Success<String>) result).getData());
                         }
                     } else {
-                        // If the updating is not successful a Snackbar will prompt to the user.
+                        // If the updating is not successful a snack bar will prompt to the user.
                         // The user will be able to retry the update.
                         Snackbar.make(binding.getRoot(), R.string.recipe_update_error, Snackbar.LENGTH_LONG)
                                 .setAnchorView(binding.fabCreateRecipe).setAction(R.string.retry, v -> updateRecipe()).show();
@@ -327,7 +316,7 @@ public class RecipeCreationFragment extends Fragment {
     }
 
     /**
-     * Starts the ActivityResultLauncher for getting content on the gallery
+     * Starts the ActivityResultLauncher for getting content on the gallery.
      */
     private void startGalleryIntent() {
         imageMediaLauncher.launch(ImageCropUtils.getRecipePictureGalleryOptions());

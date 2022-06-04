@@ -10,19 +10,19 @@ import androidx.lifecycle.MutableLiveData;
 
 import app.itadakimasu.R;
 import app.itadakimasu.data.Result;
-import app.itadakimasu.data.model.User;
 import app.itadakimasu.data.repository.AppAuthRepository;
 import app.itadakimasu.data.repository.SharedPrefRepository;
 import app.itadakimasu.data.repository.UsersRepository;
 
 /**
- * View model for the login framgnet, contains the state of the login, notifying the user
+ * View model for the login fragment, contains the state of the login, notifying the user
  * for empty fields and the error result, used to notify the user for possible errors when logging in.
  */
 public class LoginViewModel extends AndroidViewModel {
     // Repositories used to login and obtain user's data.
     private final AppAuthRepository loginRepository;
     private final UsersRepository usersRepository;
+    // Repository to write authenticated user's data on the shared pref app's file.
     private final SharedPrefRepository sharedPrefRepository;
     // Form state and login error result.
     private final MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
@@ -43,10 +43,9 @@ public class LoginViewModel extends AndroidViewModel {
     LiveData<Result<?>> retrieveCurrentUserData() {
         return usersRepository.retrieveCurrentUserData();
     }
-    //
 
     /**
-     * @return the login form state as live data to observe it.
+     * @return the login form state as live data to observe its changes.
      */
     LiveData<LoginFormState> getLoginFormState() {
         return loginFormState;
@@ -63,7 +62,7 @@ public class LoginViewModel extends AndroidViewModel {
      * Logins the user to the app.
      * @param userEmail - the user's email.
      * @param password - the user's password.
-     * @return the error result that is not null if the login fails.
+     * @return the error result if the login fails.
      */
     public LiveData<Result.Error> login(String userEmail, String password) {
         return loginRepository.login(userEmail, password);
@@ -71,14 +70,14 @@ public class LoginViewModel extends AndroidViewModel {
 
     /**
      * Sets the error message that will be prompted to the user.
-     * @param error - the error message that will be prompted to the user.
+     * @param error - the error message when the user tries to logging in.
      */
     public void setLoginErrorResult(String error) {
         loginErrorResult.setValue(new LoginErrorResult(error));
     }
 
     /**
-     * Updates the form state with the user's email and user's password.
+     * Updates the form state with the user's email and user's password when the users enters data.
      * @param userEmail - the user's email.
      * @param password - the users' password.
      */
@@ -93,7 +92,7 @@ public class LoginViewModel extends AndroidViewModel {
     }
 
     /**
-     * Sets the authenticated username on a SharedPreferences.
+     * Writes the authenticated username's name on the app's SharedPreferences file.
      * @param username - the username.
      */
     public void setAuthUsername(String username) {
@@ -101,7 +100,7 @@ public class LoginViewModel extends AndroidViewModel {
     }
 
     /**
-     * Sets the authenticated user's photo url on a SharedPreferences.
+     * Sets the authenticated user's photo url on the shared apps' SharedPreferences file.
      * @param photoUrl - the photo's url.
      */
     public void setAuthUserPhotoUrl(String photoUrl) {

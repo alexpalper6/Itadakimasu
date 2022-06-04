@@ -1,11 +1,11 @@
 package app.itadakimasu.data.repository;
 
 
-import androidx.annotation.NonNull;
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -14,13 +14,18 @@ import app.itadakimasu.data.model.FirebaseContract;
 import app.itadakimasu.data.model.User;
 
 /**
- * Class that requests authentication and user information from the remote data source.
+ * Repository that requests authentication and user information from the remote data source.
  */
 public class AppAuthRepository {
+    private final static String TAG = "AppAuthRepository";
+    // Repository's singleton
     public static volatile AppAuthRepository INSTANCE;
     // Entry point of Firebase Authentication, this is used to get the instance.
     private final FirebaseAuth firebaseAuth;
 
+    /**
+     * @return app auth repository singleton
+     */
     public static AppAuthRepository getInstance() {
         if (INSTANCE == null) {
             synchronized (AppAuthRepository.class) {
@@ -32,11 +37,12 @@ public class AppAuthRepository {
         return INSTANCE;
     }
 
+    /**
+     * Sets the firebase auth data source instance.
+     */
     private AppAuthRepository() {
         this.firebaseAuth = FirebaseAuth.getInstance();
     }
-
-
 
     /**
      * Authenticates the user with given email and password, returns a result so the UI Layer can
@@ -47,12 +53,7 @@ public class AppAuthRepository {
      */
     public LiveData<Result.Error> login(String userEmail, String password) {
         MutableLiveData<Result.Error> mutableLiveData = new MutableLiveData<>();
-        firebaseAuth.signInWithEmailAndPassword(userEmail, password).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                mutableLiveData.setValue(new Result.Error(e));
-            }
-        });
+        firebaseAuth.signInWithEmailAndPassword(userEmail, password).addOnFailureListener(error -> mutableLiveData.setValue(new Result.Error(error)));
         return mutableLiveData;
     }
 
@@ -67,18 +68,18 @@ public class AppAuthRepository {
     public MutableLiveData<Result<?>> register(String email, String username, String password) {
         MutableLiveData<Result<?>> result = new MutableLiveData<>();
 
-        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-                if (firebaseUser != null) {
-                    User user = new User(firebaseUser.getUid(), username);
-                    user.setPhotoUrl(FirebaseContract.StoragePath.USER_PICTURES + firebaseUser.getUid());
-                    result.setValue(new Result.Success<User>(user));
-                }
-
-            } else {
-                result.setValue(new Result.Error(task.getException()));
+        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnSuccessListener(task -> {
+            FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+            if (firebaseUser != null) {
+                User user = new User(firebaseUser.getUid(), username);
+                user.setPhotoUrl(FirebaseContract.StoragePath.USER_PICTURES + firebaseUser.getUid());
+                result.setValue(new Result.Success<User>(user));
+                Log.i(TAG, "register: user created successfully");
             }
+
+        }).addOnFailureListener(failure -> {
+            Log.e(TAG, "register: error creating user", failure);
+            result.setValue(new Result.Error(failure));
         });
         return result;
     }
@@ -89,13 +90,4 @@ public class AppAuthRepository {
     public void signOut() {
         firebaseAuth.signOut();
     }
-
-    /**
-     * Obtains the current user.
-     * @return a FirebaseUser instance with the user's authentication data.
-     */
-    public FirebaseUser getCurrentUser() {
-        return firebaseAuth.getCurrentUser();
-    }
-
 }

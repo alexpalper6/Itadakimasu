@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.View;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
 import androidx.annotation.NonNull;
@@ -21,8 +20,8 @@ import java.util.Objects;
 import app.itadakimasu.databinding.ActivityMainBinding;
 
 /**
- * Activity of the application, charges the nav controller, the BottomNavigation visibility on fragments
- * and the implementation of an AuthStateListener.
+ * Activity of the application, loads the nav controller, the BottomNavigation visibility on fragments
+ * and the implementation of an firebase's AuthStateListener.
  */
 public class MainActivity extends AppCompatActivity implements FirebaseAuth.AuthStateListener {
 
@@ -35,8 +34,6 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-        BottomNavigationView bottomNavigationView = findViewById(R.id.nav_view);
 
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -51,7 +48,8 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
                 R.id.navigation_recipe_creation,
                 R.id.navigation_ingredient_creation,
                 R.id.navigation_step_Creation,
-                R.id.navigation_details);
+                R.id.navigation_details,
+                R.id.navigation_user_profile);
 
         // Adds a listener, when the navigation is triggered it'll check the destination's fragment.
         // If the fragment is one from the list, the BottomNavigation will be hidden; if not, it will be visible.

@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,7 +23,7 @@ import app.itadakimasu.data.repository.UsersRepository;
  * making them able to survive configuration changes. UI States are stored in order to give the user proper feedback.
  */
 public class RegisterViewModel extends AndroidViewModel {
-    // Repository used to be able to store user's data on SharedPreferences
+    // Repository used to be able to store user's data on SharedPreferences file.
     private final SharedPrefRepository sharedPrefRepository;
     // Repository that handles the business logic for authentication.
     private final AppAuthRepository authRepository;
@@ -73,7 +72,7 @@ public class RegisterViewModel extends AndroidViewModel {
      * @param email - the email that the user has written.
      * @param username - the username that the user has written.
      * @param password - the password that the user has written.
-     * @return An observable data of Result class, will contain Firebase's registry result, it can be
+     * @return an observable data of Result class, will contain Firebase's registry result, it can be
      * the user's data if the result was successful or an error message.
      */
     public LiveData<Result<?>> register(String email, String username, String password) {
@@ -124,7 +123,6 @@ public class RegisterViewModel extends AndroidViewModel {
         registerResult.setValue(new RegisterErrorResult(null, message, user));
     }
 
-
     /**
      * Every time the user writes input on the register's edit texts fields, this method will catch
      * the content and update the form state.
@@ -152,7 +150,7 @@ public class RegisterViewModel extends AndroidViewModel {
             newReg.setPasswordError(R.string.invalid_password);
         }
         if (!isRepeatedPasswordValid) {
-            newReg.setRepeatedPasswordError(R.string.invalid_repeated_apssword);
+            newReg.setRepeatedPasswordError(R.string.invalid_repeated_password);
         }
 
         boolean isAllDataValid = isEmailValid && isUsernameValid && isPasswordValid && isRepeatedPasswordValid;

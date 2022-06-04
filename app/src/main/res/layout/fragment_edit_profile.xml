@@ -12,11 +12,11 @@
 
 
     <TextView
-        android:id="@+id/tv_welcome"
+        android:id="@+id/tv_edit_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="@string/welcome"
+        android:text="Edit your profile data"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         android:textColor="@color/primaryTextColor"
@@ -28,62 +28,36 @@
         android:id="@+id/iv_new_photo"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:layout_marginBottom="24dp"
         android:contentDescription="@string/prompt_add_photo"
-        android:scaleType="fitCenter"
 
+        android:scaleType="fitCenter"
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_photo_prompt"
+        app:layout_constraintTop_toBottomOf="@+id/tv_edit_data"
         app:srcCompat="@drawable/ic_baseline_add_photo_alternate_24"
         tools:srcCompat="@drawable/ic_baseline_add_photo_alternate_24" />
-
-    <TextView
-        android:id="@+id/tv_photo_prompt"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/prompt_add_photo"
-        android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_welcome" />
 
     <Button
         android:id="@+id/bt_done"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:text="@string/done"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/bt_decline"
-        app:layout_constraintTop_toTopOf="@+id/bt_decline"
-        tools:ignore="TextContrastCheck" />
-
-    <Button
-        android:id="@+id/bt_decline"
-        style="?attr/materialButtonOutlinedStyle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/no_thanks"
-        android:textColor="?attr/colorPrimaryVariant"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/bt_done"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="TextContrastCheck" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.54" />
+        app:layout_constraintGuide_percent="0.65" />
 
     <ProgressBar
         android:id="@+id/pb_add_photo"
@@ -92,7 +66,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/bt_decline"
+        app:layout_constraintBottom_toTopOf="@+id/bt_done"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

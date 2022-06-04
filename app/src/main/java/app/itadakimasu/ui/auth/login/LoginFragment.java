@@ -1,14 +1,11 @@
 package app.itadakimasu.ui.auth.login;
 
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -16,22 +13,25 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 
 import app.itadakimasu.data.Result;
 import app.itadakimasu.data.model.User;
-import app.itadakimasu.data.repository.SharedPrefRepository;
 import app.itadakimasu.databinding.FragmentLoginBinding;
 
 import app.itadakimasu.R;
 
 /**
  * Fragment that lets the user to login and enter the app.
+ * It also has a register button that leads the user to the register fragment.
+ *
+ * This fragment implements a FirebaseAuth authentication state listener, when the user logs in
+ * successfully, they will be redirected to the home section of the application.
  */
+@SuppressWarnings("unchecked")
 public class LoginFragment extends Fragment implements FirebaseAuth.AuthStateListener {
-    // The view model that survives Android configuration change and saves the state.
+    // The view model that survives Android configuration changes and saves the state.
     private LoginViewModel loginViewModel;
     private FragmentLoginBinding binding;
 
@@ -42,6 +42,7 @@ public class LoginFragment extends Fragment implements FirebaseAuth.AuthStateLis
                              @Nullable Bundle savedInstanceState) {
 
         binding = FragmentLoginBinding.inflate(inflater, container, false);
+        // Adds the authentication state listener.
         FirebaseAuth.getInstance().addAuthStateListener(this);
         return binding.getRoot();
 
@@ -58,18 +59,19 @@ public class LoginFragment extends Fragment implements FirebaseAuth.AuthStateLis
             if (loginFormState.getUserEmailError() != null) {
                 binding.tilEmail.setError(getString(loginFormState.getUserEmailError()));
             } else {
+                // Clears the error message when the email error is erased.
                 binding.tilEmail.setError(null);
             }
 
             binding.btLogin.setEnabled(loginFormState.isDataValid());
         });
 
-        // Observes for the logging error result and shows to the user the error message via Snackbar.
+        // Observes for the logging error result and shows to the user the error message via snack bar.
         loginViewModel.getLoginErrorResult().observe(getViewLifecycleOwner(), loginResultState -> {
             binding.loading.setVisibility(View.GONE);
             Snackbar.make(binding.getRoot()
                     , loginResultState.getError()
-                    , BaseTransientBottomBar.LENGTH_LONG).show();
+                    , Snackbar.LENGTH_LONG).show();
         });
 
         // When clicking on register button, the user is sent to the register fragment.
@@ -119,15 +121,6 @@ public class LoginFragment extends Fragment implements FirebaseAuth.AuthStateLis
         });
     }
 
-    /**
-     * When the fragment is destroyed, removes the listener.
-     */
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        FirebaseAuth.getInstance().removeAuthStateListener(this);
-        binding = null;
-    }
 
     /**
      * Listen for authentication changes, if the login is successful, this listener will be triggered,
@@ -146,11 +139,21 @@ public class LoginFragment extends Fragment implements FirebaseAuth.AuthStateLis
                     loginViewModel.setAuthUserPhotoUrl(((Result.Success<User>) result).getData().getPhotoUrl());
                     NavHostFragment.findNavController(this).navigate(R.id.action_auth_navigation_to_navigation_home);
                 } else {
-                    Snackbar.make(binding.getRoot(), R.string.username_data_error, BaseTransientBottomBar.LENGTH_LONG).show();
+                    Snackbar.make(binding.getRoot(), R.string.user_data_retrieve_error, Snackbar.LENGTH_LONG).show();
                 }
             });
 
 
         }
+    }
+
+    /**
+     * When the fragment is destroyed, removes the listener.
+     */
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        FirebaseAuth.getInstance().removeAuthStateListener(this);
+        binding = null;
     }
 }

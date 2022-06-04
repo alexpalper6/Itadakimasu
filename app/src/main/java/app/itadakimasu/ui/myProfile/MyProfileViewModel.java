@@ -1,4 +1,4 @@
-package app.itadakimasu.ui.profile;
+package app.itadakimasu.ui.myProfile;
 
 import android.app.Application;
 
@@ -16,14 +16,16 @@ import java.util.List;
 import app.itadakimasu.data.Result;
 import app.itadakimasu.data.model.Recipe;
 import app.itadakimasu.data.repository.AppAuthRepository;
+import app.itadakimasu.data.repository.FavouritesRepository;
 import app.itadakimasu.data.repository.RecipesRepository;
 import app.itadakimasu.data.repository.SharedPrefRepository;
 import app.itadakimasu.data.repository.StorageRepository;
 
 
-public class ProfileViewModel extends AndroidViewModel {
+public class MyProfileViewModel extends AndroidViewModel {
     private final RecipesRepository recipesRepository;
     private final StorageRepository storageRepository;
+    private final FavouritesRepository favouritesRepository;
     private final SharedPrefRepository sharedPrefRepository;
     private final AppAuthRepository appAuthRepository;
 
@@ -37,10 +39,11 @@ public class ProfileViewModel extends AndroidViewModel {
     private boolean reachedEndPagination;
 
 
-    public ProfileViewModel(@NonNull Application application) {
+    public MyProfileViewModel(@NonNull Application application) {
         super(application);
         this.recipesRepository = RecipesRepository.getInstance();
         this.storageRepository = StorageRepository.getInstance();
+        this.favouritesRepository = FavouritesRepository.getInstance();
         this.sharedPrefRepository = SharedPrefRepository.getInstance(application.getApplicationContext());
         this.appAuthRepository = AppAuthRepository.getInstance();
         this.recipesList = new MutableLiveData<>(new ArrayList<>());
@@ -49,6 +52,7 @@ public class ProfileViewModel extends AndroidViewModel {
         this.profileUsername = "";
         this.photoUrl = "";
     }
+
 
     /**
      * @return the recipe list from the view model as LiveData.
@@ -74,12 +78,39 @@ public class ProfileViewModel extends AndroidViewModel {
         return recipesRepository.getNextRecipesByUser(profileUsername, lastRecipeDate);
     }
 
+    /**
+     * Deletes recipe's document from the recipes collection.
+     * @param recipeId - the recipe's document id used to remove the document.
+     * @return observable data with result success if its deleted; error if else.
+     */
     public LiveData<Result<?>> deleteRecipe(String recipeId) {
         return recipesRepository.deleteRecipe(recipeId);
     }
 
+    /**
+     * Removes the image from the storage.
+     * @param recipePhotoUrl - the path where the image is stored.
+     * @return observable data with result success if its removed; error if else.
+     */
     public LiveData<Result<?>> deleteRecipeImage(String recipePhotoUrl) {
         return storageRepository.deleteRecipeImage(recipePhotoUrl);
+    }
+
+    /**
+     * Removes every document entry that contains the recipe's id to delete.
+     * @param recipeId - the recipe's id that contains the documents on favourites collection.
+     * @return result success if there is deletion; error if else.
+     */
+    public LiveData<Result<?>> removeAllFavouritesWithRecipe(String recipeId) {
+        return favouritesRepository.removeEveryEntryWithRecipe(recipeId);
+    }
+
+    /**
+     *
+     * @return image's data as uri or result error if it fails.
+     */
+    public LiveData<Result<?>> downloadAuthUserImageUri() {
+        return storageRepository.getImageUri(getAuthUserPhotoUrl());
     }
 
     /**

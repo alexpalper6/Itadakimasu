@@ -1,5 +1,8 @@
 package app.itadakimasu.data.model;
 
+/**
+ * Constant for every collection and field values on firebase database.
+ */
 public class FirebaseContract {
     public static class UserEntry {
         public static final String COLLECTION_NAME = "users";
@@ -34,8 +37,10 @@ public class FirebaseContract {
 
     public static class FavouritesEntry {
         public static final String COLLECTION_NAME = "favourites";
+        public static final String ID = "id";
         public static final String USERNAME = "username";
         public static final String RECIPE_ID = "recipeId";
+        public static final String ADDITION_DATE = "additionDate";
     }
 
     public static class StoragePath {

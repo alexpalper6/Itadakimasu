@@ -13,7 +13,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import app.itadakimasu.R;
 
 /**
- * Dialog fragment created to alert the user with a big dialog that something gone wrong.
+ * Dialog fragment created to alert the user with a dialog with a custom warning dialog and message,
+ * passed as an argument.
  */
 public class WarningDialogFragment extends DialogFragment {
     public static final String TAG = "app.itadakimasu.utils.dialogs.WarningDialogFragment.TAG";
