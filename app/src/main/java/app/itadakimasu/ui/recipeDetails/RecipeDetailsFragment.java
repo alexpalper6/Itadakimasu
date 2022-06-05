@@ -95,11 +95,6 @@ public class RecipeDetailsFragment extends Fragment {
      * @param recipe - the recipe from which data is loaded.
      */
     private void showRecipeData(Recipe recipe) {
-        // If the author is the same as the authenticated user, then they wont be able to add the recipe
-        // to favourites.
-        if (recipe.getAuthor().equals(detailsViewModel.getAuthUsername())) {
-            binding.cbFavourite.setVisibility(View.GONE);
-        }
         binding.cbFavourite.setEnabled(true);
 
         loadAuthorImage(recipe.getPhotoAuthorUrl());
@@ -124,7 +119,7 @@ public class RecipeDetailsFragment extends Fragment {
         detailsViewModel.downloadImageData(photoUrl).observe(getViewLifecycleOwner(), result -> {
            if (result instanceof Result.Success) {
                Uri uriImage = ((Result.Success<Uri>) result).getData();
-               Glide.with(requireContext()).load(uriImage).centerCrop().into(binding.ivRecipeImage);
+               Glide.with(requireContext()).load(uriImage).error(R.drawable.ic_baseline_image_not_supported_24).centerCrop().into(binding.ivRecipeImage);
            } else {
                Snackbar.make(binding.getRoot(), R.string.image_load_error, Snackbar.LENGTH_LONG)
                        .setAction(R.string.retry, v -> loadRecipeImage(photoUrl))
@@ -141,7 +136,7 @@ public class RecipeDetailsFragment extends Fragment {
         detailsViewModel.downloadImageData(photoAuthorUrl).observe(getViewLifecycleOwner(), result -> {
             if (result instanceof Result.Success) {
                 Uri uriImage = ((Result.Success<Uri>) result).getData();
-                Glide.with(requireContext()).load(uriImage).circleCrop().into(binding.ivUserImage);
+                Glide.with(requireContext()).load(uriImage).error(R.drawable.ic_default_user_profile).circleCrop().into(binding.ivUserImage);
 
             } else {
                 Snackbar.make(binding.getRoot(), R.string.image_load_error, Snackbar.LENGTH_LONG)

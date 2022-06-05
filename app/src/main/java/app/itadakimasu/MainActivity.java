@@ -113,7 +113,11 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
         if (firebaseAuth.getCurrentUser() == null) {
             NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_activity_main);
             NavController navController = Objects.requireNonNull(navHostFragment).getNavController();
-            navController.navigate(R.id.auth_navigation, null, new NavOptions.Builder().setPopUpTo(R.id.navigation_home, true).build());
+            System.out.println(navController.getGraph().getId());
+
+            if (navController.getCurrentDestination().getId() != R.id.navigation_login && navController.getCurrentDestination().getId() != R.id.navigation_register) {
+                navController.navigate(R.id.auth_navigation, null, new NavOptions.Builder().setPopUpTo(R.id.navigation_home, true).build());
+            }
         }
     }
 }

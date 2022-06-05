@@ -8,7 +8,6 @@ import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -158,6 +157,7 @@ public class RecipeCreationFragment extends Fragment {
 
     }
 
+
     /**
      * Sets a fragment result listener, this will get a recipe in order to edit it.
      * If this fragment is going to be used to edit a recipe, the buttons for adding
@@ -170,8 +170,6 @@ public class RecipeCreationFragment extends Fragment {
             creationViewModel.setEdited(true);
             creationViewModel.setRecipeIdToEdit(recipe.getId());
             creationViewModel.setRecipeDateToEdit(recipe.getCreationDate());
-
-            creationViewModel.setPhotoPath(recipe.getPhotoUrl());
 
             binding.etAddRecipeTitle.setText(recipe.getTitle());
             binding.etAddRecipeDescription.setText(recipe.getDescription());
@@ -278,6 +276,8 @@ public class RecipeCreationFragment extends Fragment {
                         //This serves as a way to tell if the image is edited, so the app will be able to compress the image.
                         if (creationViewModel.getPhotoPath() != null) {
                             uploadPhotoStorage(((Result.Success<String>) result).getData());
+                        } else {
+                            NavHostFragment.findNavController(this).popBackStack();
                         }
                     } else {
                         // If the updating is not successful a snack bar will prompt to the user.
@@ -301,6 +301,8 @@ public class RecipeCreationFragment extends Fragment {
 
         dialog.show(getParentFragmentManager(), WarningDialogFragment.TAG);
     }
+
+
 
     /**
      * Checks for the permissions in order to access the gallery, if the user already granted it,
@@ -328,7 +330,7 @@ public class RecipeCreationFragment extends Fragment {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
         builder.setTitle(R.string.exit_without_creating)
                 .setMessage(R.string.recie_data_lost_warning)
-                .setPositiveButton(R.string.delete, (dialog, which) -> NavHostFragment.findNavController(this).popBackStack())
+                .setPositiveButton(R.string.exit, (dialog, which) -> NavHostFragment.findNavController(this).popBackStack())
                 .setNegativeButton(R.string.cancel, ((dialog, which) -> dialog.cancel()));
 
         builder.show();

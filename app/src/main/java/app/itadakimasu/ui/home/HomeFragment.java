@@ -125,15 +125,12 @@ public class HomeFragment extends Fragment {
      * @param recipePosition - the selected recipe's position on the list.
      */
     private void addRemoveFavourite(int recipePosition) {
-        // If the author is the same as the authenticated user, it won't be added to favourites.
         Recipe recipeToFav = homeViewModel.getRecipeAt(recipePosition);
-        if (!recipeToFav.getAuthor().equals(homeViewModel.getAuthUsername())) {
-            setDataIsLoading();
-            if (!recipeToFav.isFavourite()) {
-                addToFavourites(recipePosition, recipeToFav);
-            } else {
-                removeFromFavourites(recipePosition, recipeToFav);
-            }
+        setDataIsLoading();
+        if (!recipeToFav.isFavourite()) {
+            addToFavourites(recipePosition, recipeToFav);
+        } else {
+            removeFromFavourites(recipePosition, recipeToFav);
         }
     }
 
@@ -223,8 +220,7 @@ public class HomeFragment extends Fragment {
     /**
      * This method overrides the value of the list with this recipes after being checked if the recipes are checked as favourite.
      *
-     * Iterates the list of recipes, and for each one checks if the authenticated user added it as favourite,
-     * in case the recipe is from the same user, it will just continue.
+     * Iterates the list of recipes, and for each one checks if the authenticated user added it as favourite.
      *
      * This uses an synchronous method from the view model, is an integer flag that sets the quantity of
      * recipes to process, when the number reach to 0, then the list is added.
@@ -235,25 +231,19 @@ public class HomeFragment extends Fragment {
         homeViewModel.setRecipesToProcess(recipeList.size());
         for (Recipe recipe : recipeList) {
             // If the recipe is from the same user as the authenticated, then it will just mark it as processed.
-            if (!recipe.getAuthor().equals(homeViewModel.getAuthUsername())) {
-                homeViewModel.isRecipeFavourite(recipe).observe(getViewLifecycleOwner(), favouriteResult -> {
-                    // If the repository returns a successful value sets true if it has found the entry
-                    // on favourites; false if not.
-                    if (favouriteResult instanceof Result.Success) {
-                        recipe.setFavourite(((Result.Success<Boolean>) favouriteResult).getData());
-                    }
-                    // Its necessary to do this twice because the asynchronous methods could spend
-                    // more time than expected.
-                    if (homeViewModel.recipeIsProcessed() == 0) {
-                        homeViewModel.addRetrievedRecipes(recipeList);
-                    }
-
-                });
-            } else {
+            homeViewModel.isRecipeFavourite(recipe).observe(getViewLifecycleOwner(), favouriteResult -> {
+                // If the repository returns a successful value sets true if it has found the entry
+                // on favourites; false if not.
+                if (favouriteResult instanceof Result.Success) {
+                    recipe.setFavourite(((Result.Success<Boolean>) favouriteResult).getData());
+                }
+                // Its necessary to do this twice because the asynchronous methods could spend
+                // more time than expected.
                 if (homeViewModel.recipeIsProcessed() == 0) {
                     homeViewModel.addRetrievedRecipes(recipeList);
                 }
-            }
+
+            });
         }
     }
 

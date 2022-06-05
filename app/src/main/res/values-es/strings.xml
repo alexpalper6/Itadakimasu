@@ -50,7 +50,7 @@
     <string name="add_steps">Añadir Pasos</string>
     <string name="create_recipe">Crear Receta</string>
     <string name="add_description">Añadir descripción</string>
-    <string name="fill_every_field">Por favor, rellene todos los campos, incluyendo la foto y las listas</string>
+    <string name="fill_every_field">Por favor, rellene todos los campos</string>
     <string name="fields_empty">Campos vacíos</string>
     <string name="add_ingredient_information">Añade información del ingrediente</string>
     <string name="ingredient_exists">Un ingrediente ya existe con esta descripción</string>
@@ -85,4 +85,6 @@
     <string name="recie_data_lost_warning">Los datos de esta receta se borrarán</string>
     <string name="without_description">Sin descripción</string>
     <string name="without_title">Sin título</string>
+    <string name="exit">Salir</string>
+    <string name="edit_your_profile_data">Edita los datos de tu perfil</string>
 </resources>

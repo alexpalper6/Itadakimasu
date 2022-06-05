@@ -92,10 +92,6 @@ public class RecipePreviewAdapter extends ListAdapter<Recipe, RecipePreviewViewH
     public void onBindViewHolder(@NonNull RecipePreviewViewHolder holder, int position) {
         final Recipe recipe = getItem(position);
 
-        if (sharedPrefRepository.getAuthUsername().equals(recipe.getAuthor())) {
-            holder.setCheckVisibility(View.GONE);
-        }
-
         // Downloads and sets the recipe image.
         storageRepository.getImageUri(recipe.getPhotoUrl()).observe(lifecycleOwner, result -> {
             if (result instanceof Result.Success) {

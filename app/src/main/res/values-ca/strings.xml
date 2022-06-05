@@ -50,7 +50,7 @@
     <string name="add_steps">Afegir Passos</string>
     <string name="create_recipe">Crear Recepta</string>
     <string name="add_description">Afegir descripció</string>
-    <string name="fill_every_field">Si us plau, omple tots els camps, incloent la fotografia i els llistats</string>
+    <string name="fill_every_field">Si us plau, omple tots els camps</string>
     <string name="fields_empty">Camps buits</string>
     <string name="add_ingredient_information">Afegeix informació dels ingredients</string>
     <string name="ingredient_exists">Un ingredient ja existeix amb aquesta informació</string>
@@ -85,4 +85,7 @@
     <string name="recie_data_lost_warning">Les dades de la recepta es perdran</string>
     <string name="without_description">Sense descripció</string>
     <string name="without_title">Sense títol</string>
+    <string name="exit">Eixir</string>
+    <string name="edit_your_profile_data">Edita les dades del teu perfil</string>
+
 </resources>

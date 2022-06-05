@@ -321,7 +321,7 @@ public class CreationViewModel extends AndroidViewModel {
     }
 
     /**
-     * Checks if all fields are filled when editing.
+     * Checks if all necessary fields are filled when editing.
      * @param recipeTitle - the recipe's title EditText from the RecipeCreationFragment.
      * @param recipeDescription - the recipe's description EditText from the RecipeCreationFragment.
      * @return true if every field is filled; false if not.
@@ -332,9 +332,8 @@ public class CreationViewModel extends AndroidViewModel {
 
         boolean titleIsFilled = recipeTitle.length() != 0;
         boolean descriptionIsFilled = recipeDescription.length() != 0;
-        boolean photoFieldFilled = (photoPath != null && photoPath.length() != 0) && photoUri.getValue() != null;
 
-        return titleIsFilled && descriptionIsFilled && photoFieldFilled;
+        return titleIsFilled && descriptionIsFilled;
     }
 
     /**
