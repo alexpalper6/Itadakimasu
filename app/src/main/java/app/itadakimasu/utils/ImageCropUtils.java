@@ -4,6 +4,8 @@ import com.canhub.cropper.CropImageContractOptions;
 import com.canhub.cropper.CropImageOptions;
 import com.canhub.cropper.CropImageView;
 
+import app.itadakimasu.R;
+
 /**
  * Util class that uses Android-Image-Cropper to set crop image options.
  */
@@ -14,6 +16,7 @@ public class ImageCropUtils {
      */
     public static CropImageContractOptions getProfilePictureGalleryOptions() {
         return new CropImageContractOptions(null, new CropImageOptions())
+                .setCropMenuCropButtonIcon(R.drawable.ic_baseline_done_24)
                 .setImageSource(true, false)
                 .setFixAspectRatio(true)
                 .setCropShape(CropImageView.CropShape.OVAL)
@@ -26,6 +29,7 @@ public class ImageCropUtils {
      */
     public static CropImageContractOptions getProfilePictureCameraOptions() {
         return new CropImageContractOptions(null, new CropImageOptions())
+                .setCropMenuCropButtonIcon(R.drawable.ic_baseline_done_24)
                 .setImageSource(false, true)
                 .setFixAspectRatio(true)
                 .setCropShape(CropImageView.CropShape.OVAL)
@@ -38,6 +42,7 @@ public class ImageCropUtils {
      */
     public static CropImageContractOptions getRecipePictureGalleryOptions() {
         return new CropImageContractOptions(null, new CropImageOptions())
+                .setCropMenuCropButtonIcon(R.drawable.ic_baseline_done_24)
                 .setImageSource(true, false)
                 .setFixAspectRatio(false)
                 .setCropShape(CropImageView.CropShape.RECTANGLE)
@@ -50,6 +55,7 @@ public class ImageCropUtils {
      */
     public static CropImageContractOptions getRecipePictureCameraOptions() {
         return new CropImageContractOptions(null, new CropImageOptions())
+                .setCropMenuCropButtonIcon(R.drawable.ic_baseline_done_24)
                 .setImageSource(false, true)
                 .setFixAspectRatio(false)
                 .setCropShape(CropImageView.CropShape.RECTANGLE)
