@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.List;
 
@@ -81,7 +80,7 @@ public class RecipeDetailsFragment extends Fragment {
         binding.ibGoBack.setOnClickListener(v -> NavHostFragment.findNavController(this).popBackStack());
         // Adds or removes from favourite the recipe.
         binding.cbFavourite.setOnClickListener(v -> {
-            if (binding.cbFavourite.isChecked()) {
+            if (detailsViewModel.isRecipeFavourite()) {
                 removeFromFavourites();
             } else {
                 addToFavourites();
@@ -101,6 +100,7 @@ public class RecipeDetailsFragment extends Fragment {
         if (recipe.getAuthor().equals(detailsViewModel.getAuthUsername())) {
             binding.cbFavourite.setVisibility(View.GONE);
         }
+        binding.cbFavourite.setEnabled(true);
 
         loadAuthorImage(recipe.getPhotoAuthorUrl());
         loadRecipeImage(recipe.getPhotoUrl());
@@ -109,7 +109,7 @@ public class RecipeDetailsFragment extends Fragment {
         binding.tvRecipeTitle.setText(recipe.getTitle());
         binding.tvRecipeDescription.setText(recipe.getDescription());
         // Checks if the recipe is a user's favourite one.
-        isRecipeFavourite();
+        loadRecipeFavourite();
         // Loads the ingredient and step list.
         loadIngredientList(recipe.getId());
         loadStepList(recipe.getId());
@@ -154,10 +154,12 @@ public class RecipeDetailsFragment extends Fragment {
     /**
      * Checks if the user added to favourites the selected recipe.
      */
-    private void isRecipeFavourite() {
-        detailsViewModel.isRecipeFavourite().observe(getViewLifecycleOwner(), result -> {
+    private void loadRecipeFavourite() {
+        detailsViewModel.loadRecipeAsFavourite().observe(getViewLifecycleOwner(), result -> {
             if (result instanceof Result.Success) {
-                binding.cbFavourite.setChecked(((Result.Success<Boolean>) result).getData());
+                boolean isFavourite = ((Result.Success<Boolean>) result).getData();
+                binding.cbFavourite.setChecked(isFavourite);
+                detailsViewModel.setRecipeAsFavourite(isFavourite);
             }
         });
     }
@@ -169,7 +171,9 @@ public class RecipeDetailsFragment extends Fragment {
         detailsViewModel.addRecipeToFavourites().observe(getViewLifecycleOwner(), result -> {
             if (result instanceof Result.Success) {
                 binding.cbFavourite.setChecked(true);
+                detailsViewModel.setRecipeAsFavourite(true);
             } else {
+                binding.cbFavourite.setChecked(false);
                 Snackbar.make(binding.getRoot(), R.string.add_fav_error, Snackbar.LENGTH_SHORT).show();
             }
         });
@@ -182,7 +186,9 @@ public class RecipeDetailsFragment extends Fragment {
         detailsViewModel.removeRecipeFromFavourites().observe(getViewLifecycleOwner(), result -> {
             if (result instanceof Result.Success) {
                 binding.cbFavourite.setChecked(false);
+                detailsViewModel.setRecipeAsFavourite(false);
             } else {
+                binding.cbFavourite.setChecked(false);
                 Snackbar.make(binding.getRoot(), R.string.remove_fav_error, Snackbar.LENGTH_SHORT).show();
             }
         });

@@ -83,4 +83,6 @@
     <string name="edit_profile_data">Editeu el vostre perfil</string>
     <string name="exit_without_creating">Sortir sense crear?</string>
     <string name="recie_data_lost_warning">Les dades de la recepta es perdran</string>
+    <string name="without_description">Sense descripció</string>
+    <string name="without_title">Sense títol</string>
 </resources>

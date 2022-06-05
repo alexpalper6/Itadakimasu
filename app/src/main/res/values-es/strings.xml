@@ -83,4 +83,6 @@
     <string name="edit_profile_data">Edita tu perfil</string>
     <string name="exit_without_creating">¿Salir sin crear?</string>
     <string name="recie_data_lost_warning">Los datos de esta receta se borrarán</string>
+    <string name="without_description">Sin descripción</string>
+    <string name="without_title">Sin título</string>
 </resources>

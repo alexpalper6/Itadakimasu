@@ -110,7 +110,7 @@ public class RecipeDetailsViewModel extends AndroidViewModel {
      * Checks if the user has this recipe added as favourite, using the auth user's username and recipe's id.
      * @return boolean true if is favourite, false if not; error if something wrong happens.
      */
-    public LiveData<Result<?>> isRecipeFavourite() {
+    public LiveData<Result<?>> loadRecipeAsFavourite() {
         return favouritesRepository.findFavouriteRecipe(getAuthUsername(), selectedRecipe.getValue().getId());
     }
 
@@ -160,5 +160,20 @@ public class RecipeDetailsViewModel extends AndroidViewModel {
      */
     public String getAuthUsername() {
         return sharedPrefRepository.getAuthUsername();
+    }
+
+    /**
+     * @return the recipe is addes as favourite of not.
+     */
+    public boolean isRecipeFavourite() {
+        return selectedRecipe.getValue().isFavourite();
+    }
+
+    /**
+     * Sets if the recipe is added to favourites or not.
+     * @param state - true if it's added to favourites; false if else.
+     */
+    public void setRecipeAsFavourite(boolean state) {
+        selectedRecipe.getValue().setFavourite(state);
     }
 }

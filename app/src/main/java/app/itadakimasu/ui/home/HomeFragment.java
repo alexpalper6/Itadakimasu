@@ -147,11 +147,11 @@ public class HomeFragment extends Fragment {
             setDataIsRetrieved();
             if (result instanceof Result.Success) {
                 homeViewModel.markRecipeFavouriteAt(recipePosition, false);
-                // Notifies the adapter that the item state changed.
-                adapter.notifyItemChanged(recipePosition);
             } else {
                 Snackbar.make(binding.getRoot(), R.string.remove_fav_error, Snackbar.LENGTH_SHORT).show();
             }
+            // Notifies the adapter that the item state changed.
+            adapter.notifyItemChanged(recipePosition);
         });
     }
 
@@ -165,11 +165,11 @@ public class HomeFragment extends Fragment {
             setDataIsRetrieved();
             if (result instanceof Result.Success) {
                 homeViewModel.markRecipeFavouriteAt(recipePosition, true);
-                // Notifies the adapter that the item state changed.
-                adapter.notifyItemChanged(recipePosition);
             } else {
                 Snackbar.make(binding.getRoot(), R.string.add_fav_error, Snackbar.LENGTH_SHORT).show();
             }
+            // Notifies the adapter that the item state changed.
+            adapter.notifyItemChanged(recipePosition);
         });
     }
 
