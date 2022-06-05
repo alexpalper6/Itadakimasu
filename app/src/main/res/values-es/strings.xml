@@ -18,7 +18,7 @@
     <string name="sign_out">Cerrar sesión</string>
     <string name="action_sign_up">¿Eres nuevo? ¡Regístrate!</string>
     <string name="create_account">Crear Cuenta</string>
-    <string name="welcome">¡Te damos la bienvenida, %1$s!</string>
+    <string name="welcome">¡Bienvenido, %1$s!</string>
     <string name="prompt_add_photo">¡Termina configurado tu perfil añadiendo una foto!</string>
     <string name="add_photo_info">Añade la foto tocando la imagen</string>
     <string name="invalid_email">Email no válido</string>

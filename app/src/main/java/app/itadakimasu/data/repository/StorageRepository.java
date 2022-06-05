@@ -1,13 +1,19 @@
 package app.itadakimasu.data.repository;
 
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 
+import com.google.firebase.FirebaseException;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageException;
 import com.google.firebase.storage.StorageReference;
+
+import java.io.IOException;
 
 import app.itadakimasu.data.Result;
 
@@ -122,7 +128,11 @@ public class StorageRepository {
         dbStorage.getReference(imageUrl).getDownloadUrl().addOnSuccessListener(uri -> result.setValue(new Result.Success(uri)))
                 .addOnFailureListener(failure -> {
                     Log.e(TAG, "getImageUri: error downloading image's data", failure);
-                    result.setValue(new Result.Error(failure));
+                    if ( ((StorageException) failure).getErrorCode() == StorageException.ERROR_OBJECT_NOT_FOUND) {
+                        result.setValue(new Result.Success<Uri>(null));
+                    } else {
+                        result.setValue(new Result.Error(failure));
+                    }
                 });
 
         return result;

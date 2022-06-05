@@ -18,7 +18,7 @@
     <string name="sign_out">Tancar sessió</string>
     <string name="action_sign_up">Ets nou? Registra\'t!</string>
     <string name="create_account">Crear compte</string>
-    <string name="welcome">Et donem la nouvinguda, %1$s!</string>
+    <string name="welcome">Benvingut, %1$s!</string>
     <string name="prompt_add_photo">Acava configurant el teu perfil afegint una foto!</string>
     <string name="add_photo_info">Afegeix una fotografia tocant la imatge</string>
     <string name="invalid_email">Email no vàlid</string>
