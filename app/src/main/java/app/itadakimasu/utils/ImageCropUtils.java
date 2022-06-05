@@ -16,7 +16,7 @@ public class ImageCropUtils {
      */
     public static CropImageContractOptions getProfilePictureGalleryOptions() {
         return new CropImageContractOptions(null, new CropImageOptions())
-                .setCropMenuCropButtonIcon(R.drawable.ic_baseline_done_24)
+                .setCropMenuCropButtonIcon(R.drawable.ic_baseline_done_crop_24)
                 .setImageSource(true, false)
                 .setFixAspectRatio(true)
                 .setCropShape(CropImageView.CropShape.OVAL)
@@ -29,7 +29,7 @@ public class ImageCropUtils {
      */
     public static CropImageContractOptions getProfilePictureCameraOptions() {
         return new CropImageContractOptions(null, new CropImageOptions())
-                .setCropMenuCropButtonIcon(R.drawable.ic_baseline_done_24)
+                .setCropMenuCropButtonIcon(R.drawable.ic_baseline_done_crop_24)
                 .setImageSource(false, true)
                 .setFixAspectRatio(true)
                 .setCropShape(CropImageView.CropShape.OVAL)
@@ -42,7 +42,7 @@ public class ImageCropUtils {
      */
     public static CropImageContractOptions getRecipePictureGalleryOptions() {
         return new CropImageContractOptions(null, new CropImageOptions())
-                .setCropMenuCropButtonIcon(R.drawable.ic_baseline_done_24)
+                .setCropMenuCropButtonIcon(R.drawable.ic_baseline_done_crop_24)
                 .setImageSource(true, false)
                 .setFixAspectRatio(false)
                 .setCropShape(CropImageView.CropShape.RECTANGLE)
@@ -55,7 +55,7 @@ public class ImageCropUtils {
      */
     public static CropImageContractOptions getRecipePictureCameraOptions() {
         return new CropImageContractOptions(null, new CropImageOptions())
-                .setCropMenuCropButtonIcon(R.drawable.ic_baseline_done_24)
+                .setCropMenuCropButtonIcon(R.drawable.ic_baseline_done_crop_24)
                 .setImageSource(false, true)
                 .setFixAspectRatio(false)
                 .setCropShape(CropImageView.CropShape.RECTANGLE)
