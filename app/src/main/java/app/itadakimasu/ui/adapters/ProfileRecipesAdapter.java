@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.firebase.storage.StorageReference;
 
 import app.itadakimasu.R;
 import app.itadakimasu.data.Result;
@@ -204,7 +203,7 @@ class ProfileRecipesViewHolder extends RecyclerView.ViewHolder {
      * @param uriImage - the downloaded image's uri.
      */
     public void setRecipeImage(Uri uriImage) {
-        Glide.with(ivRecipeImage.getContext()).load(uriImage).centerCrop().into(ivRecipeImage);
+        Glide.with(ivRecipeImage.getContext()).load(uriImage).error(R.drawable.ic_baseline_image_not_supported_24).centerCrop().into(ivRecipeImage);
     }
 
     /**

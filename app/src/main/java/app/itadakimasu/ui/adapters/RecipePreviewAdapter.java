@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.firebase.storage.StorageReference;
 
+import app.itadakimasu.R;
 import app.itadakimasu.data.Result;
 import app.itadakimasu.data.model.Recipe;
 import app.itadakimasu.data.repository.SharedPrefRepository;
@@ -212,7 +212,7 @@ class RecipePreviewViewHolder extends RecyclerView.ViewHolder {
      * @param uriImage - the downloaded image's uri.
      */
     public void setRecipeImage(Uri uriImage) {
-        Glide.with(ivRecipeImage.getContext()).load(uriImage).centerCrop().into(ivRecipeImage);
+        Glide.with(ivRecipeImage.getContext()).load(uriImage).error(R.drawable.ic_baseline_image_not_supported_24).centerCrop().into(ivRecipeImage);
     }
 
     /**
@@ -236,7 +236,7 @@ class RecipePreviewViewHolder extends RecyclerView.ViewHolder {
      * @param uriImage - the downloaded image's uri.
      */
     public void setUserImage(Uri uriImage) {
-        Glide.with(ivUserImage.getContext()).load(uriImage).circleCrop().into(ivUserImage);
+        Glide.with(ivUserImage.getContext()).load(uriImage).error(R.drawable.ic_default_user_profile).circleCrop().into(ivUserImage);
     }
 
     /**
